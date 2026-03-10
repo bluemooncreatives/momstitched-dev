@@ -5,8 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp';
-import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute';
+import { WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute';
 import './FeaturedProduct.css';
 
 // Assign sizes in a repeating pattern for the row layout
@@ -61,33 +62,57 @@ const FeaturedProduct = () => {
     // GSAP clip-path reveal + hover effects (from stefan-markovic portfolio)
     useGSAP(() => {
         if (!imagesLoaded || !containerRef.current) return;
+        gsap.registerPlugin(ScrollTrigger);
 
         const cols = containerRef.current.querySelectorAll('.fp-col');
+        const hoverHandlers = [];
 
-        // Clip-path reveal animation on load
-        gsap.to(cols, {
+        // Reveal animation starts when section scrolls into view
+        gsap.fromTo(cols, {
+            y: 120,
+            opacity: 0,
+            clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)',
+        }, {
+            y: 0,
+            opacity: 1,
             clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)',
-            duration: 1.5,
-            delay: 0.3,
+            duration: 1.2,
             ease: 'power4.out',
-            stagger: 0.1,
+            stagger: 0.12,
+            scrollTrigger: {
+                trigger: containerRef.current,
+                start: 'top 75%',
+                once: true,
+            },
         });
 
         // Hover effects: image scale + title slide
         cols.forEach((col) => {
             const img = col.querySelector('img');
             const titleEl = col.querySelector('.fp-project-title h3');
+            if (!img) return;
 
-            col.addEventListener('mouseenter', () => {
+            const onEnter = () => {
                 gsap.to(img, { scale: 1.25, duration: 2, ease: 'power4.out' });
                 if (titleEl) gsap.to(titleEl, { y: 0, duration: 1, ease: 'power4.out' });
-            });
+            };
 
-            col.addEventListener('mouseleave', () => {
+            const onLeave = () => {
                 gsap.to(img, { scale: 1, duration: 2, ease: 'power4.out' });
                 if (titleEl) gsap.to(titleEl, { y: 28, duration: 1, ease: 'power4.out' });
-            });
+            };
+
+            col.addEventListener('mouseenter', onEnter);
+            col.addEventListener('mouseleave', onLeave);
+            hoverHandlers.push({ col, onEnter, onLeave });
         });
+
+        return () => {
+            hoverHandlers.forEach(({ col, onEnter, onLeave }) => {
+                col.removeEventListener('mouseenter', onEnter);
+                col.removeEventListener('mouseleave', onLeave);
+            });
+        };
     }, { scope: containerRef, dependencies: [imagesLoaded] });
 
     // Build rows of 3 products
@@ -161,6 +186,16 @@ const FeaturedProduct = () => {
         <section className="fp-section bg-white" ref={containerRef}>
             <div className="fp-container">
                 {imagesLoaded && renderProductRows()}
+                {imagesLoaded && (
+                    <div className="mt-4 flex justify-center">
+                        <Link
+                            href={WEBSITE_SHOP}
+                            className="inline-flex items-center justify-center rounded-full border border-black px-8 py-3 text-sm font-semibold uppercase tracking-wide transition-colors duration-300 hover:bg-black hover:text-white"
+                        >
+                            Shop All Products
+                        </Link>
+                    </div>
+                )}
             </div>
         </section>
     );

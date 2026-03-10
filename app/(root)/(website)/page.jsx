@@ -4,11 +4,10 @@ import CategorySection from '@/components/Application/Website/CategorySection'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import banner1 from '@/public/assets/images/banner1.png'
-import banner2 from '@/public/assets/images/banner2.png'
 import FeaturedProduct from '@/components/Application/Website/FeaturedProduct'
 import advertisingBanner from '@/public/assets/images/advertising-banner.png'
 import Testimonial from '@/components/Application/Website/Testimonial'
+import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 
 import { GiReturnArrow } from "react-icons/gi";
 import { FaShippingFast } from "react-icons/fa";
@@ -69,6 +68,14 @@ const Home = () => {
                         <h3 className='text-xl font-semibold'>Member Discounts</h3>
                         <p>Special offers for our loyal customers.</p>
                     </div>
+                </div>
+                <div className='mt-10 flex justify-center'>
+                    <Link
+                        href={WEBSITE_SHOP}
+                        className='inline-flex items-center justify-center rounded-full border border-black px-8 py-3 text-sm font-semibold uppercase tracking-wide transition-colors duration-300 hover:bg-black hover:text-white'
+                    >
+                        Shop All Products
+                    </Link>
                 </div>
             </section>
 
