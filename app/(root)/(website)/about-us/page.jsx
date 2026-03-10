@@ -1,39 +1,223 @@
-import WebsiteBreadcrumb from '@/components/Application/Website/WebsiteBreadcrumb'
-import React from 'react'
+"use client";
 
-const breadcrumb = {
- title: 'About',
- links: [
-   { label: 'About' },
- ]
-}
-const AboutUs = () => {
- return (
-   <div>
-     <WebsiteBreadcrumb props={breadcrumb} />
-     <div className='lg:px-40 px-5 py-20'>
-       <h1 className='text-xl font-semibold mb-3'>About Us</h1>
-       <p>Welcome to E-store, your one-stop destination for quality, convenience, and innovation in online shopping.</p>
-       <p>Founded with a mission to redefine the eCommerce experience, we are passionate about bringing you a carefully curated selection of products that meet your everyday needs—whether it's fashion, electronics, home essentials, beauty, or lifestyle goods. Our goal is to deliver not just products, but value, trust, and a seamless shopping journey.</p>
-       <p className='mt-5'>What sets us apart is our commitment to:</p>
-       <ul className='list-disc ps-10 mt-3'>
-         <li> <b> Customer Satisfaction:</b> Your happiness is our priority. From browsing to checkout, we&apos;re here to make your shopping experience effortless and enjoyable.</li>
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import CustomEase from "gsap/CustomEase";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import SplitType from "@/lib/SplitType/index";
+import styles from "./about-us.module.css";
+import { cvItems } from "./cvItems";
 
-         <li>  <b> Quality & Affordability: </b>We partner directly with trusted suppliers and brands to offer high-quality products at competitive prices.</li>
+const AboutUsPage = () => {
+  const container = useRef();
+  const aboutCopyRef = useRef(null);
+  const cvWrapperRef = useRef(null);
+  const cvHeaderRef = useRef(null);
+  const cvListRef = useRef(null);
+  const heroImgRef = useRef(null);
 
-         <li> <b>  Fast & Reliable Shipping: </b>We understand the excitement of online shopping, so we work hard to ensure your orders arrive on time.</li>
+  useEffect(() => {
+    gsap.registerPlugin(CustomEase, ScrollTrigger);
+    CustomEase.create(
+      "hop",
+      "M0,0 C0.354,0 0.464,0.133 0.498,0.502 0.532,0.872 0.651,1 1,1"
+    );
 
-         <li>  <b> Secure Shopping: </b>Your data is safe with us. Our platform uses cutting-edge encryption and payment security technologies.</li>
-       </ul>
+    const splitInstances = [];
+    const pageTriggers = [];
 
-       <p className='mt-3'>As a growing brand, we believe in constantly evolving—adding new products, improving our services, and listening to what our customers want. Whether you're shopping for yourself or finding the perfect gift, we&apos;re here to help you discover something you'll love.
-       </p>
-       <p className='mt-3'>
-       Thank you for choosing E-store. Let&apos;s make shopping smarter, simpler, and more enjoyable—together.
-       </p>
-     </div>
-   </div>
- )
-}
+    const applySplitType = (element) => {
+      const splitTexts = element.querySelectorAll("h1, h2, h3");
 
-export default AboutUs
+      splitTexts.forEach((text) => {
+        const split = new SplitType(text, {
+          types: "lines",
+          tagName: "span",
+        });
+
+        splitInstances.push(split);
+
+        split.lines.forEach((line) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = styles.lineWrapper;
+          line.parentNode.insertBefore(wrapper, line);
+          wrapper.appendChild(line);
+        });
+      });
+    };
+
+    if (aboutCopyRef.current) {
+      applySplitType(aboutCopyRef.current);
+
+      gsap.to(
+        aboutCopyRef.current.querySelectorAll(`.${styles.lineWrapper} > span`),
+        {
+          y: 0,
+          stagger: 0.05,
+          delay: 1.5,
+          duration: 1.5,
+          ease: "power4.out",
+        }
+      );
+    }
+
+    if (cvHeaderRef.current) {
+      applySplitType(cvHeaderRef.current);
+    }
+
+    if (cvListRef.current) {
+      applySplitType(cvListRef.current);
+    }
+
+    if (cvWrapperRef.current) {
+      const cvHeaderSpans = cvHeaderRef.current.querySelectorAll(
+        `.${styles.lineWrapper} > span`
+      );
+      const cvListSpans = cvListRef.current.querySelectorAll(
+        `.${styles.lineWrapper} > span`
+      );
+
+      gsap.set([cvHeaderSpans, cvListSpans], { y: "100%" });
+
+      const cvTrigger = ScrollTrigger.create({
+        trigger: cvWrapperRef.current,
+        start: "top 50%",
+        onEnter: () => {
+          gsap.to(cvHeaderSpans, {
+            y: 0,
+            stagger: 0.05,
+            duration: 1.5,
+            ease: "power4.out",
+          });
+
+          gsap.to(cvListSpans, {
+            y: 0,
+            stagger: 0.02,
+            duration: 1.5,
+            ease: "power4.out",
+          });
+        },
+      });
+
+      pageTriggers.push(cvTrigger);
+    }
+
+    if (heroImgRef.current) {
+      const heroTrigger = ScrollTrigger.create({
+        trigger: heroImgRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: true,
+        onUpdate: (self) => {
+          const scale = 1 + self.progress * 0.5;
+
+          gsap.to(heroImgRef.current.querySelector("img"), {
+            scale,
+            ease: "none",
+            duration: 0.1,
+          });
+        },
+      });
+
+      pageTriggers.push(heroTrigger);
+    }
+
+    return () => {
+      splitInstances.forEach((split) => split.revert());
+      pageTriggers.forEach((trigger) => trigger.kill());
+    };
+  }, []);
+
+  useGSAP(
+    () => {
+      gsap.to(`.${styles.aboutPortrait}`, {
+        clipPath: "polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)",
+        delay: 0.8,
+        duration: 1,
+        ease: "hop",
+      });
+
+      gsap.to(`.${styles.aboutCopyTitle} h1`, {
+        y: 0,
+        delay: 1,
+        duration: 1.5,
+        ease: "power4.out",
+      });
+    },
+    { scope: container }
+  );
+
+  return (
+    <div className={styles.aboutPage} ref={container}>
+      <div className={styles.container}>
+        <div className={styles.aboutIntro}>
+          <div className={styles.aboutPortraitImg}>
+            <div className={styles.aboutPortrait}>
+              <img src="/about/portrait-min.jpg" alt="Portrait" />
+            </div>
+          </div>
+
+          <div className={styles.aboutCopyWrapper}>
+            <div className={styles.aboutCopyTitle}>
+              <h1>About Us</h1>
+            </div>
+
+            <div className={styles.aboutCopy} ref={aboutCopyRef}>
+              <h3>
+                Passionate about crafting immersive digital experiences, Stefan
+                Markovic blends design and code to push the boundaries of
+                what&apos;s possible on the web. His approach focuses on creating
+                seamless, responsive, and engaging interfaces that leave a
+                lasting impact.
+              </h3>
+              <br />
+              <h3>
+                With a strong foundation in JavaScript, React, and modern web
+                technologies, Stefan excels at turning complex ideas into
+                interactive realities. Whether it&apos;s a sleek portfolio site, a
+                dynamic web app, or a mesmerizing animation, he approaches each
+                project with creativity and technical precision.
+              </h3>
+              <br />
+              <h3>
+                Driven by curiosity and innovation, Stefan constantly explores
+                new tools, techniques, and frameworks. He&apos;s not just a
+                developer - he&apos;s a problem solver, ready to bring your vision
+                to
+                life with a unique and modern touch.
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.aboutHeroImg} ref={heroImgRef}>
+        <img src="/about/portrait-2-min.jpg" alt="Portrait" />
+      </div>
+
+      <div className={styles.container}>
+        <div className={styles.cvWrapper} ref={cvWrapperRef}>
+          <div className={styles.cvHeader} ref={cvHeaderRef}>
+            <h2>CV</h2>
+          </div>
+
+          <div ref={cvListRef}>
+            {cvItems.map((item, index) => (
+              <div className={styles.cvItem} key={index}>
+                <div className={styles.cvName}>
+                  <h3>{item.name}</h3>
+                </div>
+                <div className={styles.cvYear}>
+                  <h3>{item.year}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AboutUsPage;

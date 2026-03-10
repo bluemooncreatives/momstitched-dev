@@ -1,13 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import FeaturedProductLarge from './FeaturedProductLarge';
-import FeaturedProductSmall from './FeaturedProductSmall';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import imgPlaceholder from '@/public/assets/images/img-placeholder.webp';
+import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute';
+import './FeaturedProduct.css';
+
+// Assign sizes in a repeating pattern for the row layout
+const sizePattern = ['lg', 'sm', 'lg', 'sm', 'lg', 'lg', 'lg', 'lg', 'sm'];
 
 const FeaturedProduct = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [imagesLoaded, setImagesLoaded] = useState(false);
+    const containerRef = useRef(null);
 
     useEffect(() => {
         const fetchFeaturedProducts = async () => {
@@ -32,29 +42,104 @@ const FeaturedProduct = () => {
         fetchFeaturedProducts();
     }, []);
 
+    // Preload images before revealing
+    useEffect(() => {
+        if (!products.length) return;
+
+        const imagePromises = products.map((product) => {
+            return new Promise((resolve) => {
+                const img = new window.Image();
+                img.src = product?.media?.[0]?.secure_url || imgPlaceholder.src;
+                img.onload = resolve;
+                img.onerror = resolve;
+            });
+        });
+
+        Promise.all(imagePromises).then(() => setImagesLoaded(true));
+    }, [products]);
+
+    // GSAP clip-path reveal + hover effects (from stefan-markovic portfolio)
+    useGSAP(() => {
+        if (!imagesLoaded || !containerRef.current) return;
+
+        const cols = containerRef.current.querySelectorAll('.fp-col');
+
+        // Clip-path reveal animation on load
+        gsap.to(cols, {
+            clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)',
+            duration: 1.5,
+            delay: 0.3,
+            ease: 'power4.out',
+            stagger: 0.1,
+        });
+
+        // Hover effects: image scale + title slide
+        cols.forEach((col) => {
+            const img = col.querySelector('img');
+            const titleEl = col.querySelector('.fp-project-title h3');
+
+            col.addEventListener('mouseenter', () => {
+                gsap.to(img, { scale: 1.25, duration: 2, ease: 'power4.out' });
+                if (titleEl) gsap.to(titleEl, { y: 0, duration: 1, ease: 'power4.out' });
+            });
+
+            col.addEventListener('mouseleave', () => {
+                gsap.to(img, { scale: 1, duration: 2, ease: 'power4.out' });
+                if (titleEl) gsap.to(titleEl, { y: 28, duration: 1, ease: 'power4.out' });
+            });
+        });
+    }, { scope: containerRef, dependencies: [imagesLoaded] });
+
+    // Build rows of 3 products
+    const renderProductRows = useCallback(() => {
+        const rows = [];
+        for (let i = 0; i < products.length; i += 3) {
+            const rowProducts = products.slice(i, i + 3);
+            rows.push(
+                <div className="fp-row" key={i}>
+                    {rowProducts.map((product, index) => {
+                        const size = sizePattern[(i + index) % sizePattern.length];
+                        return (
+                            <div className={`fp-col ${size}`} key={product._id}>
+                                <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)}>
+                                    <Image
+                                        src={product?.media?.[0]?.secure_url || imgPlaceholder.src}
+                                        fill
+                                        alt={product?.name || 'Product'}
+                                        className="object-cover object-center"
+                                        sizes="(max-width: 900px) 100vw, 33vw"
+                                    />
+                                    <div className="fp-project-title">
+                                        <h3>{product?.name}</h3>
+                                        <span>₹{product?.sellingPrice?.toLocaleString('en-IN')}</span>
+                                    </div>
+                                </Link>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        }
+        return rows;
+    }, [products]);
+
     if (loading) {
         return (
-            <section className='py-16 lg:py-10 bg-[#FFECD1]'>
-                <div className='max-w mx-auto px-4 lg:px-8'>
-                    <div className='grid grid-cols-2 gap-4 lg:gap-6'>
-                        {/* Left Column Loading */}
-                        <div className='col-span-1'>
-                            <div className='bg-gray-300 rounded-sm animate-pulse mb-3' style={{ aspectRatio: '1 / 1.29' }}></div>
-                            <div className='grid grid-cols-2 gap-3'>
-                                <div className='bg-gray-300 rounded-sm animate-pulse' style={{ aspectRatio: '1 / 1.15' }}></div>
-                                <div className='bg-gray-300 rounded-sm animate-pulse' style={{ aspectRatio: '1 / 1.15' }}></div>
-                            </div>
+            <section className="fp-section bg-white">
+                <div className="fp-container">
+                    {[0, 1, 2].map((rowIdx) => (
+                        <div className="fp-row" key={rowIdx}>
+                            {[0, 1, 2].map((colIdx) => (
+                                <div
+                                    key={colIdx}
+                                    className={`fp-col-skeleton ${colIdx === 1 ? 'sm' : 'lg'}`}
+                                    style={{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
+                                >
+                                    <div className="bg-gray-700 animate-pulse w-full h-full rounded-sm" />
+                                </div>
+                            ))}
                         </div>
-
-                        {/* Right Column Loading */}
-                        <div className='col-span-1'>
-                            <div className='grid grid-cols-2 gap-3 lg:gap-4'>
-                                {[...Array(6)].map((_, i) => (
-                                    <div key={i} className='bg-gray-300 rounded-sm animate-pulse' style={{ aspectRatio: '1 / 1.15' }}></div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </section>
         );
@@ -62,9 +147,9 @@ const FeaturedProduct = () => {
 
     if (error || !products.length) {
         return (
-            <section className='bg-[#FFECD1] py-16 lg:py-10'>
-                <div className='max-w mx-auto px-4 lg:px-8'>
-                    <div className='text-center py-12 text-gray-600'>
+            <section className="fp-section bg-white">
+                <div className="fp-container">
+                    <div className="text-center py-12 text-gray-400">
                         {error || 'No featured products available'}
                     </div>
                 </div>
@@ -72,47 +157,10 @@ const FeaturedProduct = () => {
         );
     }
 
-    // Split products: 1 large + 2 bottom + 6 right grid
-    const featuredProduct = products[0];
-    const bottomLeftProducts = products.slice(1, 3);
-    const rightGridProducts = products.slice(3, 9);
-
     return (
-        <section className='bg-[#FFECD1] py-16 lg:py-10'>
-            <div className='max-w mx-auto px-4 lg:px-10'>
-                {/* Main Grid: 50% Left | 50% Right */}
-                <div className='grid grid-cols-2 gap-4 lg:gap-8'>
-                    {/* LEFT COLUMN (50%) */}
-                    <div className='col-span-1'>
-                        {/* Top: Large Featured Product */}
-                        {featuredProduct && (
-                            <div className='mb-3 lg:mb-4'>
-                                <FeaturedProductLarge product={featuredProduct} />
-                            </div>
-                        )}
-
-                        {/* Bottom: Two Small Products */}
-                        <div className='grid grid-cols-2 gap-3 lg:gap-4'>
-                            {bottomLeftProducts.map((product) => (
-                                <div key={product._id}>
-                                    <FeaturedProductSmall product={product} />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* RIGHT COLUMN (50%) */}
-                    <div className='col-span-1'>
-                        {/* Grid of 6 products (2 columns x 3 rows) */}
-                        <div className='grid grid-cols-2 gap-3 lg:gap-4'>
-                            {rightGridProducts.map((product) => (
-                                <div key={product._id}>
-                                    <FeaturedProductSmall product={product} />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+        <section className="fp-section bg-white" ref={containerRef}>
+            <div className="fp-container">
+                {imagesLoaded && renderProductRows()}
             </div>
         </section>
     );
