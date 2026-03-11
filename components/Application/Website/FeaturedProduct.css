@@ -1,11 +1,11 @@
 /* Portfolio-style Featured Products Grid */
 .fp-section {
-    padding: 4em 0 6em;
+    padding: clamp(2.25rem, 4vw, 3.75rem) 0 clamp(1.25rem, 2vw, 1.75rem);
 }
 
 .fp-container {
     margin: 0 auto;
-    padding: 0 4em;
+    padding: 0 var(--website-gutter);
 }
 
 /* Row layout: 3 items per row */
@@ -129,11 +129,11 @@
     }
 
     .fp-container {
-        padding: 0 1em;
+        padding: 0 var(--website-gutter);
     }
 
     .fp-section {
-        padding: 2em 0 3em;
+        padding: 2em 0 1.25em;
     }
 }
 

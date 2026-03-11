@@ -190,7 +190,7 @@ const FeaturedProduct = () => {
                     <div className="mt-4 flex justify-center">
                         <Link
                             href={WEBSITE_SHOP}
-                            className="inline-flex items-center justify-center rounded-full border border-black px-8 py-3 text-sm font-semibold uppercase tracking-wide transition-colors duration-300 hover:bg-black hover:text-white"
+                            className="inline-flex items-center justify-center rounded-full border border-black bg-transparent px-8 py-3 text-sm font-semibold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-black hover:text-white"
                         >
                             Shop All Products
                         </Link>

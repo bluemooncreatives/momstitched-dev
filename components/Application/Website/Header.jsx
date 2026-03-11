@@ -18,7 +18,7 @@ const mobileExtraLinks = [
 
 const Header = () => {
   return (
-    <div className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4 lg:px-4">
+    <div className="fixed inset-x-0 top-0 z-50 website-gutter pt-3 sm:pt-4">
       <header className="rounded-lg border border-[#00000035] bg-white/90 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80">
         <Navbar
           logo={{

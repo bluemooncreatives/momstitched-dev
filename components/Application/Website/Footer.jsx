@@ -15,7 +15,7 @@ import { USER_DASHBOARD, WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER, WEBSITE_
 const Footer = () => {
     return (
         <footer className='sticky z-0 bottom-0 left-0 w-full bg-gray-50 border-t'>
-            <div className='grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-10 py-10 lg:px-32 px-4'>
+            <div className='grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-10 py-10 website-gutter'>
 
                 <div className='lg:col-span-1 md:col-span-2 col-span-1'>
                     <Image

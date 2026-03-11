@@ -104,6 +104,8 @@ body {
 }
 :root {
   --radius: 0.5rem;
+  --website-gutter: clamp(1rem, 2.8vw, 4rem);
+  --website-content-max: 1280px;
   /* Use PP Neue Montreal as the main sans font for theme variables */
   --font-geist-sans: 'PP Neue Montreal', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   /* Project color palette - exact values from design */
@@ -204,6 +206,18 @@ body {
 
 .font-neue {
   font-family: 'PP Neue Montreal', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.website-gutter {
+  padding-left: var(--website-gutter);
+  padding-right: var(--website-gutter);
+}
+
+.website-content {
+  width: 100%;
+  max-width: var(--website-content-max);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @theme inline {
