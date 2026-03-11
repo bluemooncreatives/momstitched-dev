@@ -21,7 +21,7 @@ const SLIDES = [
     headline: "Mother's Love",
     title: "The Revival Ensemble",
     writeup: "A 12-column rhythm that keeps every element balanced and readable.",
-    src: "/assets/images/hero/01.png",
+    src: "/assets/images/hero/01.jpg",
     alt: "Hero slide one",
   },
   {
@@ -29,7 +29,7 @@ const SLIDES = [
     headline: "Timeless",
     title: "Above The Canvas",
     writeup: "Structured spacing and typography that scale cleanly across breakpoints.",
-    src: "/assets/images/hero/02.jpg",
+    src: "/assets/images/hero/02.png",
     alt: "Hero slide two",
   },
   {
