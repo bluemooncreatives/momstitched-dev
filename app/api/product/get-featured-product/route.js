@@ -1,19 +1,19 @@
-import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import ProductModel from "@/models/Product.model";
-import MediaModel from "@/models/Media.model";
+import { getFeaturedProducts } from "@/lib/services/productService";
+
+const CACHE_HEADERS = {
+    'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+}
 
 export async function GET() {
     try {
-        await connectDB()
+        const getProduct = await getFeaturedProducts()
 
-        const getProduct = await ProductModel.find({ deletedAt: null }).populate('media').limit(9).lean()
-
-        if (!getProduct) {
-            return response(false, 404, 'Product not found.')
+        if (!getProduct || !getProduct.length) {
+            return response(false, 404, 'Product not found.', {}, { headers: CACHE_HEADERS })
         }
 
-        return response(true, 200, 'Product found.', getProduct)
+        return response(true, 200, 'Product found.', getProduct, { headers: CACHE_HEADERS })
 
     } catch (error) {
         return catchError(error)

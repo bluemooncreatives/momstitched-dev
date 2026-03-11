@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import CustomEase from "gsap/CustomEase";
@@ -154,7 +155,15 @@ const AboutUsPage = () => {
         <div className={styles.aboutIntro}>
           <div className={styles.aboutPortraitImg}>
             <div className={styles.aboutPortrait}>
-              <img src="/about/portrait-min.jpg" alt="Portrait" />
+              <Image
+                src="/about/portrait-min.jpg"
+                alt="Portrait"
+                width={960}
+                height={1280}
+                priority
+                sizes="(max-width: 900px) 100vw, 40vw"
+                className={styles.portraitImage}
+              />
             </div>
           </div>
 
@@ -193,7 +202,13 @@ const AboutUsPage = () => {
       </div>
 
       <div className={styles.aboutHeroImg} ref={heroImgRef}>
-        <img src="/about/portrait-2-min.jpg" alt="Portrait" />
+        <Image
+          src="/about/portrait-2-min.jpg"
+          alt="Portrait"
+          fill
+          sizes="100vw"
+          className={styles.heroImage}
+        />
       </div>
 
       <div className={styles.container}>

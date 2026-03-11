@@ -22,11 +22,12 @@
 }
 
 .aboutPortrait {
+  position: relative;
   clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
   overflow: hidden;
 }
 
-.aboutPortrait img {
+.portraitImage {
   width: 100%;
   height: auto;
   display: block;
@@ -68,13 +69,14 @@
 }
 
 .aboutHeroImg {
+  position: relative;
   width: 100%;
   height: 75vh;
   overflow: hidden;
   margin: 8em 0;
 }
 
-.aboutHeroImg img {
+.heroImage {
   width: 100%;
   height: 100%;
   object-fit: cover;

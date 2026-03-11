@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { CustomEase } from "gsap/CustomEase";
@@ -76,13 +77,6 @@ const HeroSection = () => {
   const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
-    SLIDES.forEach((slide) => {
-      const img = new Image();
-      img.src = slide.src;
-    });
-  }, []);
-
-  useEffect(() => {
     try {
       const hasSeenLoader = window.sessionStorage.getItem(LOADER_SESSION_KEY) === "1";
       if (hasSeenLoader) {
@@ -129,6 +123,8 @@ const HeroSection = () => {
         const textureImage = document.createElement("img");
         textureImage.src = slide.src;
         textureImage.alt = slide.alt;
+        textureImage.loading = "lazy";
+        textureImage.decoding = "async";
         textureImage.className = "slide-visual h-full w-full object-cover will-change-transform";
         textureImage.style.transformOrigin = "center center";
         slideElement.appendChild(textureImage);
@@ -463,9 +459,12 @@ const HeroSection = () => {
       <div ref={sliderRef} className="relative h-svh w-full overflow-hidden bg-black text-white">
         <div ref={sliderImagesRef} className="absolute inset-0 h-full w-full">
           <div className="img absolute inset-0 h-full w-full">
-            <img
+            <Image
               src={SLIDES[0].src}
               alt={SLIDES[0].alt}
+              fill
+              priority
+              sizes="100vw"
               className="slide-visual h-full w-full object-cover"
             />
           </div>
@@ -539,7 +538,14 @@ const HeroSection = () => {
                 previewsRef.current[index] = element;
               }}
             >
-              <img src={slide.src} alt={slide.alt} className="h-full w-full object-cover" />
+              <Image
+                src={slide.src}
+                alt={slide.alt}
+                fill
+                priority={index === 0}
+                sizes="(max-width: 1024px) 24vw, 12vw"
+                className="h-full w-full object-cover"
+              />
               <div
                 ref={(element) => {
                   progressBarsRef.current[index] = element;

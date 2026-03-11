@@ -1,12 +1,13 @@
 'use client'
 import { persistor, store } from '@/store/store'
-import React, { Suspense } from 'react'
+import React from 'react'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient()
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 const GlobalProvider = ({ children }) => {
     return (
@@ -16,9 +17,7 @@ const GlobalProvider = ({ children }) => {
                     {children}
                 </PersistGate>
             </Provider>
-            <Suspense fallback={null}>
-                <ReactQueryDevtools initialIsOpen={false} />
-            </Suspense>
+            {isDevelopment ? <ReactQueryDevtools initialIsOpen={false} /> : null}
         </QueryClientProvider>
     )
 }

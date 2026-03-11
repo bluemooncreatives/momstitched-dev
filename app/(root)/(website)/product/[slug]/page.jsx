@@ -1,20 +1,14 @@
-import axios from 'axios'
 import React from 'react'
 import ProductDetails from './ProductDetails'
+import { getProductDetailsBySlug } from '@/lib/services/productService'
 
 const ProductPage = async ({ params, searchParams }) => {
     const { slug } = await params
     const { color, size } = await searchParams
 
-    let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/details/${slug}`
+    const productData = await getProductDetailsBySlug(slug, size, color)
 
-    if (color && size) {
-        url += `?color=${color}&size=${size}`
-    }
-
-    const { data: getProduct } = await axios.get(url)
-
-    if (!getProduct.success) {
+    if (!productData) {
         return (
             <div className='flex justify-center items-center py-10 h-[300px]'>
                 <h1 className='text-4xl font-semibold'>Data not found.</h1>
@@ -24,11 +18,11 @@ const ProductPage = async ({ params, searchParams }) => {
 
         return (
             <ProductDetails
-                product={getProduct?.data?.product}
-                variant={getProduct?.data?.variant}
-                colors={getProduct?.data?.colors}
-                sizes={getProduct?.data?.sizes}
-                reviewCount={getProduct?.data?.reviewCount}
+                product={productData.product}
+                variant={productData.variant}
+                colors={productData.colors}
+                sizes={productData.sizes}
+                reviewCount={productData.reviewCount}
             />
         )
     }

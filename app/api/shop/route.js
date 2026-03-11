@@ -3,6 +3,10 @@ import { catchError, response } from "@/lib/helperFunction";
 import CategoryModel from "@/models/Category.model";
 import ProductModel from "@/models/Product.model";
 
+const CACHE_HEADERS = {
+    'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=180'
+}
+
 export async function GET(request) {
     try {
 
@@ -17,11 +21,13 @@ export async function GET(request) {
         const maxPrice = parseInt(searchParams.get('maxPrice')) || 100000
         const categorySlug = searchParams.get('category')
         const search = searchParams.get('q')
+        const sizeList = size ? size.split(',').filter(Boolean) : []
+        const colorList = color ? color.split(',').filter(Boolean) : []
 
 
 
         // pagination 
-        const limit = parseInt(searchParams.get('limit')) || 9
+        const limit = Math.min(parseInt(searchParams.get('limit')) || 9, 30)
         const page = parseInt(searchParams.get('page')) || 0
         const skip = page * limit
 
@@ -45,7 +51,7 @@ export async function GET(request) {
         }
 
         // match stage  
-        let matchStage = {}
+        let matchStage = { deletedAt: null }
         if (categoryId.length > 0) matchStage.category = { $in: categoryId }  // filter by category   
 
         if (search) {
@@ -62,39 +68,58 @@ export async function GET(request) {
             {
                 $lookup: {
                     from: 'productvariants',
-                    localField: '_id',
-                    foreignField: 'product',
+                    let: { productId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$product', '$$productId'] },
+                                        { $eq: ['$deletedAt', null] },
+                                        sizeList.length > 0 ? { $in: ['$size', sizeList] } : { $literal: true },
+                                        colorList.length > 0 ? { $in: ['$color', colorList] } : { $literal: true },
+                                        { $gte: ['$sellingPrice', minPrice] },
+                                        { $lte: ['$sellingPrice', maxPrice] },
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                color: 1,
+                                size: 1,
+                                mrp: 1,
+                                sellingPrice: 1,
+                                discountPercentage: 1,
+                            }
+                        }
+                    ],
                     as: 'variants'
                 }
             },
             {
-                $addFields: {
-                    variants: {
-                        $filter: {
-                            input: "$variants",
-                            as: 'variant',
-                            cond: {
-                                $and: [
-                                    size ? { $in: ["$$variant.size", size.split(',')] } : { $literal: true },
-                                    color ? { $in: ["$$variant.color", color.split(',')] } : { $literal: true },
-                                    { $gte: ["$$variant.sellingPrice", minPrice] },
-                                    { $lte: ["$$variant.sellingPrice", maxPrice] },
-                                ]
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                $match: {
-                    variants: { $ne: [] }
-                }
+                $match: { 'variants.0': { $exists: true } }
             },
             {
                 $lookup: {
                     from: 'medias',
-                    localField: 'media',
-                    foreignField: '_id',
+                    let: { mediaIds: '$media' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $in: ['$_id', '$$mediaIds']
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                secure_url: 1,
+                                alt: 1
+                            }
+                        }
+                    ],
                     as: 'media'
                 }
             },
@@ -131,7 +156,7 @@ export async function GET(request) {
             products.pop() // remove extra item
         }
 
-        return response(true, 200, 'Product data found.', { products, nextPage })
+        return response(true, 200, 'Product data found.', { products, nextPage }, { headers: CACHE_HEADERS })
 
     } catch (error) {
         return catchError(error)

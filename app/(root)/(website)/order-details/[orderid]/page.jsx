@@ -1,13 +1,14 @@
 import WebsiteBreadcrumb from "@/components/Application/Website/WebsiteBreadcrumb"
-import axios from "axios"
 import Image from "next/image"
 import placeholderImg from '@/public/assets/images/img-placeholder.webp'
 import Link from "next/link"
 import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute"
+import { getOrderDetailsByOrderId } from "@/lib/services/orderService"
 const OrderDetails = async ({ params }) => {
     const { orderid } = await params
-    const { data: orderData } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/orders/get/${orderid}`)
-    console.log(orderData)
+    const order = await getOrderDetailsByOrderId(orderid)
+    const orderData = { success: Boolean(order), data: order }
+
     const breadcrumb = {
         title: 'Order Details',
         links: [{ label: 'Order Details' }]
