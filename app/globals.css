@@ -251,6 +251,7 @@ body {
   --font-sans: 'PP Neue Montreal', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   --font-serif: Georgia, serif;
   --font-mono: JetBrains Mono, monospace;
+  font-family: var(--font-sans);
   --tracking-normal: 0px;
   --spacing: 0.25rem;
 }
