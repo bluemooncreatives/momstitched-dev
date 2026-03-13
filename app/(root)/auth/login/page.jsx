@@ -17,8 +17,7 @@ import { Input } from "@/components/ui/input"
 import { useForm } from 'react-hook-form'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import { z } from 'zod'
-import { FaRegEyeSlash } from "react-icons/fa";
-import { FaRegEye } from "react-icons/fa6";
+import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { USER_DASHBOARD, WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from '@/routes/WebsiteRoute'
 import axios from 'axios'
@@ -139,9 +138,9 @@ const LoginPage = () => {
                                                     </FormControl>
                                                     <button className='absolute top-1/2 right-2 cursor-pointer' type='button' onClick={() => setIsTypePassword(!isTypePassword)}>
                                                         {isTypePassword ?
-                                                            <FaRegEyeSlash />
+                                                            <EyeOff className='size-4' />
                                                             :
-                                                            <FaRegEye />
+                                                            <Eye className='size-4' />
                                                         }
                                                     </button>
                                                     <FormMessage />

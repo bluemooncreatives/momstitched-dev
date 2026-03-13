@@ -3,8 +3,7 @@ import React from 'react'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import { IoStar } from "react-icons/io5";
-import { BsChatQuote } from "react-icons/bs";
+import { Quote, Star } from 'lucide-react'
 
 
 const testimonials = [
@@ -100,13 +99,13 @@ const Testimonial = () => {
                 {testimonials.map((item, index) => (
                     <div key={index} className="p-5">
                         <div className='border rounded-lg p-5'>
-                            <BsChatQuote size={30} className='mb-3' />
+                            <Quote className='mb-3 size-7' />
 
                             <p className='mb-5'>{item.review}</p>
                             <h4 className='font-semibold'>{item.name}</h4>
                             <div className='flex mt-1'>
                                 {Array.from({ length: item.rating }).map((_, i) => (
-                                    <IoStar key={`star${i}`} className='text-yellow-400' size={20} />
+                                    <Star key={`star${i}`} className='text-yellow-400 fill-yellow-400 size-5' />
                                 ))}
                             </div>
 

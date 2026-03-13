@@ -1,7 +1,10 @@
 import AppSidebar from '@/components/Application/Admin/AppSidebar'
+import SkipToMain from '@/components/Application/Admin/SkipToMain'
 import ThemeProvider from '@/components/Application/Admin/ThemeProvider'
 import Topbar from '@/components/Application/Admin/Topbar'
-import { SidebarProvider } from '@/components/ui/sidebar'
+import Main from '@/components/Application/Admin/layout/Main'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import React from 'react'
 
 const layout = ({ children }) => {
@@ -12,19 +15,21 @@ const layout = ({ children }) => {
             enableSystem
             disableTransitionOnChange
         >
-            <SidebarProvider>
-                <AppSidebar />
-                <main className="md:w-[calc(100vw-16rem)] w-full overflow-x-hidden bg-slate-50 text-slate-900" >
-                    <div className='pt-[76px] md:px-10 px-6 min-h-[calc(100vh-40px)] pb-12'>
+            <TooltipProvider delayDuration={100}>
+                <SidebarProvider className="admin-theme bg-background">
+                    <SkipToMain />
+                    <AppSidebar />
+                    <SidebarInset
+                        className="@container/content bg-background has-data-[layout=fixed]:h-svh peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))] md:peer-data-[variant=inset]:rounded-[var(--admin-shell-radius)] md:peer-data-[variant=inset]:overflow-hidden"
+                    >
                         <Topbar />
-                        {children}
-                    </div>
-
-                    <div className='border-t border-slate-200 h-[40px] flex justify-center items-center bg-slate-50 text-sm text-slate-500'>
-                        2026 MomStitched
-                    </div>
-                </main>
-            </SidebarProvider>
+                        <Main id="content">{children}</Main>
+                        <div className='border-t bg-background px-6 py-3 text-center text-sm text-muted-foreground'>
+                            2026 MomStitched Admin
+                        </div>
+                    </SidebarInset>
+                </SidebarProvider>
+            </TooltipProvider>
         </ThemeProvider>
     )
 }

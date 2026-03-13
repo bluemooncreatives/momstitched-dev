@@ -5,7 +5,7 @@ import { logout } from '@/store/reducer/authReducer';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import React from 'react'
-import { AiOutlineLogout } from "react-icons/ai";
+import { LogOut } from 'lucide-react'
 import { useDispatch } from 'react-redux';
 
 const LogoutButton = () => {
@@ -28,7 +28,7 @@ const LogoutButton = () => {
 
     return (
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-            <AiOutlineLogout color='red' />
+            <LogOut className='size-4 text-red-500' />
             Logout
         </DropdownMenuItem>
     )

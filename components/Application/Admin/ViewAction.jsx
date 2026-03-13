@@ -1,18 +1,16 @@
-import { RemoveRedEye } from '@mui/icons-material'
-import { ListItemIcon, MenuItem } from '@mui/material'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { Eye } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
 const ViewAction = ({ href }) => {
     return (
-        <MenuItem key="view"  >
-            <Link className='flex items-center' href={href}>
-                <ListItemIcon>
-                    <RemoveRedEye />
-                </ListItemIcon>
+        <DropdownMenuItem key="view" asChild>
+            <Link className='flex items-center gap-2 cursor-pointer' href={href}>
+                <Eye className='size-4' />
                 View
             </Link>
-        </MenuItem>
+        </DropdownMenuItem>
     )
 }
 

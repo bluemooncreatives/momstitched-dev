@@ -1,10 +1,7 @@
 'use client'
 
-import { ThemeProvider } from "@mui/material"
 import Datatable from "./Datatable"
-import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
-import { darkTheme, lightTheme } from "@/lib/materialTheme"
 
 const DatatableWrapper = ({
     queryKey,
@@ -17,8 +14,6 @@ const DatatableWrapper = ({
     trashView,
     createAction
 }) => {
-
-    const { resolvedTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
@@ -28,19 +23,17 @@ const DatatableWrapper = ({
     if (!mounted) return null
 
     return (
-        <ThemeProvider theme={resolvedTheme === 'dark' ? darkTheme : lightTheme}>
-            <Datatable
-                queryKey={queryKey}
-                fetchUrl={fetchUrl}
-                columnsConfig={columnsConfig}
-                initialPageSize={initialPageSize}
-                exportEndpoint={exportEndpoint}
-                deleteEndpoint={deleteEndpoint}
-                deleteType={deleteType}
-                trashView={trashView}
-                createAction={createAction}
-            />
-        </ThemeProvider>
+        <Datatable
+            queryKey={queryKey}
+            fetchUrl={fetchUrl}
+            columnsConfig={columnsConfig}
+            initialPageSize={initialPageSize}
+            exportEndpoint={exportEndpoint}
+            deleteEndpoint={deleteEndpoint}
+            deleteType={deleteType}
+            trashView={trashView}
+            createAction={createAction}
+        />
     )
 }
 

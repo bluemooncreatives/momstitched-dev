@@ -3,7 +3,7 @@ import React from 'react'
 import usericon from '@/public/assets/images/user.png'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { IoStar } from 'react-icons/io5'
+import { Star } from 'lucide-react'
 
 dayjs.extend(relativeTime);
 const ReviewList = ({ review }) => {
@@ -25,7 +25,7 @@ const ReviewList = ({ review }) => {
                         <span className='font-medium'>{review?.reviewedBy}</span>
                         -
                         <span className='text-gray-500'>{dayjs(review?.createdAt).fromNow()}</span>
-                        <span className='flex items-center text-xs gap-1'>( {review.rating} <IoStar className='text-yellow-500 mb-1' />)</span>
+                        <span className='flex items-center text-xs gap-1'>( {review.rating} <Star className='text-yellow-500 mb-1 size-3.5 fill-yellow-500' />)</span>
                     </p>
                     <p className='mt-3 text-gray-600'>{review?.review}</p>
                 </div>

@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/select"
 import { sortings } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { IoFilter } from "react-icons/io5";
+import { SlidersHorizontal } from 'lucide-react'
 
 const Sorting = ({ limit, setLimit, sorting, setSorting, mobileFilterOpen, setMobileFilterOpen }) => {
     return (
         <div className='flex justify-between items-center flex-wrap gap-2 p-4 bg-gray-50'>
             <Button type="button" className="lg:hidden" variant="outline" onClick={() => setMobileFilterOpen(!mobileFilterOpen)}>
-                <IoFilter />
+                <SlidersHorizontal className='size-4' />
                 Filter
             </Button>
 

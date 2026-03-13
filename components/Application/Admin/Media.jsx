@@ -5,10 +5,7 @@ import { ADMIN_MEDIA_EDIT } from '@/routes/AdminPanelRoute';
 import Image from 'next/image'
 import Link from 'next/link';
 import React from 'react'
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { MdOutlineEdit } from "react-icons/md";
-import { IoIosLink } from "react-icons/io";
-import { LuTrash } from "react-icons/lu";
+import { MoreVertical, Pencil, Link2, Trash2 } from 'lucide-react'
 import { showToast } from '@/lib/showToast';
 
 const Media = ({ media, handleDelete, deleteType, selectedMedia, setSelectedMedia }) => {
@@ -39,30 +36,30 @@ const Media = ({ media, handleDelete, deleteType, selectedMedia, setSelectedMedi
             </div>
 
             <div className='absolute top-2 right-2 z-20'>
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <span className='w-7 h-7 flex items-center justify-center  rounded-full bg-black/50 cursor-pointer'>
-                            <BsThreeDotsVertical color='#fff' />
-                        </span>
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                        <button type='button' className='w-7 h-7 flex items-center justify-center rounded-full bg-black/50 text-white cursor-pointer'>
+                            <MoreVertical className='size-4' />
+                        </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
                         {deleteType === 'SD' &&
                             <>
                                 <DropdownMenuItem asChild className="cursor-pointer">
                                     <Link href={ADMIN_MEDIA_EDIT(media._id)}>
-                                        <MdOutlineEdit />
+                                        <Pencil className='size-4' />
                                         Edit
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="cursor-pointer" onClick={() => handleCopyLink(media.secure_url)}>
-                                    <IoIosLink />
+                                    <Link2 className='size-4' />
                                     Copy Link
                                 </DropdownMenuItem>
                             </>
                         }
 
                         <DropdownMenuItem className="cursor-pointer" onClick={() => handleDelete([media._id], deleteType)}>
-                            <LuTrash color='red' />
+                            <Trash2 className='size-4 text-red-500' />
                             {deleteType === 'SD' ? 'Move Into Trash' : 'Delete Permanently'}
                         </DropdownMenuItem>
 

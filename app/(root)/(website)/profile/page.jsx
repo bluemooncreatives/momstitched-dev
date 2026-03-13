@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form'
 import Dropzone from 'react-dropzone'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import userIcon from '@/public/assets/images/user.png'
-import { FaCamera } from "react-icons/fa";
+import { Camera } from 'lucide-react'
 import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
@@ -109,7 +109,7 @@ const Profile = () => {
                                                     <div className='absolute z-50 w-full h-full top-1/2
                                                      left-1/2 -translate-x-1/2 -translate-y-1/2
                                                       justify-center items-center border-2 border-violet-500 rounded-full group-hover:flex hidden cursor-pointer bg-black/20'>
-                                                        <FaCamera color='#7c3aed' />
+                                                        <Camera className='size-4 text-violet-500' />
                                                     </div>
                                                 </Avatar>
                                             </div>

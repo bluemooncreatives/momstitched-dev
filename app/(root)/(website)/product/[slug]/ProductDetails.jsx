@@ -8,14 +8,13 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { IoStar } from "react-icons/io5";
+import { Minus, Plus, Star } from 'lucide-react'
 import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import { decode, encode } from "entities";
-import { HiMinus, HiPlus } from "react-icons/hi2";
 import ButtonLoading from "@/components/Application/ButtonLoading";
 import { useDispatch, useSelector } from "react-redux";
 import { addIntoCart } from "@/store/reducer/cartReducer";
@@ -144,7 +143,7 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
                     <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
                     <div className="flex items-center gap-1 mb-5">
                         {Array.from({ length: 5 }).map((_, i) => (
-                            <IoStar key={i} />
+                            <Star key={i} className='size-4 fill-foreground' />
                         ))}
                         <span className="text-sm ps-2">({reviewCount} Reviews)</span>
                     </div>
@@ -197,11 +196,11 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
                         <div className="flex items-center h-10 border w-fit rounded-full">
 
                             <button type="button" className="h-full w-10 flex justify-center items-center" onClick={() => handleQty('desc')}>
-                                <HiMinus />
+                                <Minus className='size-4' />
                             </button>
                             <input type="text" value={qty} className="w-14 text-center border-none outline-offset-0" readOnly />
                             <button type="button" className="h-full w-10 flex justify-center items-center" onClick={() => handleQty('inc')}>
-                                <HiPlus />
+                                <Plus className='size-4' />
                             </button>
 
                         </div>

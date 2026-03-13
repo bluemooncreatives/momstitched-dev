@@ -1,13 +1,10 @@
 'use client'
 import Link from 'next/link'
 import React from 'react'
-import { BiCategory } from "react-icons/bi";
-import { IoShirtOutline, IoArrowUp, IoArrowDown } from "react-icons/io5";
-import { MdOutlineShoppingBag } from "react-icons/md";
-import { LuUserRound } from "react-icons/lu";
 import useFetch from '@/hooks/useFetch';
 import { ADMIN_CATEGORY_SHOW, ADMIN_CUSTOMERS_SHOW, ADMIN_PRODUCT_SHOW, ADMIN_ORDER_SHOW } from '@/routes/AdminPanelRoute';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { FolderTree, Shirt, UsersRound, ShoppingBag, TrendingUp, TrendingDown } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const CountOverview = () => {
 
     const { data: countData } = useFetch('/api/dashboard/admin/count')
@@ -28,93 +25,60 @@ const CountOverview = () => {
     const customerTrend = getTrendInfo(countData?.data?.customer || 0, countData?.data?.customerPrevious)
     const orderTrend = getTrendInfo(countData?.data?.order || 0, countData?.data?.orderPrevious)
 
+    const cards = [
+        {
+            title: 'Total Categories',
+            value: countData?.data?.category || 0,
+            trend: categoryTrend,
+            href: ADMIN_CATEGORY_SHOW,
+            icon: FolderTree,
+        },
+        {
+            title: 'Total Products',
+            value: countData?.data?.product || 0,
+            trend: productTrend,
+            href: ADMIN_PRODUCT_SHOW,
+            icon: Shirt,
+        },
+        {
+            title: 'Total Customers',
+            value: countData?.data?.customer || 0,
+            trend: customerTrend,
+            href: ADMIN_CUSTOMERS_SHOW,
+            icon: UsersRound,
+        },
+        {
+            title: 'Total Orders',
+            value: countData?.data?.order || 0,
+            trend: orderTrend,
+            href: ADMIN_ORDER_SHOW,
+            icon: ShoppingBag,
+        },
+    ]
+
     return (
-        <div className='grid lg:grid-cols-4 sm:grid-cols-2 gap-6 font-neue'>
-            <Link href={ADMIN_CATEGORY_SHOW}>
-                <div className='p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-white border border-slate-100 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-shadow'>
-                    <div className='space-y-4'>
-                        <div className='flex justify-between items-start'>
-                            <div>
-                                <p className='text-sm font-medium text-slate-600 mb-2'>Total Categories</p>
-                                <span className='text-3xl font-semibold text-slate-900'>{countData?.data?.category || 0}</span>
-                            </div>
-                            <div className='w-10 h-10 flex justify-center items-center rounded-lg bg-blue-50 text-blue-600'>
-                                <BiCategory className='w-5 h-5'/>
-                            </div>
-                        </div>
-                        <p className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1 ${
-                            categoryTrend.isIncreased 
-                                ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        }`}>
-                            {categoryTrend.isIncreased ? <TrendingUp className='w-3 h-3' /> : <TrendingDown className='w-3 h-3' />}
-                            {categoryTrend.text}
-                        </p>
-                    </div>
-                </div>
-            </Link>
-            <Link href={ADMIN_PRODUCT_SHOW}>
-                <div className='p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-white border border-slate-100 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-shadow'>
-                    <div className='space-y-4'>
-                        <div className='flex justify-between items-start'>
-                            <div>
-                                <p className='text-sm font-medium text-slate-600 mb-2'>Total Products</p>
-                                <span className='text-3xl font-semibold text-slate-900'>{countData?.data?.product || 0}</span>
-                            </div>
-                            <div className='w-10 h-10 flex justify-center items-center rounded-lg bg-purple-50 text-purple-600'>
-                                <IoShirtOutline className='w-5 h-5'/>
-                            </div>
-                        </div>
-                        <p className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1 ${
-                            productTrend.isIncreased ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        }`}>
-                            {productTrend.isIncreased ? <TrendingUp className='w-3 h-3' /> : <TrendingDown className='w-3 h-3' />}
-                            {productTrend.text}
-                        </p>
-                    </div>
-                </div>
-            </Link>
-            <Link href={ADMIN_CUSTOMERS_SHOW}>
-                <div className='p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-white border border-slate-100 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-shadow'>
-                    <div className='space-y-4'>
-                        <div className='flex justify-between items-start'>
-                            <div>
-                                <p className='text-sm font-medium text-slate-600 mb-2'>Total Customers</p>
-                                <span className='text-3xl font-semibold text-slate-900'>{countData?.data?.customer || 0}</span>
-                            </div>
-                            <div className='w-10 h-10 flex justify-center items-center rounded-lg bg-orange-50 text-orange-600'>
-                                <LuUserRound className='w-5 h-5'/>
-                            </div>
-                        </div>
-                        <p className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1 ${
-                            customerTrend.isIncreased ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        }`}>
-                            {customerTrend.isIncreased ? <TrendingUp className='w-3 h-3' /> : <TrendingDown className='w-3 h-3' />}
-                            {customerTrend.text}
-                        </p>
-                    </div>
-                </div>
-            </Link>
-            <Link href={ADMIN_ORDER_SHOW}>
-                <div className='p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-white border border-slate-100 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-shadow'>
-                    <div className='space-y-4'>
-                        <div className='flex justify-between items-start'>
-                            <div>
-                                <p className='text-sm font-medium text-slate-600 mb-2'>Total Orders</p>
-                                <span className='text-3xl font-semibold text-slate-900'>{countData?.data?.order || 0}</span>
-                            </div>
-                            <div className='w-10 h-10 flex justify-center items-center rounded-lg bg-cyan-50 text-cyan-600'>
-                                <MdOutlineShoppingBag className='w-5 h-5'/>
-                            </div>
-                        </div>
-                        <p className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1 ${
-                            orderTrend.isIncreased ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        }`}>
-                            {orderTrend.isIncreased ? <TrendingUp className='w-3 h-3' /> : <TrendingDown className='w-3 h-3' />}
-                            {orderTrend.text}
-                        </p>
-                    </div>
-                </div>
-            </Link>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {cards.map((card) => (
+                <Link key={card.title} href={card.href}>
+                    <Card className="transition-shadow hover:shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                            <card.icon className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{card.value}</div>
+                            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                                {card.trend.isIncreased ? (
+                                    <TrendingUp className="h-3 w-3 text-emerald-500" />
+                                ) : (
+                                    <TrendingDown className="h-3 w-3 text-rose-500" />
+                                )}
+                                {card.trend.text}
+                            </p>
+                        </CardContent>
+                    </Card>
+                </Link>
+            ))}
         </div>
     )
 }

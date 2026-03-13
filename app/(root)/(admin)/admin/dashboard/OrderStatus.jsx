@@ -128,27 +128,27 @@ export function OrderStatus() {
             <div>
                 <ul className="space-y-3 text-sm">
                     <li className="flex justify-between items-center">
-                        <span className="text-slate-600">Pending</span>
+                        <span className="text-muted-foreground">Pending</span>
                         <span className="rounded-full px-3 py-1 text-xs font-semibold bg-blue-50 text-blue-600">{statusCount?.pending || 0}</span>
                     </li>
                     <li className="flex justify-between items-center">
-                        <span className="text-slate-600">Processing</span>
+                        <span className="text-muted-foreground">Processing</span>
                         <span className="rounded-full px-3 py-1 text-xs font-semibold bg-amber-50 text-amber-600">{statusCount?.processing || 0}</span>
                     </li>
                     <li className="flex justify-between items-center">
-                        <span className="text-slate-600">Shipped</span>
+                        <span className="text-muted-foreground">Shipped</span>
                         <span className="rounded-full px-3 py-1 text-xs font-semibold bg-cyan-50 text-cyan-600">{statusCount?.shipped || 0}</span>
                     </li>
                     <li className="flex justify-between items-center">
-                        <span className="text-slate-600">Delivered</span>
+                        <span className="text-muted-foreground">Delivered</span>
                         <span className="rounded-full px-3 py-1 text-xs font-semibold bg-emerald-50 text-emerald-600">{statusCount?.delivered || 0}</span>
                     </li>
                     <li className="flex justify-between items-center">
-                        <span className="text-slate-600">Cancelled</span>
+                        <span className="text-muted-foreground">Cancelled</span>
                         <span className="rounded-full px-3 py-1 text-xs font-semibold bg-red-50 text-red-600">{statusCount?.cancelled || 0}</span>
                     </li>
                     <li className="flex justify-between items-center">
-                        <span className="text-slate-600">Unverified</span>
+                        <span className="text-muted-foreground">Unverified</span>
                         <span className="rounded-full px-3 py-1 text-xs font-semibold bg-orange-50 text-orange-600">{statusCount?.unverified || 0}</span>
                     </li>
                 </ul>

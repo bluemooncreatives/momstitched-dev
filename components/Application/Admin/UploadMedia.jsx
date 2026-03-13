@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { showToast } from '@/lib/showToast';
 import axios from 'axios';
 import { CldUploadWidget } from 'next-cloudinary';
-import { FiPlus } from "react-icons/fi";
+import { Plus } from 'lucide-react'
 
 const UploadMedia = ({ isMultiple, queryClient }) => {
 
@@ -58,7 +58,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
             {({ open }) => {
                 return (
                     <Button onClick={() => open()}>
-                        <FiPlus />
+                        <Plus className='size-4' />
                         Upload Media
                     </Button>
                 );

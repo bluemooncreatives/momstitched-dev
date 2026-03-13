@@ -7,19 +7,17 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useTheme } from "next-themes";
-
-import { IoSunnyOutline } from "react-icons/io5";
-import { IoMoonOutline } from "react-icons/io5";
+import { Moon, Sun } from 'lucide-react'
 
 
 const ThemeSwitch = () => {
     const { setTheme } = useTheme()
     return (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
                 <Button type="button" variant="ghost" className="cursor-pointer">
-                    <IoSunnyOutline className="dark:hidden" />
-                    <IoMoonOutline className="hidden dark:block" />
+                    <Sun className="size-4 dark:hidden" />
+                    <Moon className="hidden size-4 dark:block" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>

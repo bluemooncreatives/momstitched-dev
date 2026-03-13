@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { WEBSITE_SHOP } from "@/routes/WebsiteRoute";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { IoSearchOutline } from "react-icons/io5";
+import { Search as SearchIcon } from 'lucide-react'
 
 
 const Search = ({ isShow }) => {
@@ -24,7 +24,7 @@ const Search = ({ isShow }) => {
                     onChange={(e) => setQuery(e.target.value)}
                 />
                 <button type="button" onClick={handleSearch} className="absolute right-3 cursor-pointer">
-                    <IoSearchOutline size={20} className="text-gray-500" />
+                    <SearchIcon className="size-5 text-gray-500" />
                 </button>
             </div>
         </div>

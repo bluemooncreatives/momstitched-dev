@@ -7,10 +7,9 @@ import { zSchema } from '@/lib/zodSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { IoStar } from 'react-icons/io5'
+import { Star } from 'lucide-react'
 import ButtonLoading from '../ButtonLoading'
 import { useSelector } from 'react-redux'
-import { Rating } from '@mui/material'
 import { Textarea } from '@/components/ui/textarea'
 import axios from 'axios'
 import Link from 'next/link'
@@ -19,6 +18,27 @@ import { showToast } from '@/lib/showToast'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import ReviewList from './ReviewList'
 import useFetch from '@/hooks/useFetch'
+
+const StarRatingField = ({ value = 0, onChange }) => {
+    return (
+        <div className='flex items-center gap-1'>
+            {[1, 2, 3, 4, 5].map((star) => {
+                const isFilled = star <= Number(value || 0)
+                return (
+                    <button
+                        key={star}
+                        type='button'
+                        onClick={() => onChange(star)}
+                        className='text-2xl text-amber-500 transition-transform hover:scale-110'
+                        aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                    >
+                        <Star className={`size-6 ${isFilled ? 'fill-amber-500 text-amber-500' : 'text-amber-500'}`} />
+                    </button>
+                )
+            })}
+        </div>
+    )
+}
 
 const ProductReveiw = ({ productId }) => {
     const queryClient = useQueryClient()
@@ -185,11 +205,7 @@ const ProductReveiw = ({ productId }) => {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormControl>
-                                                            <Rating
-                                                                value={field.value}
-                                                                size="large"
-                                                                {...field}
-                                                            />
+                                                            <StarRatingField value={field.value} onChange={field.onChange} />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>

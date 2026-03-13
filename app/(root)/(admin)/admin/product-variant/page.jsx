@@ -3,14 +3,14 @@ import BreadCrumb from "@/components/Application/Admin/BreadCrumb"
 import DatatableWrapper from "@/components/Application/Admin/DatatableWrapper"
 import DeleteAction from "@/components/Application/Admin/DeleteAction"
 import EditAction from "@/components/Application/Admin/EditAction"
+import PageHeader from "@/components/Application/Admin/PageHeader"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { DT_PRODUCT_VARIANT_COLUMN } from "@/lib/column"
 import { columnConfig } from "@/lib/helperFunction"
-import { ADMIN_DASHBOARD, ADMIN_PRODUCT_ADD, ADMIN_PRODUCT_EDIT, ADMIN_PRODUCT_VARIANT_ADD, ADMIN_PRODUCT_VARIANT_EDIT, ADMIN_PRODUCT_VARIANT_SHOW, ADMIN_TRASH } from "@/routes/AdminPanelRoute"
+import { ADMIN_DASHBOARD, ADMIN_PRODUCT_VARIANT_ADD, ADMIN_PRODUCT_VARIANT_EDIT, ADMIN_PRODUCT_VARIANT_SHOW, ADMIN_TRASH } from "@/routes/AdminPanelRoute"
 import Link from "next/link"
 import { useCallback, useMemo } from "react"
-import { FiPlus } from "react-icons/fi"
+import { Plus } from 'lucide-react'
 
 const breadcrumbData = [
     { href: ADMIN_DASHBOARD, label: 'Home' },
@@ -30,33 +30,34 @@ const ShowProductVariant = () => {
     }, [])
 
     return (
-        <div>
-            <BreadCrumb breadcrumbData={breadcrumbData} />
+        <div className="flex flex-col gap-4 sm:gap-6">
+            <PageHeader
+                title="Show Product Variants"
+                description="Keep variant options and stock in sync."
+                breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
+                actions={
+                    <Button asChild>
+                        <Link href={ADMIN_PRODUCT_VARIANT_ADD} className="inline-flex items-center gap-2">
+                            <Plus className="size-4" />
+                            New Variant
+                        </Link>
+                    </Button>
+                }
+            />
 
-            <Card className="py-0 rounded shadow-sm gap-0">
-                <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
-                    <div className="flex justify-between items-center">
-                        <h4 className='text-xl font-semibold'>Show Product Variants</h4>
-                        <Button>
-                            <FiPlus />
-                            <Link href={ADMIN_PRODUCT_VARIANT_ADD}>New Variant</Link>
-                        </Button>
-                    </div>
-                </CardHeader>
-                <CardContent className="px-0 pt-0">
-                    <DatatableWrapper
-                        queryKey="product-variant-data"
-                        fetchUrl="/api/product-variant"
-                        initialPageSize={10}
-                        columnsConfig={columns}
-                        exportEndpoint="/api/product-variant/export"
-                        deleteEndpoint="/api/product-variant/delete"
-                        deleteType="SD"
-                        trashView={`${ADMIN_TRASH}?trashof=product-variant`}
-                        createAction={action}
-                    />
-                </CardContent>
-            </Card>
+            <div className="rounded-md border bg-card">
+                <DatatableWrapper
+                    queryKey="product-variant-data"
+                    fetchUrl="/api/product-variant"
+                    initialPageSize={10}
+                    columnsConfig={columns}
+                    exportEndpoint="/api/product-variant/export"
+                    deleteEndpoint="/api/product-variant/delete"
+                    deleteType="SD"
+                    trashView={`${ADMIN_TRASH}?trashof=product-variant`}
+                    createAction={action}
+                />
+            </div>
         </div>
     )
 }

@@ -33,22 +33,22 @@ const LatestOrder = () => {
     return (
         <Table>
             <TableHeader>
-                <TableRow className="border-b border-slate-200 hover:bg-transparent">
-                    <TableHead className="text-slate-700 font-semibold text-xs">Order Id</TableHead>
-                    <TableHead className="text-slate-700 font-semibold text-xs">Payment Id</TableHead>
-                    <TableHead className="text-slate-700 font-semibold text-xs">Total Item</TableHead>
-                    <TableHead className="text-slate-700 font-semibold text-xs">Status</TableHead>
-                    <TableHead className="text-slate-700 font-semibold text-xs">Amount</TableHead>
+                <TableRow className="group/row">
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Order Id</TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Payment Id</TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Total Item</TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Status</TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Amount</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {latestOrder?.map((order) => (
-                    <TableRow key={order._id} className="border-b border-slate-100 hover:bg-slate-50 text-sm">
-                        <TableCell className="text-slate-700 font-medium py-3">{order._id}</TableCell>
-                        <TableCell className="text-slate-600 py-3">{order.payment_id}</TableCell>
-                        <TableCell className="text-slate-600 py-3">{order.products.length}</TableCell>
-                        <TableCell className="py-3">{statusBadge(order.status)}</TableCell>
-                        <TableCell className="text-slate-900 font-medium py-3">${order.totalAmount}</TableCell>
+                    <TableRow key={order._id} className="group/row text-sm">
+                        <TableCell className="bg-background py-3 font-medium">{order._id}</TableCell>
+                        <TableCell className="bg-background py-3 text-muted-foreground">{order.payment_id}</TableCell>
+                        <TableCell className="bg-background py-3 text-muted-foreground">{order.products.length}</TableCell>
+                        <TableCell className="bg-background py-3">{statusBadge(order.status)}</TableCell>
+                        <TableCell className="bg-background py-3 font-medium">${order.totalAmount}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>

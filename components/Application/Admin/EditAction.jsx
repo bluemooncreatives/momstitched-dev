@@ -1,17 +1,15 @@
-import { ListItemIcon, MenuItem } from '@mui/material'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
 import React from 'react'
-import EditIcon from '@mui/icons-material/Edit';
+import { Pencil } from 'lucide-react'
 const EditAction = ({ href }) => {
     return (
-        <MenuItem key="edit"  >
-            <Link href={href}>
-                <ListItemIcon>
-                    <EditIcon />
-                </ListItemIcon>
+        <DropdownMenuItem key="edit" asChild>
+            <Link href={href} className='flex items-center gap-2 cursor-pointer'>
+                <Pencil className='size-4' />
                 Edit
             </Link>
-        </MenuItem>
+        </DropdownMenuItem>
     )
 }
 

@@ -5,8 +5,7 @@ import useFetch from '@/hooks/useFetch';
 import { WEBSITE_ORDER_DETAILS } from '@/routes/WebsiteRoute';
 import Link from 'next/link';
 import React from 'react'
-import { HiOutlineShoppingBag } from "react-icons/hi2";
-import { IoCartOutline } from "react-icons/io5";
+import { ShoppingBag, ShoppingCart } from 'lucide-react'
 import { useSelector } from 'react-redux';
 
 const breadCrumbData = {
@@ -33,7 +32,7 @@ const MyAccount = () => {
                                     <span className='font-semibold text-gray-500'>{dashboardData?.data?.totalOrder || 0}</span>
                                 </div>
                                 <div className='w-16 h-16 bg-primary rounded-full flex justify-center items-center'>
-                                    <HiOutlineShoppingBag className='text-white' size={25} />
+                                    <ShoppingBag className='text-white size-6' />
                                 </div>
                             </div>
                             <div className='flex items-center justify-between gap-5 border rounded p-3'>
@@ -42,7 +41,7 @@ const MyAccount = () => {
                                     <span className='font-semibold text-gray-500'>{cartStore?.count}</span>
                                 </div>
                                 <div className='w-16 h-16 bg-primary rounded-full flex justify-center items-center'>
-                                    <IoCartOutline className='text-white' size={25} />
+                                    <ShoppingCart className='text-white size-6' />
                                 </div>
                             </div>
                         </div>

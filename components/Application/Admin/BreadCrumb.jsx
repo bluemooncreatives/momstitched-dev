@@ -11,8 +11,9 @@ const BreadCrumb = ({ breadcrumbData }) => {
         <Breadcrumb className="mb-5">
             <BreadcrumbList>
                 {breadcrumbData.length > 0 && breadcrumbData.map((data, index) => {
+                    const isLast = index === breadcrumbData.length - 1
                     return (
-                        index !== breadcrumbData.length - 1
+                        !isLast
                             ?
                             <div key={index} className="flex items-center">
                                 <BreadcrumbItem>
@@ -23,7 +24,7 @@ const BreadCrumb = ({ breadcrumbData }) => {
                             :
                             <div key={index} className="flex items-center">
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink className="font-semibold" href={data.href}>{data.label}</BreadcrumbLink>
+                                    <BreadcrumbPage className="font-semibold">{data.label}</BreadcrumbPage>
                                 </BreadcrumbItem>
                             </div>
                     )

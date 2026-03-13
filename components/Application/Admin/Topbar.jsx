@@ -1,40 +1,52 @@
 'use client'
+'use client'
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import ThemeSwitch from './ThemeSwitch'
 import UserDropdown from './UserDropdown'
-import { Button } from '@/components/ui/button'
-import { RiMenu4Fill } from "react-icons/ri";
-import { useSidebar } from '@/components/ui/sidebar';
 import AdminSearch from './AdminSearch'
-import logoBlack from '@/public/assets/images/logo-black.png'
-import logoWhite from '@/public/assets/images/logo-white.png'
-import Image from 'next/image'
 import AdminMobileSearch from './AdminMobileSearch'
+import Header from './layout/Header'
+import TopNav from './layout/TopNav'
+import { Button } from '@/components/ui/button'
+import { Settings } from 'lucide-react'
+import {
+    ADMIN_CUSTOMERS_SHOW,
+    ADMIN_DASHBOARD,
+    ADMIN_PRODUCT_SHOW,
+    ADMIN_TRASH,
+} from '@/routes/AdminPanelRoute'
+
+const topNav = [
+    { title: 'Overview', href: ADMIN_DASHBOARD },
+    { title: 'Customers', href: ADMIN_CUSTOMERS_SHOW },
+    { title: 'Products', href: ADMIN_PRODUCT_SHOW },
+    { title: 'Settings', href: ADMIN_TRASH },
+]
+
 const Topbar = () => {
-    const { toggleSidebar } = useSidebar()
+    const pathname = usePathname()
+    const links = topNav.map((link) => ({
+        ...link,
+        isActive: pathname === link.href,
+        disabled: link.disabled ?? false,
+    }))
 
     return (
-        <div className='fixed h-16 w-full top-0 left-0 z-30 md:ps-72 md:pe-8 px-5 flex justify-between items-center bg-white backdrop-blur border-b border-slate-100'>
-
-            <div className='flex items-center md:hidden'>
-                <Image src={logoBlack.src} height={50} width={logoBlack.width} className="block dark:hidden h-[50px] w-auto" alt="logo dark" unoptimized />
-                <Image src={logoWhite.src} height={50} width={logoWhite.width} className="hidden dark:block h-[50px] w-auto" alt="logo white" unoptimized />
-            </div>
-            <div className='md:block hidden'>
-                <AdminSearch />
-            </div>
-
-
-            <div className='flex items-center gap-3'>
+        <Header fixed className="border-b bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/70">
+            <TopNav links={links} />
+            <div className="ms-auto flex items-center gap-2">
+                <div className="hidden md:block">
+                    <AdminSearch />
+                </div>
                 <AdminMobileSearch />
                 <ThemeSwitch />
-                <UserDropdown />
-                <Button onClick={toggleSidebar} type="button" size="icon" className="ms-2 md:hidden">
-                    <RiMenu4Fill />
+                <Button variant="ghost" size="icon" aria-label="Settings">
+                    <Settings className="size-4" />
                 </Button>
+                <UserDropdown />
             </div>
-
-        </div>
+        </Header>
     )
 }
 

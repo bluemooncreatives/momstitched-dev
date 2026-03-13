@@ -7,44 +7,45 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import adminLogo from '@/public/assets/images/admin-logo.png'
 import { useSelector } from "react-redux"
 
-import { IoShirtOutline } from "react-icons/io5";
-import { MdOutlineShoppingBag } from "react-icons/md";
+import { PackagePlus, ShoppingBag } from 'lucide-react'
 import Link from "next/link";
 import LogoutButton from "./LogoutButton";
 import { ADMIN_ORDER_SHOW, ADMIN_PRODUCT_ADD } from "@/routes/AdminPanelRoute";
 
 const UserDropdown = () => {
     const auth = useSelector((store) => store.authStore.auth)
+    const avatarSrc = auth?.avatar || ''
     return (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-3 cursor-pointer">
-                    <Avatar className="w-10 h-10">
-                        <AvatarImage src={adminLogo.src} />
+                <button
+                    type="button"
+                    className="flex items-center justify-center rounded-full p-0.5 hover:bg-muted cursor-pointer"
+                    aria-label="Account"
+                >
+                    <Avatar className="h-8 w-8">
+                        <AvatarImage src={avatarSrc} />
+                        <AvatarFallback>{auth?.name?.slice(0, 2)?.toUpperCase() || 'AD'}</AvatarFallback>
                     </Avatar>
-                    <div className="hidden md:block text-left">
-                        <p className="text-sm font-semibold text-slate-900">{auth?.name || 'Admin User'}</p>
-                        <p className="text-xs text-slate-500">{auth?.email || 'admin@mail.com'}</p>
-                    </div>
-                </div>
+                </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="me-5 w-44">
+            <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuLabel>
                     <p className="font-semibold">{auth?.name}</p>
+                    <p className="text-xs text-muted-foreground font-normal">{auth?.email}</p>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link href={ADMIN_PRODUCT_ADD} className="cursor-pointer">
-                        <IoShirtOutline />
+                        <PackagePlus className="size-4" />
                         New Product
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                     <Link href={ADMIN_ORDER_SHOW} className="cursor-pointer">
-                        <MdOutlineShoppingBag />
+                        <ShoppingBag className="size-4" />
                         Orders
                     </Link>
                 </DropdownMenuItem>
