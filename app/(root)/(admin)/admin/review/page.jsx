@@ -34,7 +34,7 @@ const ShowReview = () => {
                 breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
             />
 
-            <div className="rounded-md border bg-card">
+            <div className="rounded-md bg-card">
                 <DatatableWrapper
                     queryKey="review-data"
                     fetchUrl="/api/review"

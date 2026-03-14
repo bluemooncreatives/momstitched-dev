@@ -150,7 +150,7 @@ const EditProduct = ({ params }) => {
         breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
       />
 
-      <div className="rounded-md border bg-card p-4 sm:p-6">
+      <div className="rounded-md bg-card p-4 sm:p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
@@ -301,7 +301,7 @@ const EditProduct = ({ params }) => {
             </div>
 
             <div className="mb-3 mt-5">
-              <ButtonLoading loading={loading} type="submit" text="Save Changes" className="cursor-pointer" />
+              <ButtonLoading loading={loading} type="submit" text="Save Changes" className="h-9 cursor-pointer" size="lg" />
             </div>
           </form>
         </Form>

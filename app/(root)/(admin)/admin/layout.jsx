@@ -24,9 +24,6 @@ const layout = ({ children }) => {
                     >
                         <Topbar />
                         <Main id="content">{children}</Main>
-                        <div className='border-t bg-background px-6 py-3 text-center text-sm text-muted-foreground'>
-                            2026 MomStitched Admin
-                        </div>
                     </SidebarInset>
                 </SidebarProvider>
             </TooltipProvider>

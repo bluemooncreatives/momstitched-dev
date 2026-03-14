@@ -96,7 +96,7 @@ const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
 
                                     {hasNextPage ?
                                         <div className='flex justify-center py-5'>
-                                            <ButtonLoading type="button" onClick={() => fetchNextPage()} loading={isFetching} text="Load More" />
+                                                    <ButtonLoading type="button" onClick={() => fetchNextPage()} loading={isFetching} text="Load More" size="lg" />
                                         </div>
                                         :
                                         <p className='text-center py-5'>Nothing more to load.</p>
@@ -109,15 +109,15 @@ const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
 
                     <div className='h-10 pt-3 border-t flex justify-between'>
                         <div>
-                            <Button type="button" variant="destructive" onClick={handleClear} >
+                            <Button type="button" variant="destructive" size="lg" onClick={handleClear} >
                                 Clear All
                             </Button>
                         </div>
                         <div className='flex gap-5'>
-                            <Button type="button" variant="secondary" onClick={handleClose} >
+                            <Button type="button" variant="secondary" size="lg" onClick={handleClose} >
                                 Close
                             </Button>
-                            <Button type="button" onClick={handleSelect} >
+                            <Button type="button" size="lg" onClick={handleSelect} >
                                 Select
                             </Button>
                         </div>

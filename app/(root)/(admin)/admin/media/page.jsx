@@ -109,14 +109,14 @@ const MediaPage = () => {
                             <UploadMedia isMultiple={true} queryClient={queryClient} />
                         )}
                         {deleteType === 'SD' ? (
-                            <Button type="button" variant="destructive" asChild>
+                            <Button type="button" variant="destructive" asChild size="lg" className="h-9">
                                 <Link href={`${ADMIN_MEDIA_SHOW}?trashof=media`} className="inline-flex items-center gap-2">
                                     <Trash2 className="size-4" />
                                     Trash
                                 </Link>
                             </Button>
                         ) : (
-                            <Button type="button" variant="outline" asChild>
+                            <Button type="button" variant="outline" asChild size="lg" className="h-9">
                                 <Link href={`${ADMIN_MEDIA_SHOW}`} className="inline-flex items-center gap-2">
                                     <ArrowLeft className="size-4" />
                                     Back To Media
@@ -127,7 +127,7 @@ const MediaPage = () => {
                 }
             />
 
-            <div className="rounded-md border bg-card p-4 sm:p-5">
+            <div className="rounded-md bg-card p-4 sm:p-5">
                 {selectedMedia.length > 0 && (
                     <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border bg-muted/40 px-3 py-2">
                         <Label>
@@ -144,20 +144,22 @@ const MediaPage = () => {
                                 <Button
                                     variant="destructive"
                                     onClick={() => handleDelete(selectedMedia, deleteType)}
-                                    className="cursor-pointer"
+                                    className="h-9 cursor-pointer"
+                                    size="lg"
                                 >
                                     Move Into Trash
                                 </Button>
                             ) : (
                                 <>
                                     <Button
-                                        className="bg-green-500 hover:bg-green-600"
+                                        className="bg-green-500 hover:bg-green-600 h-9"
                                         onClick={() => handleDelete(selectedMedia, "RSD")}
+                                        size="lg"
                                     >
                                         Restore
                                     </Button>
 
-                                    <Button variant="destructive" onClick={() => handleDelete(selectedMedia, deleteType)}>
+                                    <Button variant="destructive" onClick={() => handleDelete(selectedMedia, deleteType)} className="h-9" size="lg">
                                         Delete Permanently
                                     </Button>
                                 </>
@@ -198,10 +200,11 @@ const MediaPage = () => {
                 {hasNextPage && (
                     <ButtonLoading
                         type="button"
-                        className="cursor-pointer"
+                        className="h-9 cursor-pointer"
                         loading={isFetching}
                         onClick={() => fetchNextPage()}
                         text="Load More"
+                        size="lg"
                     />
                 )}
             </div>

@@ -86,7 +86,7 @@ const OrderDetails = ({ params }) => {
                 breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
             />
 
-            <div className="rounded-md border bg-card">
+            <div className="rounded-md bg-card">
                 {!orderData ? (
                     <div className="flex justify-center items-center py-24">
                         <h4 className="text-red-500 text-xl font-semibold">Order Not Found</h4>
@@ -235,7 +235,7 @@ const OrderDetails = ({ params }) => {
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        <ButtonLoading type="button" loading={updatingStatus} onClick={handleOrderStatus} text="Save Status" className="mt-5 cursor-pointer" />
+                                        <ButtonLoading type="button" loading={updatingStatus} onClick={handleOrderStatus} text="Save Status" className="mt-5 h-9 cursor-pointer" size="lg" />
                                     </div>
 
                                 </div>

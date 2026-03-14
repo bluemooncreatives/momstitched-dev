@@ -57,7 +57,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
 
             {({ open }) => {
                 return (
-                    <Button onClick={() => open()}>
+                    <Button size="lg" onClick={() => open()}>
                         <Plus className='size-4' />
                         Upload Media
                     </Button>

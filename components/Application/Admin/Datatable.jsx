@@ -238,14 +238,15 @@ const Datatable = ({
     return (
         <div className="space-y-4">
             <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                     <DataTableToolbar
                         table={table}
                         searchPlaceholder="Search in table..."
+                        className="flex-1"
                     />
                     <div className="flex flex-wrap items-center gap-2">
                         {deleteType !== 'PD' && (
-                            <Button asChild variant="outline" size="sm">
+                            <Button asChild variant="outline" size="lg" className="h-9">
                                 <Link href={trashView}>
                                     <Recycle className="mr-2 size-4" />
                                     Recycle Bin
@@ -256,7 +257,8 @@ const Datatable = ({
                         {deleteType === 'SD' && (
                             <Button
                                 variant="destructive"
-                                size="sm"
+                                size="lg"
+                                className="h-9"
                                 disabled={!hasSelection}
                                 onClick={() => handleDelete(Object.keys(rowSelection), deleteType)}
                             >
@@ -269,7 +271,8 @@ const Datatable = ({
                             <>
                                 <Button
                                     variant="outline"
-                                    size="sm"
+                                    size="lg"
+                                    className="h-9"
                                     disabled={!hasSelection}
                                     onClick={() => handleDelete(Object.keys(rowSelection), 'RSD')}
                                 >
@@ -278,7 +281,8 @@ const Datatable = ({
                                 </Button>
                                 <Button
                                     variant="destructive"
-                                    size="sm"
+                                    size="lg"
+                                    className="h-9"
                                     disabled={!hasSelection}
                                     onClick={() => handleDelete(Object.keys(rowSelection), deleteType)}
                                 >
@@ -292,18 +296,19 @@ const Datatable = ({
                             type="button"
                             text={
                                 <>
-                                    <Download className="size-4" /> Export
+                                    <Download className="mr-2 size-4" /> Export
                                 </>
                             }
                             loading={exportLoading}
                             onClick={() => handleExport(table.getSelectedRowModel().rows)}
-                            className="cursor-pointer"
+                            className="h-9 cursor-pointer"
+                            size="lg"
                         />
                     </div>
                 </div>
             </div>
 
-            <div className="overflow-hidden rounded-md border bg-card">
+            <div className="overflow-hidden rounded-md bg-card border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

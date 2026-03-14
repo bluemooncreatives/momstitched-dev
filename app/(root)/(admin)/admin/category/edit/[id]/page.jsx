@@ -84,7 +84,7 @@ const EditCategory = ({ params }) => {
                 breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
             />
 
-            <div className="rounded-md border bg-card p-4 sm:p-6">
+            <div className="rounded-md bg-card p-4 sm:p-6">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                         <div className="mb-5">
@@ -119,7 +119,7 @@ const EditCategory = ({ params }) => {
                         </div>
 
                         <div className="mb-3">
-                            <ButtonLoading loading={loading} type="submit" text="Update Category" className="cursor-pointer" />
+                            <ButtonLoading loading={loading} type="submit" text="Update Category" className="h-9 cursor-pointer" size="lg" />
                         </div>
                     </form>
                 </Form>

@@ -36,7 +36,7 @@ const ShowCoupon = () => {
                 description="Manage discounts and promotions for your store."
                 breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
                 actions={
-                    <Button asChild>
+                    <Button asChild size="lg" className="h-9">
                         <Link href={ADMIN_COUPON_ADD} className="inline-flex items-center gap-2">
                             <Plus className="size-4" />
                             New Coupon
@@ -45,7 +45,7 @@ const ShowCoupon = () => {
                 }
             />
 
-            <div className="rounded-md border bg-card">
+            <div className="rounded-md bg-card">
                 <DatatableWrapper
                     queryKey="coupon-data"
                     fetchUrl="/api/coupon"

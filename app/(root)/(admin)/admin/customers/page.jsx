@@ -34,7 +34,7 @@ const ShowCustomers = () => {
                 breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
             />
 
-            <div className="rounded-md border bg-card">
+            <div className="rounded-md bg-card">
                 <DatatableWrapper
                     queryKey="customers-data"
                     fetchUrl="/api/customers"

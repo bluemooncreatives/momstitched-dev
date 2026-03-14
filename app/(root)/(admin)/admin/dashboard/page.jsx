@@ -21,13 +21,13 @@ const AdminDashboard = () => {
                 actions={
                     <>
                         <Link href={ADMIN_PRODUCT_ADD}>
-                            <Button className="gap-2">
+                            <Button className="gap-2 h-9" size="lg">
                                 <span>+</span>
                                 Add Product
                             </Button>
                         </Link>
                         <Link href={ADMIN_MEDIA_SHOW}>
-                            <Button variant="outline">Upload Media</Button>
+                            <Button variant="outline" className="h-9" size="lg">Upload Media</Button>
                         </Link>
                     </>
                 }

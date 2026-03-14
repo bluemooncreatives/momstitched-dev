@@ -13,6 +13,7 @@ import useFetch from "@/hooks/useFetch"
 import Image from "next/image"
 import notFound from '@/public/assets/images/not-found.png'
 import { useEffect, useState } from "react"
+import { CreditCard, Hash, Package, ReceiptText } from "lucide-react"
 import { statusBadge } from "@/lib/helperFunction"
 const LatestOrder = () => {
     const [latestOrder, setLatestOrder] = useState()
@@ -34,10 +35,30 @@ const LatestOrder = () => {
         <Table>
             <TableHeader>
                 <TableRow className="group/row">
-                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Order Id</TableHead>
-                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Payment Id</TableHead>
-                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Total Item</TableHead>
-                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Status</TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                            <Hash className="h-3.5 w-3.5" />
+                            Order Id
+                        </span>
+                    </TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                            <CreditCard className="h-3.5 w-3.5" />
+                            Payment Id
+                        </span>
+                    </TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                            <Package className="h-3.5 w-3.5" />
+                            Total Item
+                        </span>
+                    </TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                            <ReceiptText className="h-3.5 w-3.5" />
+                            Status
+                        </span>
+                    </TableHead>
                     <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Amount</TableHead>
                 </TableRow>
             </TableHeader>

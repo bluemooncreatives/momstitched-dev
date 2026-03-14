@@ -87,7 +87,7 @@ const EditMedia = ({ params }) => {
                 breadcrumb={<BreadCrumb breadcrumbData={breadCrumbData} />}
             />
 
-            <div className="rounded-md border bg-card p-4 sm:p-6">
+            <div className="rounded-md bg-card p-4 sm:p-6">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                         <div className="mb-5">
@@ -130,7 +130,7 @@ const EditMedia = ({ params }) => {
                         </div>
 
                         <div className="mb-3">
-                            <ButtonLoading loading={loading} type="submit" text="Update Media" className="cursor-pointer" />
+                            <ButtonLoading loading={loading} type="submit" text="Update Media" className="h-9 cursor-pointer" size="lg" />
                         </div>
                     </form>
                 </Form>

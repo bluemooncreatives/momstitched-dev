@@ -84,7 +84,7 @@ const Trash = () => {
                     description="Select a section to review deleted items."
                     breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
                 />
-                <div className="rounded-md border bg-card px-4 py-6 text-sm text-muted-foreground">
+                <div className="rounded-md bg-card px-4 py-6 text-sm text-muted-foreground">
                     Choose a valid trash section from an entity table.
                 </div>
             </div>
@@ -107,7 +107,7 @@ const Trash = () => {
                 breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
             />
 
-            <div className="rounded-md border bg-card">
+            <div className="rounded-md bg-card">
                 <DatatableWrapper
                     queryKey={`${trashOf}-data-deleted`}
                     fetchUrl={config.fetchUrl}

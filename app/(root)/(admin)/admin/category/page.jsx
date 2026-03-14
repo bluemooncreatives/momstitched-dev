@@ -36,7 +36,7 @@ const ShowCategory = () => {
                 description="Manage your product categories and hierarchy."
                 breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
                 actions={
-                    <Button asChild>
+                    <Button asChild size="lg" className="h-9">
                         <Link href={ADMIN_CATEGORY_ADD} className="inline-flex items-center gap-2">
                             <Plus className="size-4" />
                             New Category
@@ -45,7 +45,7 @@ const ShowCategory = () => {
                 }
             />
 
-            <div className="rounded-md border bg-card">
+            <div className="rounded-md bg-card">
                 <DatatableWrapper
                     queryKey="category-data"
                     fetchUrl="/api/category"

@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Star } from 'lucide-react'
+import { Package, Star } from 'lucide-react'
 
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import useFetch from "@/hooks/useFetch";
@@ -36,8 +36,18 @@ const LatestReview = () => {
         <Table>
             <TableHeader>
                 <TableRow className="group/row">
-                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Product</TableHead>
-                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">Rating</TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                            <Package className="h-3.5 w-3.5" />
+                            Product
+                        </span>
+                    </TableHead>
+                    <TableHead className="bg-background text-xs font-semibold text-muted-foreground">
+                        <span className="flex items-center gap-2">
+                            <Star className="h-3.5 w-3.5" />
+                            Rating
+                        </span>
+                    </TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

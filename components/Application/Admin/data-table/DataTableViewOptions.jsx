@@ -15,12 +15,12 @@ const DataTableViewOptions = ({ table }) => {
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="ms-auto hidden h-8 lg:flex">
+                <Button variant="outline" size="lg" className="h-9 px-3">
                     <MixerHorizontalIcon className="size-4" />
                     View
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[150px]">
+            <DropdownMenuContent align="end" className="min-w-[220px] max-w-[320px]">
                 <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {table
@@ -32,7 +32,7 @@ const DataTableViewOptions = ({ table }) => {
                     .map((column) => (
                         <DropdownMenuCheckboxItem
                             key={column.id}
-                            className="capitalize"
+                            className="capitalize max-w-[260px] truncate"
                             checked={column.getIsVisible()}
                             onCheckedChange={(value) => column.toggleVisibility(!!value)}
                         >

@@ -339,6 +339,7 @@ function SidebarSeparator({
 
 function SidebarContent({
   className,
+  onWheel,
   ...props
 }) {
   return (
@@ -346,9 +347,13 @@ function SidebarContent({
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        "thin-scrollbar bg-sidebar flex min-h-0 flex-1 flex-col gap-0 overflow-auto overscroll-contain group-data-[collapsible=icon]:overflow-hidden",
         className
       )}
+      onWheel={(event) => {
+        event.stopPropagation()
+        onWheel?.(event)
+      }}
       {...props} />
   );
 }
@@ -453,9 +458,9 @@ const sidebarMenuButtonVariants = cva(
           "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
-        default: "h-8 text-sm",
-        sm: "h-7 text-xs",
-        lg: "h-12 text-sm group-data-[collapsible=icon]:p-0!",
+        default: "h-9 text-sm",
+        sm: "h-7 text-sm",
+        lg: "h-14 text-sm group-data-[collapsible=icon]:p-0! [&_svg]:size-5",
       },
     },
     defaultVariants: {
