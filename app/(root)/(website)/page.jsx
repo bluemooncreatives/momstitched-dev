@@ -2,13 +2,12 @@ import HeroSection from '@/components/Application/Website/HeroSection'
 import Marquee from '@/components/Application/Website/Marquee'
 import CategoryArchiveSection from '@/components/Application/Website/CategoryArchiveSection'
 import Image from 'next/image'
-import Link from 'next/link'
 import React from 'react'
 import FeaturedProduct from '@/components/Application/Website/FeaturedProduct'
 import advertisingBanner from '@/public/assets/images/advertising-banner.png'
 import Testimonial from '@/components/Application/Website/Testimonial'
-import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import { RotateCcw, Truck, Headset, BadgePercent } from 'lucide-react'
+import ShopAllButton from '@/components/Application/Website/ShopAllButton'
 
 const Home = () => {
     return (
@@ -66,12 +65,7 @@ const Home = () => {
                     </div>
                 </div>
                 <div className='mt-10 flex justify-center'>
-                    <Link
-                        href={WEBSITE_SHOP}
-                        className='inline-flex items-center justify-center rounded-full border border-black bg-transparent px-8 py-3 text-sm font-semibold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-black hover:text-white'
-                    >
-                        Shop All Products
-                    </Link>
+                    <ShopAllButton colorScheme="dark-red" radius="md" />
                 </div>
             </section>
 
