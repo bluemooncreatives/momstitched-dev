@@ -12,9 +12,26 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-              "group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl transform-gpu will-change-transform transition-transform duration-400 ease-in-out hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#8E1616]/15",
+              "group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl transform-gpu will-change-transform transition-transform duration-400 ease-in-out hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#8E1616]/10",
           className
         )}
+      {...props} />
+  );
+}
+
+function CardDefaultSm({
+  className,
+  size = "default-sm",
+  ...props
+}) {
+  return (
+    <div
+      data-slot="card"
+      data-size={size}
+      className={cn(
+                  "group/card relative flex items-center justify-between gap-3 overflow-hidden rounded-lg bg-card py-3 px-4 text-sm text-card-foreground ring-1 ring-foreground/10 min-h-[64px] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-2 data-[size=sm]:py-2 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl transform-gpu will-change-transform transition duration-250 ease-in-out hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/6 cursor-pointer hover:bg-muted/10",
+              className
+            )}
       {...props} />
   );
 }
@@ -105,6 +122,7 @@ function CardFooter({
 
 export {
   Card,
+  CardDefaultSm,
   CardHeader,
   CardFooter,
   CardTitle,

@@ -32,9 +32,7 @@ const CountOverview = () => {
             trend: categoryTrend,
             href: ADMIN_CATEGORY_SHOW,
             icon: FolderTree,
-            bg: 'bg-emerald-500',
-            border: 'border-emerald-500',
-            label: 'Categories'
+            chartVar: '--chart-1'
         },
         {
             title: 'Total Products',
@@ -42,9 +40,7 @@ const CountOverview = () => {
             trend: productTrend,
             href: ADMIN_PRODUCT_SHOW,
             icon: Shirt,
-            bg: 'bg-indigo-500',
-            border: 'border-indigo-500',
-            label: 'Products'
+            chartVar: '--chart-2'
         },
         {
             title: 'Total Customers',
@@ -52,9 +48,7 @@ const CountOverview = () => {
             trend: customerTrend,
             href: ADMIN_CUSTOMERS_SHOW,
             icon: UsersRound,
-            bg: 'bg-violet-500',
-            border: 'border-violet-500',
-            label: 'Customers'
+            chartVar: '--chart-3'
         },
         {
             title: 'Total Orders',
@@ -62,9 +56,7 @@ const CountOverview = () => {
             trend: orderTrend,
             href: ADMIN_ORDER_SHOW,
             icon: ShoppingBag,
-            bg: 'bg-amber-500',
-            border: 'border-amber-500',
-            label: 'Orders'
+            chartVar: '--chart-4'
         },
     ]
 
@@ -72,25 +64,30 @@ const CountOverview = () => {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {cards.map((card) => (
                 <Link key={card.title} href={card.href} aria-label={`${card.title}: ${card.value}`}>
-                        <Card className={`${card.border} border-l-4 hover:border-l-8`}> 
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <div className="flex items-center gap-2">
-                                    <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                                    <span className={`${card.bg} text-white text-xs px-2 py-0.5 rounded-full`} aria-hidden>{card.label}</span>
-                                </div>
-                                <card.icon className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                        <CardContent>
-                            <div className="text-4xl font-bold">{card.value}</div>
-                            <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                                {card.trend.isIncreased ? (
-                                    <TrendingUp className="h-3 w-3 text-emerald-500" />
-                                ) : (
-                                    <TrendingDown className="h-3 w-3 text-rose-500" />
-                                )}
-                                {card.trend.text}
-                            </p>
-                        </CardContent>
+                        <Card className={`border-l-4 hover:border-l-8`} style={{ borderLeftColor: `var(${card.chartVar})` }}> 
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                            <div className="flex items-center gap-2">
+                                                <CardTitle className={`text-sm font-medium`} style={{ color: `var(${card.chartVar})` }}>{card.title}</CardTitle>
+                                            </div>
+                                            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: `var(${card.chartVar})`, color: 'white' }} aria-hidden>
+                                                <card.icon className="h-4 w-4" />
+                                            </span>
+                                        </CardHeader>
+                            <CardContent>
+                                <div className="text-4xl font-bold">{card.value}</div>
+                                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    {card.trend.isIncreased ? (
+                                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                                                <TrendingUp className="h-3 w-3" />
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-rose-600">
+                                                <TrendingDown className="h-3 w-3" />
+                                            </span>
+                                        )}
+                                    <span className="ml-1">{card.trend.text}</span>
+                                </p>
+                            </CardContent>
                     </Card>
                 </Link>
             ))}
