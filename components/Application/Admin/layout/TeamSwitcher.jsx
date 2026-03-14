@@ -1,5 +1,7 @@
 'use client'
 import React from 'react'
+import Image from 'next/image'
+import logoWhite from '@/public/assets/images/logo-white.png'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 
 const TeamSwitcher = ({ teams = [] }) => {
@@ -14,16 +16,21 @@ const TeamSwitcher = ({ teams = [] }) => {
                     size="lg"
                     className="cursor-default hover:bg-transparent hover:text-inherit"
                 >
-                    <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                        <img
-                            src="/assets/images/logo-black.png"
+                    <div className="flex aspect-square items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                        <Image
+                            src={logoWhite}
                             alt="MomStitched"
-                            className="size-16 object-contain"
+                            width={42}
+                            height={42}
+                            className="object-contain"
+                            priority
                         />
                     </div>
-                    <div className="grid flex-1 text-start text-sm leading-tight">
-                        <span className="truncate font-semibold">{activeTeam.name}</span>
-                        <span className="truncate text-xs">{activeTeam.plan}</span>
+                    <div className="grid flex-1 text-start text-md leading-tight">
+                        <span className="truncate font-semibold font-header">
+                            {activeTeam.name}
+                        </span>
+                        <span className="truncate text-sm">{activeTeam.plan}</span>
                     </div>
                 </SidebarMenuButton>
             </SidebarMenuItem>

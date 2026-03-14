@@ -32,6 +32,9 @@ const CountOverview = () => {
             trend: categoryTrend,
             href: ADMIN_CATEGORY_SHOW,
             icon: FolderTree,
+            bg: 'bg-emerald-500',
+            border: 'border-emerald-500',
+            label: 'Categories'
         },
         {
             title: 'Total Products',
@@ -39,6 +42,9 @@ const CountOverview = () => {
             trend: productTrend,
             href: ADMIN_PRODUCT_SHOW,
             icon: Shirt,
+            bg: 'bg-indigo-500',
+            border: 'border-indigo-500',
+            label: 'Products'
         },
         {
             title: 'Total Customers',
@@ -46,6 +52,9 @@ const CountOverview = () => {
             trend: customerTrend,
             href: ADMIN_CUSTOMERS_SHOW,
             icon: UsersRound,
+            bg: 'bg-violet-500',
+            border: 'border-violet-500',
+            label: 'Customers'
         },
         {
             title: 'Total Orders',
@@ -53,20 +62,26 @@ const CountOverview = () => {
             trend: orderTrend,
             href: ADMIN_ORDER_SHOW,
             icon: ShoppingBag,
+            bg: 'bg-amber-500',
+            border: 'border-amber-500',
+            label: 'Orders'
         },
     ]
 
     return (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {cards.map((card) => (
-                <Link key={card.title} href={card.href}>
-                    <Card className="transition-shadow hover:shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                            <card.icon className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
+                <Link key={card.title} href={card.href} aria-label={`${card.title}: ${card.value}`}>
+                        <Card className={`${card.border} border-l-4 hover:border-l-8`}> 
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <div className="flex items-center gap-2">
+                                    <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                                    <span className={`${card.bg} text-white text-xs px-2 py-0.5 rounded-full`} aria-hidden>{card.label}</span>
+                                </div>
+                                <card.icon className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{card.value}</div>
+                            <div className="text-4xl font-bold">{card.value}</div>
                             <p className="flex items-center gap-1 text-xs text-muted-foreground">
                                 {card.trend.isIncreased ? (
                                     <TrendingUp className="h-3 w-3 text-emerald-500" />
