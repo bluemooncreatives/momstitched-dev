@@ -18,27 +18,27 @@ const chartConfig = {
     },
     pending: {
         label: "Pending",
-        color: "#3b82f6",
+        color: "var(--chart-1)",
     },
     processing: {
         label: "Processing",
-        color: "#eab308",
+        color: "var(--chart-2)",
     },
     shipped: {
         label: "Shipped",
-        color: "#06b6d4",
+        color: "var(--chart-3)",
     },
     delivered: {
         label: "Delivered",
-        color: "#22c55e",
+        color: "var(--chart-4)",
     },
     cancelled: {
         label: "Cancelled",
-        color: "#ef4444",
+        color: "var(--chart-5)",
     },
     unverified: {
         label: "Unverified",
-        color: "#f97316",
+        color: "var(--chart-2)",
     },
 }
 
@@ -46,7 +46,15 @@ export function OrderStatus() {
     const [chartData, setChartData] = useState([])
     const [statusCount, setStatusCount] = useState()
     const [totalCount, setTotalCount] = useState(0)
-    const { data: orderStatus, loading } = useFetch('/api/dashboard/admin/order-status')
+    const { data: orderStatus } = useFetch('/api/dashboard/admin/order-status')
+    const statusList = [
+        { key: 'pending', label: 'Pending', colorVar: '--chart-1' },
+        { key: 'processing', label: 'Processing', colorVar: '--chart-2' },
+        { key: 'shipped', label: 'Shipped', colorVar: '--chart-3' },
+        { key: 'delivered', label: 'Delivered', colorVar: '--chart-4' },
+        { key: 'cancelled', label: 'Cancelled', colorVar: '--chart-5' },
+        { key: 'unverified', label: 'Unverified', colorVar: '--chart-2' },
+    ]
 
     useEffect(() => {
         if (orderStatus && orderStatus.success) {
@@ -74,20 +82,20 @@ export function OrderStatus() {
         <div className="space-y-4">
             <ChartContainer
                 config={chartConfig}
-                className="mx-auto aspect-square max-h-[260px]"
+                className="mx-auto aspect-square max-h-[250px]"
             >
                 <PieChart>
                     <ChartTooltip
                         cursor={false}
-                        content={<ChartTooltipContent />}
+                        content={<ChartTooltipContent hideLabel />}
                     />
                     <Pie
                         data={chartData}
                         dataKey="count"
                         nameKey="status"
                         innerRadius={60}
+                        strokeWidth={5}
                     >
-
                         <Label
                             content={({ viewBox }) => {
                                 if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -117,40 +125,26 @@ export function OrderStatus() {
                                 }
                             }}
                         />
-
                     </Pie>
-
-
-
                 </PieChart>
             </ChartContainer>
 
             <div>
                 <ul className="space-y-3 text-sm">
-                    <li className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Pending</span>
-                        <span className="rounded-full px-3 py-1 text-xs font-semibold bg-blue-50 text-blue-600">{statusCount?.pending || 0}</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Processing</span>
-                        <span className="rounded-full px-3 py-1 text-xs font-semibold bg-amber-50 text-amber-600">{statusCount?.processing || 0}</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Shipped</span>
-                        <span className="rounded-full px-3 py-1 text-xs font-semibold bg-cyan-50 text-cyan-600">{statusCount?.shipped || 0}</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Delivered</span>
-                        <span className="rounded-full px-3 py-1 text-xs font-semibold bg-emerald-50 text-emerald-600">{statusCount?.delivered || 0}</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Cancelled</span>
-                        <span className="rounded-full px-3 py-1 text-xs font-semibold bg-red-50 text-red-600">{statusCount?.cancelled || 0}</span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Unverified</span>
-                        <span className="rounded-full px-3 py-1 text-xs font-semibold bg-orange-50 text-orange-600">{statusCount?.unverified || 0}</span>
-                    </li>
+                    {statusList.map((status) => (
+                        <li key={status.key} className="flex items-center justify-between">
+                            <span className="text-muted-foreground">{status.label}</span>
+                            <span
+                                className="rounded-full px-3 py-1 text-xs font-semibold"
+                                style={{
+                                    backgroundColor: `var(${status.colorVar})`,
+                                    color: 'var(--primary-foreground)',
+                                }}
+                            >
+                                {statusCount?.[status.key] || 0}
+                            </span>
+                        </li>
+                    ))}
                 </ul>
             </div>
 

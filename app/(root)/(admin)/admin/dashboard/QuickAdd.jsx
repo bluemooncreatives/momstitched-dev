@@ -1,8 +1,7 @@
 import Link from 'next/link'
-import React from 'react'
 import { FolderTree, Shirt, TicketPercent, Images } from 'lucide-react'
-import { ADMIN_CATEGORY_ADD, ADMIN_COUPON_ADD, ADMIN_COUPON_SHOW, ADMIN_MEDIA_SHOW, ADMIN_PRODUCT_ADD } from '@/routes/AdminPanelRoute';
-import { CardDefaultSm as Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ADMIN_CATEGORY_ADD, ADMIN_COUPON_ADD, ADMIN_MEDIA_SHOW, ADMIN_PRODUCT_ADD } from '@/routes/AdminPanelRoute';
+import { CardDefaultSm as Card } from '@/components/ui/card';
 const QuickAdd = () => {
     const quickLinks = [
         {
