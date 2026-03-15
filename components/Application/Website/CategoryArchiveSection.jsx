@@ -84,6 +84,7 @@ const CategoryArchiveSection = () => {
     const mouseTimeoutRef = useRef(null)
     const pointerRafRef = useRef(null)
     const rectRafRef = useRef(null)
+    const archiveVisibleRef = useRef(false)
 
     const clearMouseTimeout = () => {
         if (mouseTimeoutRef.current) {
@@ -165,6 +166,10 @@ const CategoryArchiveSection = () => {
     useEffect(() => {
         if (!containerRef.current) return
 
+        const prefersReducedMotion =
+            typeof window !== 'undefined' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
         gsap.registerPlugin(ScrollTrigger)
         updateArchiveRect()
 
@@ -185,6 +190,7 @@ const CategoryArchiveSection = () => {
                 start: 'top 75%',
                 once: true,
                 onEnter: () => {
+                    if (prefersReducedMotion) return
                     // Phase 1: Header text reveals
                     const headerTl = gsap.timeline({
                         defaults: { ease: 'power3.out' },
@@ -207,6 +213,28 @@ const CategoryArchiveSection = () => {
                             index * 0.05
                         )
                     })
+                }
+            })
+
+            ScrollTrigger.create({
+                trigger: containerRef.current,
+                start: 'top bottom',
+                end: 'bottom top',
+                onEnter: () => {
+                    archiveVisibleRef.current = true
+                },
+                onEnterBack: () => {
+                    archiveVisibleRef.current = true
+                },
+                onLeave: () => {
+                    archiveVisibleRef.current = false
+                    clearMouseTimeout()
+                    removeAllImages()
+                },
+                onLeaveBack: () => {
+                    archiveVisibleRef.current = false
+                    clearMouseTimeout()
+                    removeAllImages()
                 }
             })
         }, containerRef)
@@ -232,6 +260,7 @@ const CategoryArchiveSection = () => {
         }
 
         const handleMouseMove = (event) => {
+            if (prefersReducedMotion || !archiveVisibleRef.current) return
             mousePosRef.current = { x: event.clientX, y: event.clientY }
             if (pointerRafRef.current) return
             pointerRafRef.current = requestAnimationFrame(() => {

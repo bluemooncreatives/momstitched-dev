@@ -37,7 +37,7 @@ export async function POST(request) {
                 media: variant?.media[0]?.secure_url,
                 qty: cartItem.qty,
             }
-        })
+        }).filter(Boolean)
 
 
         return response(true, 200, 'Verified Cart Data.', verifiedCartData)

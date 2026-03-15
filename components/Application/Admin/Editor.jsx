@@ -22,12 +22,10 @@ import {
     FontColor,
     FontFamily,
     FontSize,
-    FullPage,
     GeneralHtmlSupport,
     Heading,
     Highlight,
     HorizontalLine,
-    HtmlComment,
     HtmlEmbed,
     ImageBlock,
     ImageCaption,
@@ -46,9 +44,7 @@ import {
     LinkImage,
     List,
     ListProperties,
-    Markdown,
     MediaEmbed,
-    Mention,
     PageBreak,
     Paragraph,
     PasteFromOffice,
@@ -72,11 +68,9 @@ import {
     TableColumnResize,
     TableProperties,
     TableToolbar,
-    TextPartLanguage,
     TextTransformation,
     TodoList,
-    Underline,
-    WordCount
+    Underline
 } from 'ckeditor5';
 import '@/app/ckeditor5.css';
  
@@ -173,12 +167,10 @@ export default function Editor({ onChange, initialData }) {
                     FontColor,
                     FontFamily,
                     FontSize,
-                    FullPage,
                     GeneralHtmlSupport,
                     Heading,
                     Highlight,
                     HorizontalLine,
-                    HtmlComment,
                     HtmlEmbed,
                     ImageBlock,
                     ImageCaption,
@@ -197,9 +189,7 @@ export default function Editor({ onChange, initialData }) {
                     LinkImage,
                     List,
                     ListProperties,
-                    Markdown,
                     MediaEmbed,
-                    Mention,
                     PageBreak,
                     Paragraph,
                     PasteFromOffice,
@@ -223,11 +213,9 @@ export default function Editor({ onChange, initialData }) {
                     TableColumnResize,
                     TableProperties,
                     TableToolbar,
-                    TextPartLanguage,
                     TextTransformation,
                     TodoList,
-                    Underline,
-                    WordCount
+                    Underline
                 ],
                 balloonToolbar: ['bold', 'italic', '|', 'link', 'insertImage', '|', 'bulletedList', 'numberedList'],
                 fontFamily: {

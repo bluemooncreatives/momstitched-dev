@@ -18,7 +18,13 @@ export async function GET() {
         const orders = await OrderModel.aggregate([
             {
                 $match: {
-                    user: new mongoose.Types.ObjectId(userId)
+                    user: new mongoose.Types.ObjectId(userId),
+                    deletedAt: null,
+                }
+            },
+            {
+                $sort: {
+                    createdAt: -1,
                 }
             },
             {
