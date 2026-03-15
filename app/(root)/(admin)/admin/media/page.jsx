@@ -1,10 +1,10 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import Media from '@/components/Application/Admin/Media'
+import PageHeader from '@/components/Application/Admin/PageHeader'
 import UploadMedia from '@/components/Application/Admin/UploadMedia'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import useDeleteMutation from '@/hooks/useDeleteMutation'
@@ -14,6 +14,7 @@ import axios from 'axios'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import { ArrowLeft, Trash2 } from 'lucide-react'
 
 const breadcrumbData = [
     { href: ADMIN_DASHBOARD, label: 'Home' },
@@ -97,115 +98,116 @@ const MediaPage = () => {
 
 
     return (
-        <div>
-            <BreadCrumb breadcrumbData={breadcrumbData} />
-            <Card className="py-0 rounded shadow-sm">
-                <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
-                    <div className='flex justify-between items-center'>
-                        <h4 className='font-semibold text-xl uppercase'>
+        <div className="flex flex-col gap-4 sm:gap-6">
+            <PageHeader
+                title={deleteType === 'SD' ? 'Media' : 'Media Trash'}
+                description="Manage your media library and uploads."
+                breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
+                actions={
+                    <div className="flex flex-wrap items-center gap-2">
+                        {deleteType === 'SD' && (
+                            <UploadMedia isMultiple={true} queryClient={queryClient} />
+                        )}
+                        {deleteType === 'SD' ? (
+                            <Button type="button" variant="destructive" asChild size="lg" className="h-9">
+                                <Link href={`${ADMIN_MEDIA_SHOW}?trashof=media`} className="inline-flex items-center gap-2">
+                                    <Trash2 className="size-4" />
+                                    Trash
+                                </Link>
+                            </Button>
+                        ) : (
+                            <Button type="button" variant="outline" asChild size="lg" className="h-9">
+                                <Link href={`${ADMIN_MEDIA_SHOW}`} className="inline-flex items-center gap-2">
+                                    <ArrowLeft className="size-4" />
+                                    Back To Media
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
+                }
+            />
 
-                            {deleteType === 'SD' ? 'Media' : 'Media Trash'}
+            <div className="rounded-md bg-card p-4 sm:p-5">
+                {selectedMedia.length > 0 && (
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-md border bg-muted/40 px-3 py-2">
+                        <Label>
+                            <Checkbox
+                                checked={selectAll}
+                                onCheckedChange={handleSelectAll}
+                                className="border-primary mr-2"
+                            />
+                            Select All
+                        </Label>
 
-                        </h4>
-                        <div className='flex items-center gap-5'>
-                            {deleteType === 'SD' && <UploadMedia isMultiple={true} queryClient={queryClient} />}
-
-                            <div className='flex gap-3'>
-                                {deleteType === 'SD' ?
-                                    <Button type="button" variant="destructive">
-                                        <Link href={`${ADMIN_MEDIA_SHOW}?trashof=media`}>
-                                            Trash
-                                        </Link>
+                        <div className="flex flex-wrap gap-2">
+                            {deleteType === 'SD' ? (
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => handleDelete(selectedMedia, deleteType)}
+                                    className="h-9 cursor-pointer"
+                                    size="lg"
+                                >
+                                    Move Into Trash
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button
+                                        className="bg-green-500 hover:bg-green-600 h-9"
+                                        onClick={() => handleDelete(selectedMedia, "RSD")}
+                                        size="lg"
+                                    >
+                                        Restore
                                     </Button>
-                                    :
-                                    <Button type="button"  >
-                                        <Link href={`${ADMIN_MEDIA_SHOW}`}>
-                                            Back To Media
-                                        </Link>
+
+                                    <Button variant="destructive" onClick={() => handleDelete(selectedMedia, deleteType)} className="h-9" size="lg">
+                                        Delete Permanently
                                     </Button>
-                                }
-                            </div>
+                                </>
+                            )}
                         </div>
                     </div>
-                </CardHeader>
-                <CardContent className="pb-5">
+                )}
 
-                    {selectedMedia.length > 0
-                        &&
-                        <div className='py-2 px-3 bg-violet-200 mb-2 rounded flex justify-between items-center'>
-                            <Label>
-                                <Checkbox
-                                    checked={selectAll}
-                                    onCheckedChange={handleSelectAll}
-                                    className="border-primary"
-                                />
-                                Select All
-                            </Label>
+                {status === 'pending' ? (
+                    <div>Loading...</div>
+                ) : status === 'error' ? (
+                    <div className="text-red-500 text-sm">{error.message}</div>
+                ) : (
+                    <>
+                        {data.pages.flatMap(page => page.mediaData.map(media => media._id)).length === 0 && (
+                            <div>Data not found.</div>
+                        )}
 
-                            <div className='flex gap-2'>
-                                {deleteType === 'SD'
-                                    ?
-                                    <Button variant="destructive" onClick={() => handleDelete(selectedMedia, deleteType)} className="cursor-pointer">
-                                        Move Into Trash
-                                    </Button>
-                                    :
-                                    <>
-                                        <Button className="bg-green-500 hover:bg-green-600" onClick={() => handleDelete(selectedMedia, "RSD")}>
-                                            Restore
-                                        </Button>
-
-                                        <Button variant="destructive" onClick={() => handleDelete(selectedMedia, deleteType)}>
-                                            Delete Permanently
-                                        </Button>
-                                    </>
-                                }
-                            </div>
-
+                        <div className="grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 gap-2 mb-5">
+                            {data?.pages?.map((page, index) => (
+                                <React.Fragment key={index}>
+                                    {page?.mediaData?.map((media) => (
+                                        <Media
+                                            key={media._id}
+                                            media={media}
+                                            handleDelete={handleDelete}
+                                            deleteType={deleteType}
+                                            selectedMedia={selectedMedia}
+                                            setSelectedMedia={setSelectedMedia}
+                                        />
+                                    ))}
+                                </React.Fragment>
+                            ))}
                         </div>
-                    }
+                    </>
+                )}
 
-
-
-                    {status === 'pending'
-                        ?
-                        <div>Loading...</div>
-                        :
-                        status === 'error' ?
-                            <div className='text-red-500 text-sm'>
-                                {error.message}
-                            </div>
-                            :
-                            <>
-                                {data.pages.flatMap(page => page.mediaData.map(media => media._id)).length === 0 && <div >Data not found.</div>}
-
-                                <div className='grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 gap-2 mb-5'>
-                                    {
-                                        data?.pages?.map((page, index) => (
-                                            <React.Fragment key={index}>
-                                                {
-                                                    page?.mediaData?.map((media) => (
-                                                        <Media key={media._id}
-                                                            media={media}
-                                                            handleDelete={handleDelete}
-                                                            deleteType={deleteType}
-                                                            selectedMedia={selectedMedia}
-                                                            setSelectedMedia={setSelectedMedia}
-                                                        />
-                                                    ))
-                                                }
-                                            </React.Fragment>
-                                        ))
-                                    }
-                                </div>
-                            </>
-                    }
-             
-                    {hasNextPage &&
-                        <ButtonLoading type="button" className="cursor-pointer" loading={isFetching} onClick={() => fetchNextPage()} text="Load More" />
-                    }
-
-                </CardContent>
-            </Card>
+                {hasNextPage && (
+                    <ButtonLoading
+                        type="button"
+                        className="h-9 cursor-pointer"
+                        loading={isFetching}
+                        onClick={() => fetchNextPage()}
+                        text="Load More"
+                        size="lg"
+                    />
+                )}
+            </div>
         </div>
     )
 }

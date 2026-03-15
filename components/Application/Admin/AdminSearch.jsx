@@ -1,23 +1,23 @@
 import { Input } from '@/components/ui/input'
 import React, { useState } from 'react'
-import { IoIosSearch } from "react-icons/io";
+import { Search } from 'lucide-react'
 import SearchModel from './SearchModel';
 
 const AdminSearch = () => {
     const [open, setOpen] = useState(false)
     return (
-        <div className='md:w-[400px]'>
+        <div className='md:w-[280px] lg:w-[320px]'>
             <div className='flex items-center relative'>
-                <IoIosSearch className='absolute left-4 text-slate-400 w-5 h-5 pointer-events-none' />
+                <Search className='pointer-events-none absolute left-4 h-5 w-5 text-muted-foreground' />
                 <Input
                     readOnly
-                    className="rounded-full cursor-pointer h-11 pl-12 pr-16 bg-slate-50 border border-slate-200 shadow-none text-slate-700 placeholder:text-slate-400"
-                    placeholder="Search task"
+                    className="h-9 cursor-pointer rounded-md border bg-muted/40 pl-12 pr-16 shadow-none placeholder:text-muted-foreground"
+                    placeholder="Search"
                     onClick={() => setOpen(true)}
                 />
-                <div className='absolute right-4 flex items-center gap-1 text-xs text-slate-400 font-medium pointer-events-none'>
-                    <span className='px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-500'>⌘</span>
-                    <span className='px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-500'>F</span>
+                <div className='pointer-events-none absolute right-4 flex items-center gap-1 text-xs font-medium text-muted-foreground'>
+                    <span className='rounded border bg-background px-1.5 py-0.5'>Ctrl</span>
+                    <span className='rounded border bg-background px-1.5 py-0.5'>K</span>
                 </div>
             </div>
 

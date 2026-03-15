@@ -21,6 +21,7 @@ export async function PUT(request) {
 
         const formData = await request.formData()
         const file = formData.get('file')
+        const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
 
         user.name = formData.get('name')
@@ -28,6 +29,10 @@ export async function PUT(request) {
         user.address = formData.get('address')
 
         if (file) {
+            if (typeof file.size === 'number' && file.size > MAX_IMAGE_BYTES) {
+                return response(false, 413, 'Upload failed. Max image size is 5 MB.')
+            }
+
             const fileBuffer = await file.arrayBuffer()
             const base64Image = `data:${file.type};base64,${Buffer.from(fileBuffer).toString("base64")}`
 

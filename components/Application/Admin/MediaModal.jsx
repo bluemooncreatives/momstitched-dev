@@ -50,14 +50,14 @@ const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
     return (
         <Dialog
             open={open}
-            onOpenChange={() => setOpen(!open)}
+            onOpenChange={setOpen}
         >
             <DialogContent onInteractOutside={(e) => e.preventDefault()}
-                className="sm:max-w-[80%] h-screen p-0 py-10 bg-transparent border-0 shadow-none"
+                className="sm:max-w-[80%] h-screen border-0 bg-transparent p-0 py-10 shadow-none"
             >
                 <DialogDescription className="hidden"></DialogDescription>
 
-                <div className='h-[90vh] bg-white dark:bg-card p-3 rounded shadow'>
+                <div className='h-[90vh] rounded-xl border bg-background p-3 shadow-sm'>
                     <DialogHeader className="h-8 border-b">
                         <DialogTitle>Media Selection</DialogTitle>
                     </DialogHeader>
@@ -96,7 +96,7 @@ const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
 
                                     {hasNextPage ?
                                         <div className='flex justify-center py-5'>
-                                            <ButtonLoading type="button" onClick={() => fetchNextPage()} loading={isFetching} text="Load More" />
+                                                    <ButtonLoading type="button" onClick={() => fetchNextPage()} loading={isFetching} text="Load More" size="lg" />
                                         </div>
                                         :
                                         <p className='text-center py-5'>Nothing more to load.</p>
@@ -109,15 +109,15 @@ const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
 
                     <div className='h-10 pt-3 border-t flex justify-between'>
                         <div>
-                            <Button type="button" variant="destructive" onClick={handleClear} >
+                            <Button type="button" variant="destructive" size="lg" onClick={handleClear} >
                                 Clear All
                             </Button>
                         </div>
                         <div className='flex gap-5'>
-                            <Button type="button" variant="secondary" onClick={handleClose} >
+                            <Button type="button" variant="secondary" size="lg" onClick={handleClose} >
                                 Close
                             </Button>
-                            <Button type="button" onClick={handleSelect} >
+                            <Button type="button" size="lg" onClick={handleSelect} >
                                 Select
                             </Button>
                         </div>

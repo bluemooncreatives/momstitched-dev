@@ -34,7 +34,7 @@ const SearchModel = ({ open, setOpen }) => {
     }, [query])
 
     return (
-        <Dialog open={open} onOpenChange={() => setOpen(!open)}>
+        <Dialog open={open} onOpenChange={setOpen}>
 
             <DialogContent>
                 <DialogHeader>

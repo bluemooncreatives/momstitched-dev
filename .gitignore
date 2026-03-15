@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /stefan-markovic
+/shadcn-admin-main
 /format-archive
 /.pnp
 .pnp.*

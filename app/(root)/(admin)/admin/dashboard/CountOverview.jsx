@@ -1,13 +1,9 @@
 'use client'
 import Link from 'next/link'
-import React from 'react'
-import { BiCategory } from "react-icons/bi";
-import { IoShirtOutline, IoArrowUp, IoArrowDown } from "react-icons/io5";
-import { MdOutlineShoppingBag } from "react-icons/md";
-import { LuUserRound } from "react-icons/lu";
 import useFetch from '@/hooks/useFetch';
 import { ADMIN_CATEGORY_SHOW, ADMIN_CUSTOMERS_SHOW, ADMIN_PRODUCT_SHOW, ADMIN_ORDER_SHOW } from '@/routes/AdminPanelRoute';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { FolderTree, Shirt, UsersRound, ShoppingBag, TrendingUp, TrendingDown } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const CountOverview = () => {
 
     const { data: countData } = useFetch('/api/dashboard/admin/count')
@@ -28,93 +24,72 @@ const CountOverview = () => {
     const customerTrend = getTrendInfo(countData?.data?.customer || 0, countData?.data?.customerPrevious)
     const orderTrend = getTrendInfo(countData?.data?.order || 0, countData?.data?.orderPrevious)
 
+    const cards = [
+        {
+            title: 'Total Categories',
+            value: countData?.data?.category || 0,
+            trend: categoryTrend,
+            href: ADMIN_CATEGORY_SHOW,
+            icon: FolderTree,
+            chartVar: '--chart-1'
+        },
+        {
+            title: 'Total Products',
+            value: countData?.data?.product || 0,
+            trend: productTrend,
+            href: ADMIN_PRODUCT_SHOW,
+            icon: Shirt,
+            chartVar: '--chart-2'
+        },
+        {
+            title: 'Total Customers',
+            value: countData?.data?.customer || 0,
+            trend: customerTrend,
+            href: ADMIN_CUSTOMERS_SHOW,
+            icon: UsersRound,
+            chartVar: '--chart-3'
+        },
+        {
+            title: 'Total Orders',
+            value: countData?.data?.order || 0,
+            trend: orderTrend,
+            href: ADMIN_ORDER_SHOW,
+            icon: ShoppingBag,
+            chartVar: '--chart-4'
+        },
+    ]
+
     return (
-        <div className='grid lg:grid-cols-4 sm:grid-cols-2 gap-6 font-neue'>
-            <Link href={ADMIN_CATEGORY_SHOW}>
-                <div className='p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-white border border-slate-100 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-shadow'>
-                    <div className='space-y-4'>
-                        <div className='flex justify-between items-start'>
-                            <div>
-                                <p className='text-sm font-medium text-slate-600 mb-2'>Total Categories</p>
-                                <span className='text-3xl font-semibold text-slate-900'>{countData?.data?.category || 0}</span>
-                            </div>
-                            <div className='w-10 h-10 flex justify-center items-center rounded-lg bg-blue-50 text-blue-600'>
-                                <BiCategory className='w-5 h-5'/>
-                            </div>
-                        </div>
-                        <p className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1 ${
-                            categoryTrend.isIncreased 
-                                ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        }`}>
-                            {categoryTrend.isIncreased ? <TrendingUp className='w-3 h-3' /> : <TrendingDown className='w-3 h-3' />}
-                            {categoryTrend.text}
-                        </p>
-                    </div>
-                </div>
-            </Link>
-            <Link href={ADMIN_PRODUCT_SHOW}>
-                <div className='p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-white border border-slate-100 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-shadow'>
-                    <div className='space-y-4'>
-                        <div className='flex justify-between items-start'>
-                            <div>
-                                <p className='text-sm font-medium text-slate-600 mb-2'>Total Products</p>
-                                <span className='text-3xl font-semibold text-slate-900'>{countData?.data?.product || 0}</span>
-                            </div>
-                            <div className='w-10 h-10 flex justify-center items-center rounded-lg bg-purple-50 text-purple-600'>
-                                <IoShirtOutline className='w-5 h-5'/>
-                            </div>
-                        </div>
-                        <p className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1 ${
-                            productTrend.isIncreased ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        }`}>
-                            {productTrend.isIncreased ? <TrendingUp className='w-3 h-3' /> : <TrendingDown className='w-3 h-3' />}
-                            {productTrend.text}
-                        </p>
-                    </div>
-                </div>
-            </Link>
-            <Link href={ADMIN_CUSTOMERS_SHOW}>
-                <div className='p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-white border border-slate-100 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-shadow'>
-                    <div className='space-y-4'>
-                        <div className='flex justify-between items-start'>
-                            <div>
-                                <p className='text-sm font-medium text-slate-600 mb-2'>Total Customers</p>
-                                <span className='text-3xl font-semibold text-slate-900'>{countData?.data?.customer || 0}</span>
-                            </div>
-                            <div className='w-10 h-10 flex justify-center items-center rounded-lg bg-orange-50 text-orange-600'>
-                                <LuUserRound className='w-5 h-5'/>
-                            </div>
-                        </div>
-                        <p className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1 ${
-                            customerTrend.isIncreased ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        }`}>
-                            {customerTrend.isIncreased ? <TrendingUp className='w-3 h-3' /> : <TrendingDown className='w-3 h-3' />}
-                            {customerTrend.text}
-                        </p>
-                    </div>
-                </div>
-            </Link>
-            <Link href={ADMIN_ORDER_SHOW}>
-                <div className='p-6 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-white border border-slate-100 hover:shadow-[0_8px_16px_rgba(0,0,0,0.12)] transition-shadow'>
-                    <div className='space-y-4'>
-                        <div className='flex justify-between items-start'>
-                            <div>
-                                <p className='text-sm font-medium text-slate-600 mb-2'>Total Orders</p>
-                                <span className='text-3xl font-semibold text-slate-900'>{countData?.data?.order || 0}</span>
-                            </div>
-                            <div className='w-10 h-10 flex justify-center items-center rounded-lg bg-cyan-50 text-cyan-600'>
-                                <MdOutlineShoppingBag className='w-5 h-5'/>
-                            </div>
-                        </div>
-                        <p className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1 ${
-                            orderTrend.isIncreased ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                        }`}>
-                            {orderTrend.isIncreased ? <TrendingUp className='w-3 h-3' /> : <TrendingDown className='w-3 h-3' />}
-                            {orderTrend.text}
-                        </p>
-                    </div>
-                </div>
-            </Link>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {cards.map((card) => (
+                <Link key={card.title} href={card.href} aria-label={`${card.title}: ${card.value}`}>
+                        <Card className={`border-l-4 hover:border-l-8`} style={{ borderLeftColor: `var(${card.chartVar})` }}> 
+                                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                            <div className="flex items-center gap-2">
+                                                <CardTitle className={`text-sm font-medium`} style={{ color: `var(${card.chartVar})` }}>{card.title}</CardTitle>
+                                            </div>
+                                            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: `var(${card.chartVar})`, color: 'white' }} aria-hidden>
+                                                <card.icon className="h-4 w-4" />
+                                            </span>
+                                        </CardHeader>
+                            <CardContent>
+                                <div className="text-4xl font-bold">{card.value}</div>
+                                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    {card.trend.isIncreased ? (
+                                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                                                <TrendingUp className="h-3 w-3" />
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-rose-600">
+                                                <TrendingDown className="h-3 w-3" />
+                                            </span>
+                                        )}
+                                    <span className="ml-1">{card.trend.text}</span>
+                                </p>
+                            </CardContent>
+                    </Card>
+                </Link>
+            ))}
         </div>
     )
 }

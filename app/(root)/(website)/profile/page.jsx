@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form'
 import Dropzone from 'react-dropzone'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import userIcon from '@/public/assets/images/user.png'
-import { FaCamera } from "react-icons/fa";
+import { Camera } from 'lucide-react'
 import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
@@ -29,6 +29,7 @@ const Profile = () => {
     const [loading, setLoading] = useState(false)
     const [preview, setPreview] = useState()
     const [file, setFile] = useState()
+    const MAX_IMAGE_BYTES = 5 * 1024 * 1024
     const formSchema = zSchema.pick({
         name: true, phone: true, address: true
     })
@@ -58,6 +59,13 @@ const Profile = () => {
 
     const handleFileSelection = (files) => {
         const file = files[0]
+        if (!file) {
+            return
+        }
+        if (file.size > MAX_IMAGE_BYTES) {
+            showToast('error', 'Upload failed. Max image size is 5 MB.')
+            return
+        }
         const preview = URL.createObjectURL(file)
         setPreview(preview)
         setFile(file)
@@ -100,22 +108,29 @@ const Profile = () => {
                         <Form {...form}>
                             <form className='grid md:grid-cols-2 grid-cols-1 gap-5' onSubmit={form.handleSubmit(updateProfile)} >
                                 <div className='md:col-span-2 col-span-1 flex justify-center items-center'>
-                                    <Dropzone onDrop={acceptedFiles => handleFileSelection(acceptedFiles)}>
-                                        {({ getRootProps, getInputProps }) => (
-                                            <div {...getRootProps()}>
-                                                <input {...getInputProps()} />
-                                                <Avatar className="w-28 h-28 relative group border border-gray-100">
-                                                    <AvatarImage src={preview ? preview : userIcon.src} />
-                                                    <div className='absolute z-50 w-full h-full top-1/2
-                                                     left-1/2 -translate-x-1/2 -translate-y-1/2
-                                                      justify-center items-center border-2 border-violet-500 rounded-full group-hover:flex hidden cursor-pointer bg-black/20'>
-                                                        <FaCamera color='#7c3aed' />
-                                                    </div>
-                                                </Avatar>
-                                            </div>
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Dropzone
+                                            onDrop={(acceptedFiles) => handleFileSelection(acceptedFiles)}
+                                            maxSize={MAX_IMAGE_BYTES}
+                                            accept={{ 'image/*': [] }}
+                                        >
+                                            {({ getRootProps, getInputProps }) => (
+                                                <div {...getRootProps()}>
+                                                    <input {...getInputProps()} />
+                                                    <Avatar className="w-28 h-28 relative group border border-gray-100">
+                                                        <AvatarImage src={preview ? preview : userIcon.src} />
+                                                        <div className='absolute z-50 w-full h-full top-1/2
+                                                         left-1/2 -translate-x-1/2 -translate-y-1/2
+                                                          justify-center items-center border-2 border-violet-500 rounded-full group-hover:flex hidden cursor-pointer bg-black/20'>
+                                                            <Camera className='size-4 text-violet-500' />
+                                                        </div>
+                                                    </Avatar>
+                                                </div>
 
-                                        )}
-                                    </Dropzone>
+                                            )}
+                                        </Dropzone>
+                                        <p className="text-xs text-muted-foreground">Max image size: 5 MB.</p>
+                                    </div>
                                 </div>
                                 <div className='mb-3'>
                                     <FormField

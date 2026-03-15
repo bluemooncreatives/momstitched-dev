@@ -1,7 +1,7 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
+import PageHeader from '@/components/Application/Admin/PageHeader'
 import ButtonLoading from '@/components/Application/ButtonLoading'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import useFetch from '@/hooks/useFetch'
@@ -80,66 +80,61 @@ const EditMedia = ({ params }) => {
 
 
     return (
-        <div>
-            <BreadCrumb breadcrumbData={breadCrumbData} />
+        <div className="flex flex-col gap-4 sm:gap-6">
+            <PageHeader
+                title="Edit Media"
+                description="Update alt text and title metadata."
+                breadcrumb={<BreadCrumb breadcrumbData={breadCrumbData} />}
+            />
 
-            <Card className="py-0 rounded shadow-sm">
-                <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
-                    <h4 className='text-xl font-semibold'>Edit Media</h4>
-                </CardHeader>
-                <CardContent className="pb-5">
+            <div className="rounded-md bg-card p-4 sm:p-6">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)}>
+                        <div className="mb-5">
+                            <Image
+                                src={mediaData?.data?.secure_url || imgPlaceholder}
+                                width={150}
+                                height={150}
+                                alt={mediaData?.atl || 'Image'}
+                            />
+                        </div>
+                        <div className="mb-5">
+                            <FormField
+                                control={form.control}
+                                name="alt"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Alt</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" placeholder="Enter alt" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="mb-5">
+                            <FormField
+                                control={form.control}
+                                name="title"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Title</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" placeholder="Enter title" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} >
-                            <div className='mb-5'>
-                                <Image
-                                    src={mediaData?.data?.secure_url || imgPlaceholder}
-                                    width={150}
-                                    height={150}
-                                    alt={mediaData?.atl || 'Image'}
-                                />
-                            </div>
-                            <div className='mb-5'>
-                                <FormField
-                                    control={form.control}
-                                    name="alt"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Alt</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" placeholder="Enter alt" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className='mb-5'>
-                                <FormField
-                                    control={form.control}
-                                    name="title"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Title</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" placeholder="Enter title" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-
-                            <div className='mb-3'>
-                                <ButtonLoading loading={loading} type="submit" text="Update Media" className="cursor-pointer" />
-                            </div>
-
-                        </form>
-                    </Form>
-
-                </CardContent>
-            </Card>
-
+                        <div className="mb-3">
+                            <ButtonLoading loading={loading} type="submit" text="Update Media" className="h-9 cursor-pointer" size="lg" />
+                        </div>
+                    </form>
+                </Form>
+            </div>
         </div>
     )
 }

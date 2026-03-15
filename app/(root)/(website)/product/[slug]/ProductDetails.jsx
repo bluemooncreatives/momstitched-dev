@@ -5,17 +5,15 @@ import {
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-    BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { IoStar } from "react-icons/io5";
+import { Minus, Plus, Star } from 'lucide-react'
 import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
-import { decode, encode } from "entities";
-import { HiMinus, HiPlus } from "react-icons/hi2";
+import { decode } from "entities";
 import ButtonLoading from "@/components/Application/ButtonLoading";
 import { useDispatch, useSelector } from "react-redux";
 import { addIntoCart } from "@/store/reducer/cartReducer";
@@ -86,7 +84,8 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
     }
 
     return (
-        <div className="lg:px-32 px-4">
+        <section className="website-gutter bg-[linear-gradient(180deg,rgba(62,0,13,0.03),transparent_20%)] py-10 lg:py-14">
+            <div className="website-content font-neue">
 
             {isProductLoading &&
                 <div className="fixed top-10 left-1/2 -translate-x-1/2 z-50">
@@ -94,7 +93,7 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
                 </div>
             }
 
-            <div className="my-10">
+            <div className="mb-8">
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
@@ -114,130 +113,124 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
                 </Breadcrumb>
             </div>
 
-            <div className="md:flex justify-between items-start lg:gap-10 gap-5 mb-20">
-                <div className="md:w-1/2 xl:flex xl:justify-center xl:gap-5 md:sticky md:top-0">
-                    <div className="xl:order-last xl:mb-0 mb-5 xl:w-[calc(100%-144px)]">
-                        <Image
-                            src={activeThumb || imgPlaceholder.src}
-                            width={650}
-                            height={650}
-                            alt="product"
-                            className="border rounded max-w-full"
-                        />
-                    </div>
-                    <div className="flex xl:flex-col items-center xl:gap-5 gap-3 xl:w-36 overflow-auto xl:pb-0 pb-2 max-h-[600px]">
-                        {variant?.media?.map((thumb) => (
-                            <Image
-                                key={thumb._id}
-                                src={thumb?.secure_url || imgPlaceholder.src}
-                                width={100}
-                                height={100}
-                                alt="product thumbnail"
-                                className={`md:max-w-full max-w-16 rounded cursor-pointer ${thumb.secure_url === activeThumb ? 'border-2 border-primary' : 'border'}`}
-                                onClick={() => handleThumb(thumb.secure_url)}
-                            />
-                        ))}
+            <div className="grid items-start gap-7 lg:grid-cols-[1.05fr_1fr] lg:gap-9 mb-16">
+                <div className="rounded-[var(--admin-shell-radius)] border border-border/60 bg-white p-4 shadow-sm md:sticky md:top-6">
+                    <div className="grid gap-4 xl:grid-cols-[88px_1fr]">
+                        <div className="order-2 flex gap-3 overflow-auto pb-2 xl:order-1 xl:max-h-[540px] xl:flex-col xl:pb-0">
+                            {variant?.media?.map((thumb) => (
+                                <Image
+                                    key={thumb._id}
+                                    src={thumb?.secure_url || imgPlaceholder.src}
+                                    width={92}
+                                    height={92}
+                                    alt="product thumbnail"
+                                    className={`h-[84px] w-[84px] rounded-md cursor-pointer border object-cover object-center transition xl:h-[92px] xl:w-[92px] ${thumb.secure_url === activeThumb ? 'border-[var(--dark-red)] ring-1 ring-[var(--dark-red)]/25' : 'border-border/70 hover:border-foreground/40'}`}
+                                    onClick={() => handleThumb(thumb.secure_url)}
+                                />
+                            ))}
+                        </div>
+                        <div className="order-1 xl:order-2 rounded-md border border-border/60 bg-[#f6f6f5] p-4">
+                            <div className="overflow-hidden rounded-md">
+                                <Image
+                                    src={activeThumb || imgPlaceholder.src}
+                                    width={700}
+                                    height={700}
+                                    alt="product"
+                                    className="h-full w-full object-contain"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="md:w-1/2 md:mt-0 mt-5">
-                    <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
-                    <div className="flex items-center gap-1 mb-5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                            <IoStar key={i} />
-                        ))}
-                        <span className="text-sm ps-2">({reviewCount} Reviews)</span>
-                    </div>
-                    <div className="flex items-center gap-2 mb-3">
-                        <span className="text-xl font-semibold">{variant.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                        <span className="text-sm line-through text-gray-500">{variant.mrp.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-
-
-                        <span className="bg-red-500 rounded-2xl px-3 py-1 text-white text-xs ms-5">-{variant.discountPercentage}%</span>
-
-
-                    </div>
-
-                    <div className="line-clamp-3" dangerouslySetInnerHTML={{ __html: decode(product.description) }}></div>
-
-
-                    <div className="mt-5">
-                        <p className="mb-2">
-                            <span className="font-semibold">Color: </span> {variant?.color}
-                        </p>
-                        <div className="flex gap-5">
-                            {colors.map(color => (
-                                <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${color}&size=${variant.size}`}
-                                    key={color}
-                                    className={`border py-1 px-3 rounded-lg cursor-pointer hover:bg-primary hover:text-white ${color === variant.color ? 'bg-primary text-white' : ''}`}
-                                >
-                                    {color}
-                                </Link>
+                <div className="rounded-[var(--admin-shell-radius)] border border-border/60 bg-white p-5 shadow-sm lg:p-6">
+                    <h1 className="text-2xl font-semibold uppercase tracking-[0.04em] lg:text-3xl">{product.name}</h1>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <div className="flex items-center gap-1 text-foreground">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <Star key={i} className='size-4 fill-foreground text-foreground' />
                             ))}
                         </div>
+                        <span className="text-sm text-muted-foreground">({reviewCount} Reviews)</span>
                     </div>
-                    <div className="mt-5">
-                        <p className="mb-2">
-                            <span className="font-semibold">Size: </span> {variant?.size}
-                        </p>
-                        <div className="flex gap-5">
-                            {sizes.map(size => (
-                                <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${variant.color}&size=${size}`}
-                                    key={size}
-                                    className={`border py-1 px-3 rounded-lg cursor-pointer hover:bg-primary hover:text-white ${size === variant.size ? 'bg-primary text-white' : ''}`}
-                                >
-                                    {size}
-                                </Link>
-                            ))}
+
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                        <span className="text-2xl font-semibold text-foreground">{variant.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
+                        <span className="text-sm line-through text-muted-foreground">{variant.mrp.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
+                        <span className="ms-2 rounded-md bg-[var(--dark-red)] px-2.5 py-1 text-[11px] font-semibold text-white">-{variant.discountPercentage}%</span>
+                    </div>
+
+                    <div className="mt-5 rounded-md border border-border/70 bg-muted/30 p-3 text-sm leading-relaxed text-foreground/85">
+                        <div className="line-clamp-3" dangerouslySetInnerHTML={{ __html: decode(product.description) }}></div>
+                    </div>
+
+                    <div className="mt-5 space-y-4">
+                        <div>
+                            <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Color: <span className="text-foreground">{variant?.color}</span></p>
+                            <div className="flex flex-wrap gap-2">
+                                {colors.map(color => (
+                                    <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${color}&size=${variant.size}`}
+                                        key={color}
+                                        className={`rounded-md border px-3 py-1.5 text-sm transition ${color === variant.color ? 'border-[var(--dark-red)] bg-[var(--dark-red)] text-white' : 'border-border/70 hover:border-foreground/40 hover:bg-muted/30'}`}
+                                    >
+                                        {color}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Size: <span className="text-foreground">{variant?.size}</span></p>
+                            <div className="flex flex-wrap gap-2">
+                                {sizes.map(size => (
+                                    <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${variant.color}&size=${size}`}
+                                        key={size}
+                                        className={`rounded-md border px-3 py-1.5 text-sm transition ${size === variant.size ? 'border-[var(--dark-red)] bg-[var(--dark-red)] text-white' : 'border-border/70 hover:border-foreground/40 hover:bg-muted/30'}`}
+                                    >
+                                        {size}
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
                     <div className="mt-5">
-                        <p className="font-bold mb-2">Quantity</p>
-                        <div className="flex items-center h-10 border w-fit rounded-full">
-
-                            <button type="button" className="h-full w-10 flex justify-center items-center" onClick={() => handleQty('desc')}>
-                                <HiMinus />
+                        <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Quantity</p>
+                        <div className="inline-flex items-center h-10 rounded-md border border-border/70 bg-white">
+                            <button type="button" className="h-full w-10 flex justify-center items-center text-foreground/80 hover:text-foreground" onClick={() => handleQty('desc')}>
+                                <Minus className='size-4' />
                             </button>
-                            <input type="text" value={qty} className="w-14 text-center border-none outline-offset-0" readOnly />
-                            <button type="button" className="h-full w-10 flex justify-center items-center" onClick={() => handleQty('inc')}>
-                                <HiPlus />
+                            <input type="text" value={qty} className="w-14 bg-transparent text-center border-none outline-offset-0" readOnly />
+                            <button type="button" className="h-full w-10 flex justify-center items-center text-foreground/80 hover:text-foreground" onClick={() => handleQty('inc')}>
+                                <Plus className='size-4' />
                             </button>
-
                         </div>
                     </div>
-
 
                     <div className="mt-5">
                         {!isAddedIntoCart ?
-                            <ButtonLoading type="button" text="Add To Cart" className="w-full rounded-full py-6 text-md cursor-pointer" onClick={handleAddToCart} />
+                            <ButtonLoading type="button" text="Add To Cart" className="h-11 w-full rounded-md bg-[var(--dark-red)] text-[12px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)]" onClick={handleAddToCart} />
                             :
-                            <Button className="w-full rounded-full py-6 text-md cursor-pointer" type="button" asChild>
+                            <Button className="h-11 w-full rounded-md bg-[var(--dark-red)] text-[12px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)]" type="button" asChild>
                                 <Link href={WEBSITE_CART}>Go To Cart</Link>
                             </Button>
                         }
-
-
                     </div>
-
                 </div>
             </div>
 
-
-            <div className="mb-10">
-                <div className="shadow rounded border">
-                    <div className="p-3 bg-gray-50 border-b">
-                        <h2 className="font-semibold text-2xl">Product Description</h2>
-                    </div>
-                    <div className="p-3">
-                        <div dangerouslySetInnerHTML={{ __html: encode(product.description) }}></div>
-                    </div>
+            <div className="mb-10 rounded-[var(--admin-shell-radius)] border border-border/60 bg-white shadow-sm">
+                <div className="border-b border-border/60 px-5 py-4">
+                    <h2 className="text-xl font-semibold uppercase tracking-[0.04em]">Product Description</h2>
+                </div>
+                <div className="p-5 leading-relaxed text-foreground/85">
+                    <div dangerouslySetInnerHTML={{ __html: decode(product.description) }}></div>
                 </div>
             </div>
 
             <ProductReveiw productId={product._id} />
-
-        </div>
+            </div>
+        </section>
     )
 }
 

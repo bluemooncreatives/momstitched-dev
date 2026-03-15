@@ -1,7 +1,7 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
+import PageHeader from '@/components/Application/Admin/PageHeader'
 import { ADMIN_CATEGORY_SHOW, ADMIN_DASHBOARD } from '@/routes/AdminPanelRoute'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import ButtonLoading from '@/components/Application/ButtonLoading'
@@ -77,59 +77,53 @@ const EditCategory = ({ params }) => {
     }
 
     return (
-        <div>
-            <BreadCrumb breadcrumbData={breadcrumbData} />
+        <div className="flex flex-col gap-4 sm:gap-6">
+            <PageHeader
+                title="Edit Category"
+                description="Update the category details and slug."
+                breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
+            />
 
-            <Card className="py-0 rounded shadow-sm">
-                <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
-                    <h4 className='text-xl font-semibold'>Edit Category</h4>
-                </CardHeader>
-                <CardContent className="pb-5">
+            <div className="rounded-md bg-card p-4 sm:p-6">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)}>
+                        <div className="mb-5">
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" placeholder="Enter category name" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="mb-5">
+                            <FormField
+                                control={form.control}
+                                name="slug"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Slug</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" placeholder="Enter slug" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} >
-
-                            <div className='mb-5'>
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" placeholder="Enter category name" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className='mb-5'>
-                                <FormField
-                                    control={form.control}
-                                    name="slug"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Slug</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" placeholder="Enter slug" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-
-                            <div className='mb-3'>
-                                <ButtonLoading loading={loading} type="submit" text="Update Category" className="cursor-pointer" />
-                            </div>
-
-                        </form>
-                    </Form>
-
-                </CardContent>
-            </Card>
-
+                        <div className="mb-3">
+                            <ButtonLoading loading={loading} type="submit" text="Update Category" className="h-9 cursor-pointer" size="lg" />
+                        </div>
+                    </form>
+                </Form>
+            </div>
         </div>
     )
 }

@@ -1,7 +1,7 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
-import { ADMIN_CATEGORY_SHOW, ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW } from '@/routes/AdminPanelRoute'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import PageHeader from '@/components/Application/Admin/PageHeader'
+import { ADMIN_DASHBOARD, ADMIN_PRODUCT_VARIANT_SHOW } from '@/routes/AdminPanelRoute'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import ButtonLoading from '@/components/Application/ButtonLoading'
@@ -9,99 +9,84 @@ import { zSchema } from '@/lib/zodSchema'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { use, useEffect, useState } from 'react'
-import slugify from 'slugify'
 import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 import useFetch from '@/hooks/useFetch'
 import Select from '@/components/Application/Select'
-import Editor from '@/components/Application/Admin/Editor'
 import MediaModal from '@/components/Application/Admin/MediaModal'
 import Image from 'next/image'
+import { sizes } from '@/lib/utils'
+
 const breadcrumbData = [
   { href: ADMIN_DASHBOARD, label: 'Home' },
-  { href: ADMIN_PRODUCT_SHOW, label: 'Products' },
-  { href: '', label: 'Edit Product' },
+  { href: ADMIN_PRODUCT_VARIANT_SHOW, label: 'Product Variants' },
+  { href: '', label: 'Edit Product Variant' },
 ]
 
-const EditProduct = ({ params }) => {
-
+const EditProductVariant = ({ params }) => {
   const { id } = use(params)
 
   const [loading, setLoading] = useState(false)
-  const [categoryOption, setCategoryOption] = useState([])
-  const { data: getCategory } = useFetch('/api/category?deleteType=SD')
-  const { data: getProduct, loading: getProductLoading } = useFetch(`/api/product/get/${id}`)
+  const [productOption, setProductOption] = useState([])
+  const { data: getProduct } = useFetch('/api/product?deleteType=SD&&size=10000')
+  const { data: getVariant } = useFetch(`/api/product-variant/get/${id}`)
 
-
-
-  // media modal states  
   const [open, setOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState([])
 
   useEffect(() => {
-    if (getCategory && getCategory.success) {
-      const data = getCategory.data
-      const options = data.map((cat) => ({ label: cat.name, value: cat._id }))
-      setCategoryOption(options)
+    if (getProduct && getProduct.success) {
+      const options = getProduct.data.map((product) => ({ label: product.name, value: product._id }))
+      setProductOption(options)
     }
-  }, [getCategory])
+  }, [getProduct])
 
   const formSchema = zSchema.pick({
     _id: true,
-    name: true,
-    slug: true,
-    category: true,
+    product: true,
+    sku: true,
+    color: true,
+    size: true,
     mrp: true,
     sellingPrice: true,
     discountPercentage: true,
-    description: true,
   })
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       _id: id,
-      name: "",
-      slug: "",
-      category: "",
-      mrp: 0,
-      sellingPrice: 0,
-      discountPercentage: 0,
-      description: "",
+      product: '',
+      sku: '',
+      color: '',
+      size: '',
+      mrp: '',
+      sellingPrice: '',
+      discountPercentage: '',
     },
   })
 
-
   useEffect(() => {
-    if (getProduct && getProduct.success) {
-      const product = getProduct.data
+    if (getVariant && getVariant.success) {
+      const variant = getVariant.data
       form.reset({
-        _id: product?._id,
-        name: product?.name,
-        slug: product?.slug,
-        category: product?.category,
-        mrp: product?.mrp,
-        sellingPrice: product?.sellingPrice,
-        discountPercentage: product?.discountPercentage,
-        description: product?.description,
+        _id: variant._id,
+        product: variant.product,
+        sku: variant.sku,
+        color: variant.color,
+        size: variant.size,
+        mrp: variant.mrp,
+        sellingPrice: variant.sellingPrice,
+        discountPercentage: variant.discountPercentage,
       })
 
-      if (product.media) {
-        const media = product.media.map((media) => ({ _id: media._id, url: media.secure_url }))
+      if (variant.media) {
+        const media = variant.media.map((item) => ({ _id: item._id, url: item.secure_url }))
         setSelectedMedia(media)
       }
-
     }
-  }, [getProduct])
+  }, [getVariant])
 
-  useEffect(() => {
-    const name = form.getValues('name')
-    if (name) {
-      form.setValue('slug', slugify(name).toLowerCase())
-    }
-  }, [form.watch('name')])
-
-  // discount percentage calculation 
   useEffect(() => {
     const mrp = form.getValues('mrp') || 0
     const sellingPrice = form.getValues('sellingPrice') || 0
@@ -110,13 +95,7 @@ const EditProduct = ({ params }) => {
       const discountPercentage = ((mrp - sellingPrice) / mrp) * 100
       form.setValue('discountPercentage', Math.round(discountPercentage))
     }
-
   }, [form.watch('mrp'), form.watch('sellingPrice')])
-
-  const editor = (event, editor) => {
-    const data = editor.getData()
-    form.setValue('description', data)
-  }
 
   const onSubmit = async (values) => {
     setLoading(true)
@@ -125,14 +104,12 @@ const EditProduct = ({ params }) => {
         return showToast('error', 'Please select media.')
       }
 
-      const mediaIds = selectedMedia.map(media => media._id)
-      values.media = mediaIds
+      values.media = selectedMedia.map((media) => media._id)
 
-      const { data: response } = await axios.put('/api/product/update', values)
+      const { data: response } = await axios.put('/api/product-variant/update', values)
       if (!response.success) {
         throw new Error(response.message)
       }
-
 
       showToast('success', response.message)
     } catch (error) {
@@ -143,168 +120,192 @@ const EditProduct = ({ params }) => {
   }
 
   return (
-    <div>
-      <BreadCrumb breadcrumbData={breadcrumbData} />
+    <div className="flex flex-col gap-4 sm:gap-6">
+      <PageHeader
+        title="Edit Product Variant"
+        description="Update variant details, pricing, and media."
+        breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
+      />
 
-      <Card className="py-0 rounded shadow-sm">
-        <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
-          <h4 className='text-xl font-semibold'>Edit Product</h4>
-        </CardHeader>
-        <CardContent className="pb-5">
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} >
-
-              <div className='grid md:grid-cols-2 grid-cols-1 gap-5'>
-
-                <div className=''>
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name<span className='text-red-500'>*</span></FormLabel>
-                        <FormControl>
-                          <Input type="text" placeholder="Enter category name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className=''>
-                  <FormField
-                    control={form.control}
-                    name="slug"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Slug <span className='text-red-500'>*</span></FormLabel>
-                        <FormControl>
-                          <Input type="text" placeholder="Enter slug" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className=''>
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category <span className='text-red-500'>*</span></FormLabel>
-                        <FormControl>
-                          <Select
-                            options={categoryOption}
-                            selected={field.value}
-                            setSelected={field.onChange}
-                            isMulti={false}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className=''>
-                  <FormField
-                    control={form.control}
-                    name="mrp"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>MRP <span className='text-red-500'>*</span></FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="Enter MRP" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className=''>
-                  <FormField
-                    control={form.control}
-                    name="sellingPrice"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Selling Price <span className='text-red-500'>*</span></FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="Enter Selling Price" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className=''>
-                  <FormField
-                    control={form.control}
-                    name="discountPercentage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Discount Percentage <span className='text-red-500'>*</span></FormLabel>
-                        <FormControl>
-                          <Input type="number" readOnly placeholder="Enter Discount Percentage" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className='mb-5 md:col-span-2'>
-                  <FormLabel className="mb-2">Description <span className='text-red-500'>*</span></FormLabel>
-                  {!getProductLoading &&
-                    <Editor onChange={editor} initialData={form.getValues('description')} />
-                  }
-                  <FormMessage></FormMessage>
-                </div>
-
-              </div>
-
-              <div className='md:col-span-2 border border-dashed rounded p-5 text-center'>
-                <MediaModal
-                  open={open}
-                  setOpen={setOpen}
-                  selectedMedia={selectedMedia}
-                  setSelectedMedia={setSelectedMedia}
-                  isMultiple={true}
-                />
-
-                {selectedMedia.length > 0
-                  && <div className='flex justify-center items-center flex-wrap mb-3 gap-2'>
-                    {selectedMedia.map(media => (
-                      <div key={media._id} className='h-24 w-24 border'>
-                        <Image
-                          src={media.url}
-                          height={100}
-                          width={100}
-                          alt=''
-                          className='size-full object-cover'
+      <div className="rounded-md bg-card p-4 sm:p-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="grid md:grid-cols-2 grid-cols-1 gap-5">
+              <div>
+                <FormField
+                  control={form.control}
+                  name="product"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Product <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          options={productOption}
+                          selected={field.value}
+                          setSelected={field.onChange}
+                          isMulti={false}
                         />
-                      </div>
-                    ))}
-                  </div>
-                }
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                <div onClick={() => setOpen(true)} className='bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer'>
-                  <span className='font-semibold'>Select Media</span>
+              <div>
+                <FormField
+                  control={form.control}
+                  name="sku"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        SKU <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="text" placeholder="Enter sku" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Color <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="text" placeholder="Enter color" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="size"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Size <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          options={sizes}
+                          selected={field.value}
+                          setSelected={field.onChange}
+                          isMulti={false}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="mrp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        MRP <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter MRP" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="sellingPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Selling Price <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Enter Selling Price" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="mb-3">
+                <FormField
+                  control={form.control}
+                  name="discountPercentage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Discount Percentage <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="number" readOnly placeholder="Enter Discount Percentage" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
+              <MediaModal
+                open={open}
+                setOpen={setOpen}
+                selectedMedia={selectedMedia}
+                setSelectedMedia={setSelectedMedia}
+                isMultiple={true}
+              />
+
+              {selectedMedia.length > 0 && (
+                <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
+                  {selectedMedia.map((media) => (
+                    <div key={media._id} className="h-24 w-24 border">
+                      <Image
+                        src={media.url}
+                        height={100}
+                        width={100}
+                        alt="Selected media"
+                        className="size-full object-cover"
+                      />
+                    </div>
+                  ))}
                 </div>
+              )}
 
+              <div onClick={() => setOpen(true)} className="mx-auto w-[200px] cursor-pointer border bg-muted/40 p-5">
+                <span className="font-semibold">Select Media</span>
               </div>
+            </div>
 
-              <div className='mb-3 mt-5'>
-                <ButtonLoading loading={loading} type="submit" text="Save Changes" className="cursor-pointer" />
-              </div>
-
-            </form>
-          </Form>
-
-        </CardContent>
-      </Card>
-
+            <div className="mb-3 mt-5">
+              <ButtonLoading loading={loading} type="submit" text="Save Changes" className="h-9 cursor-pointer" size="lg" />
+            </div>
+          </form>
+        </Form>
+      </div>
     </div>
   )
 }
 
-export default EditProduct
+export default EditProductVariant

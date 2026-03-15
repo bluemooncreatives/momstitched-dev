@@ -1,8 +1,12 @@
 import GlobalProvider from "@/components/Application/GlobalProvider";
 import LenisProvider from '@/components/Application/LenisProvider'
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-import { Assistant } from 'next/font/google'
-import { ToastContainer } from 'react-toastify';
+import { Assistant, Geist } from 'next/font/google'
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
 const assistantFont = Assistant({
   weight: ['400', '500', '600', '700', '800'],
   subsets: ['latin'],
@@ -16,12 +20,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", geist.variable)}>
       <body
         className={`${assistantFont.className} antialiased`}
       >
         <GlobalProvider>
-          <ToastContainer />
+          <Toaster />
           <LenisProvider>
             {children}
           </LenisProvider>

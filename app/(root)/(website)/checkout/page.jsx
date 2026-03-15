@@ -16,9 +16,8 @@ import Link from 'next/link'
 import React, { useActionState, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { IoCloseCircleSharp } from "react-icons/io5";
+import { Truck, XCircle } from 'lucide-react'
 import { z } from 'zod'
-import { FaShippingFast } from "react-icons/fa";
 import { Textarea } from '@/components/ui/textarea'
 import Script from 'next/script'
 import { useRouter } from 'next/navigation'
@@ -284,7 +283,7 @@ const Checkout = () => {
                 <div className='flex lg:flex-nowrap flex-wrap gap-10 my-20 lg:px-32 px-4'>
                     <div className='lg:w-[60%] w-full'>
                         <div className='flex font-semibold gap-2 items-center'>
-                            <FaShippingFast size={25} /> Shipping Address:
+                            <Truck className='size-6' /> Shipping Address:
                         </div>
                         <div className='mt-5'>
 
@@ -537,7 +536,7 @@ const Checkout = () => {
                                                 <p className='text-sm font-semibold'>{couponCode}</p>
                                             </div>
                                             <button type='button' onClick={removeCoupon} className='text-red-500 cursor-pointer'>
-                                                <IoCloseCircleSharp size={25} />
+                                                <XCircle className='size-6' />
                                             </button>
                                         </div>
                                     }

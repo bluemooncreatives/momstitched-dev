@@ -6,11 +6,27 @@ import MediaModel from "@/models/Media.model";
 
 export async function POST(request) {
     const payload = await request.json()
+    const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
     try {
         const auth = await isAuthenticated('admin')
         if (!auth.isAuth) {
             return response(false, 403, 'Unauthorized.')
+        }
+
+        if (!Array.isArray(payload) || payload.length === 0) {
+            return response(false, 400, 'No media provided.')
+        }
+
+        const oversized = payload.find((item) => typeof item?.bytes !== 'number' || item.bytes > MAX_IMAGE_BYTES)
+        if (oversized) {
+            if (payload.length > 0) {
+                const publicIds = payload.map(data => data.public_id).filter(Boolean)
+                if (publicIds.length > 0) {
+                    await cloudinary.api.delete_resources(publicIds)
+                }
+            }
+            return response(false, 413, 'Upload failed. Max image size is 5 MB.')
         }
 
         await connectDB()

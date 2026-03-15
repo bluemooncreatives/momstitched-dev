@@ -7,11 +7,25 @@ import useFetch from "@/hooks/useFetch"
 import { use, useEffect, useState } from "react"
 import { ADMIN_DASHBOARD, ADMIN_ORDER_SHOW } from "@/routes/AdminPanelRoute"
 import BreadCrumb from "@/components/Application/Admin/BreadCrumb"
-import Select from "@/components/Application/Select"
-import { orderStatus } from "@/lib/utils"
+import PageHeader from "@/components/Application/Admin/PageHeader"
 import ButtonLoading from "@/components/Application/ButtonLoading"
 import { showToast } from "@/lib/showToast"
 import axios from "axios"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 
 const breadcrumbData = [
     { href: ADMIN_DASHBOARD, label: 'Home' },
@@ -65,38 +79,40 @@ const OrderDetails = ({ params }) => {
     }
 
     return (
-        <div>
-            <BreadCrumb breadcrumbData={breadcrumbData} />
-            <div className="border">
-                {!orderData ?
-                    <div className="flex justify-center items-center py-32">
+        <div className="flex flex-col gap-4 sm:gap-6">
+            <PageHeader
+                title="Order Details"
+                description="Review order items, shipping, and status."
+                breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
+            />
+
+            <div className="rounded-md bg-card">
+                {!orderData ? (
+                    <div className="flex justify-center items-center py-24">
                         <h4 className="text-red-500 text-xl font-semibold">Order Not Found</h4>
                     </div>
-                    :
-                    <div >
-                        <div className="py-2 px-5 border-b mb-3">
-                            <h4 className="text-lg font-bold text-primary">Order Details</h4>
+                ) : (
+                    <div className="px-4 py-4">
+                        <div className="mb-5">
+                            <p><b>Order Id:</b> {orderData?.order_id}</p>
+                            <p><b>Transaction Id:</b> {orderData?.payment_id}</p>
+                            <p className="capitalize"><b>Status:</b> {orderData?.status}</p>
                         </div>
 
-                        <div className="px-5 mb-5">
-                            <div className="mb-5">
-                                <p><b>Order Id:</b> {orderData?.order_id}</p>
-                                <p><b>Transaction Id:</b> {orderData?.payment_id}</p>
-                                <p className="capitalize"><b>Status:</b> {orderData?.status}</p>
-                            </div>
-                            <table className="w-full border">
-                                <thead className="border-b bg-gray-50 dark:bg-card md:table-header-group hidden">
-                                    <tr>
-                                        <th className="text-start p-3">Product</th>
-                                        <th className="text-center p-3">Price</th>
-                                        <th className="text-center p-3">Quantity</th>
-                                        <th className="text-center p-3">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div className="rounded-lg border overflow-hidden">
+                                <Table>
+                                    <TableHeader className="hidden md:table-header-group">
+                                        <TableRow>
+                                            <TableHead className="text-start p-3">Product</TableHead>
+                                            <TableHead className="text-center p-3">Price</TableHead>
+                                            <TableHead className="text-center p-3">Quantity</TableHead>
+                                            <TableHead className="text-center p-3">Total</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
                                     {orderData && orderData?.products?.map((product) => (
-                                        <tr key={product.variantId._id} className="md:table-row block border-b">
-                                            <td className="md:table-cell p-3">
+                                        <TableRow key={product.variantId._id} className="md:table-row block border-b">
+                                            <TableCell className="md:table-cell p-3">
                                                 <div className="flex items-center gap-5">
                                                     <Image src={product?.variantId?.media[0]?.secure_url || placeholderImg.src} width={60} height={60} alt="product" className="rounded" />
                                                     <div>
@@ -107,26 +123,27 @@ const OrderDetails = ({ params }) => {
                                                         </h4>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
+                                            </TableCell>
+                                            <TableCell className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
                                                 <span className="md:hidden font-medium">Price</span>
                                                 <span>{product.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                                            </td>
-                                            <td className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
+                                            </TableCell>
+                                            <TableCell className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
                                                 <span className="md:hidden font-medium">Quantity</span>
                                                 <span>{product.qty}</span>
-                                            </td>
-                                            <td className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
+                                            </TableCell>
+                                            <TableCell className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
                                                 <span className="md:hidden font-medium">Total</span>
                                                 <span>{(product.qty * product.sellingPrice).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
-                                </tbody>
-                            </table>
+                                    </TableBody>
+                                </Table>
+                            </div>
 
-                            <div className="grid md:grid-cols-2 grid-cols-1 gap-10 border mt-10">
-                                <div className="p-5">
+                            <div className="mt-10 grid gap-4 md:grid-cols-2">
+                                <div className="rounded-lg border p-5">
                                     <h4 className="text-lg font-semibold mb-5">Shipping Address</h4>
                                     <div>
                                         <table className="w-full">
@@ -172,7 +189,7 @@ const OrderDetails = ({ params }) => {
                                         </table>
                                     </div>
                                 </div>
-                                <div className="p-5 bg-gray-50 dark:bg-card">
+                                <div className="rounded-lg border bg-muted/30 p-5">
                                     <h4 className="text-lg font-semibold mb-5">Order Summary</h4>
                                     <div>
                                         <table className="w-full">
@@ -204,23 +221,28 @@ const OrderDetails = ({ params }) => {
                                     <div className="pt-3">
                                         <h4 className="text-lg font-semibold mb-2">Order Status</h4>
                                         <Select
-                                            options={statusOptions}
-                                            selected={orderStatus}
-                                            setSelected={(value) => setOrderStatus(value)}
-                                            placeholder="Select"
-                                            isMulti={false}
-                                        />
-                                        <ButtonLoading type="button" loading={updatingStatus} onClick={handleOrderStatus} text="Save Status" className="mt-5 cursor-pointer" />
+                                            value={orderStatus}
+                                            onValueChange={setOrderStatus}
+                                        >
+                                            <SelectTrigger className="w-full h-10">
+                                                <SelectValue placeholder="Select status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {statusOptions.map((option) => (
+                                                    <SelectItem key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <ButtonLoading type="button" loading={updatingStatus} onClick={handleOrderStatus} text="Save Status" className="mt-5 h-9 cursor-pointer" size="lg" />
                                     </div>
 
                                 </div>
                             </div>
 
-                        </div>
-
-
                     </div>
-                }
+                )}
             </div>
         </div>
     )

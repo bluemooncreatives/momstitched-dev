@@ -7,8 +7,7 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
-import { HiMinus, HiPlus } from "react-icons/hi2";
-import { IoCloseCircleOutline } from "react-icons/io5";
+import { Minus, Plus, XCircle } from 'lucide-react'
 import { decreaseQuantity, increaseQuantity, removeFromCart } from '@/store/reducer/cartReducer'
 
 const breadCrumb = {
@@ -94,13 +93,13 @@ const CartPage = () => {
                                                 <div className="flex justify-center items-center md:h-10 h-7 border w-fit rounded-full">
 
                                                     <button type="button" className="h-full w-10 flex justify-center items-center cursor-pointer" onClick={() => dispatch(decreaseQuantity({ productId: product.productId, variantId: product.variantId }))}>
-                                                        <HiMinus />
+                                                        <Minus className='size-4' />
                                                     </button>
                                                     <input type="text" value={product.qty} className="md:w-14 w-8  text-center border-none outline-offset-0" readOnly />
                                                     <button type="button" className="h-full w-10 flex justify-center items-center cursor-pointer"
                                                         onClick={() => dispatch(increaseQuantity({ productId: product.productId, variantId: product.variantId }))}
                                                     >
-                                                        <HiPlus />
+                                                        <Plus className='size-4' />
                                                     </button>
 
                                                 </div>
@@ -117,7 +116,7 @@ const CartPage = () => {
                                         <td className='md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center'>
                                             <span className='md:hidden font-medium'>Remove</span>
                                             <button type='button' onClick={() => dispatch(removeFromCart({ productId: product.productId, variantId: product.variantId }))} className='text-red-500'>
-                                                <IoCloseCircleOutline />
+                                                <XCircle className='size-5' />
                                             </button>
                                         </td>
                                     </tr>

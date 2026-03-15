@@ -7,8 +7,9 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
-import { WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
+import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
 import './FeaturedProduct.css'
+import ShopAllButton from '@/components/Application/Website/ShopAllButton'
 
 // Assign sizes in a repeating pattern for the row layout
 const sizePattern = ['lg', 'sm', 'lg', 'sm', 'lg', 'lg', 'lg', 'lg', 'sm']
@@ -121,12 +122,7 @@ const FeaturedProductClient = ({ products = [] }) => {
             <div className="fp-container">
                 {renderProductRows()}
                 <div className="mt-4 flex justify-center">
-                    <Link
-                        href={WEBSITE_SHOP}
-                        className="inline-flex items-center justify-center rounded-full border border-black bg-transparent px-8 py-3 text-sm font-semibold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-black hover:text-white"
-                    >
-                        Shop All Products
-                    </Link>
+                    <ShopAllButton colorScheme="dark-red" radius="md" />
                 </div>
             </div>
         </section>

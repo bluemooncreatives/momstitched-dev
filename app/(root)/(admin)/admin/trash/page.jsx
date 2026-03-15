@@ -2,7 +2,7 @@
 import BreadCrumb from "@/components/Application/Admin/BreadCrumb"
 import DatatableWrapper from "@/components/Application/Admin/DatatableWrapper"
 import DeleteAction from "@/components/Application/Admin/DeleteAction"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import PageHeader from "@/components/Application/Admin/PageHeader"
 import { DT_CATEGORY_COLUMN, DT_COUPON_COLUMN, DT_CUSTOMERS_COLUMN, DT_ORDER_COLUMN, DT_PRODUCT_COLUMN, DT_PRODUCT_VARIANT_COLUMN, DT_REVIEW_COLUMN } from "@/lib/column"
 import { columnConfig } from "@/lib/helperFunction"
 import { ADMIN_DASHBOARD, ADMIN_TRASH } from "@/routes/AdminPanelRoute"
@@ -76,6 +76,21 @@ const Trash = () => {
 
     const config = TRASH_CONFIG[trashOf]
 
+    if (!config) {
+        return (
+            <div className="flex flex-col gap-4 sm:gap-6">
+                <PageHeader
+                    title="Trash"
+                    description="Select a section to review deleted items."
+                    breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
+                />
+                <div className="rounded-md bg-card px-4 py-6 text-sm text-muted-foreground">
+                    Choose a valid trash section from an entity table.
+                </div>
+            </div>
+        )
+    }
+
     const columns = useMemo(() => {
         return columnConfig(config.columns, false, false, true)
     }, [])
@@ -85,28 +100,25 @@ const Trash = () => {
     }, [])
 
     return (
-        <div>
-            <BreadCrumb breadcrumbData={breadcrumbData} />
+        <div className="flex flex-col gap-4 sm:gap-6">
+            <PageHeader
+                title={config.title}
+                description="Restore items or delete them permanently."
+                breadcrumb={<BreadCrumb breadcrumbData={breadcrumbData} />}
+            />
 
-            <Card className="py-0 rounded shadow-sm gap-0">
-                <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
-                    <div className="flex justify-between items-center">
-                        <h4 className='text-xl font-semibold'>{config.title}</h4>
-                    </div>
-                </CardHeader>
-                <CardContent className="px-0 pt-0">
-                    <DatatableWrapper
-                        queryKey={`${trashOf}-data-deleted`}
-                        fetchUrl={config.fetchUrl}
-                        initialPageSize={10}
-                        columnsConfig={columns}
-                        exportEndpoint={config.exportUrl}
-                        deleteEndpoint={config.deleteUrl}
-                        deleteType="PD"
-                        createAction={action}
-                    />
-                </CardContent>
-            </Card>
+            <div className="rounded-md bg-card">
+                <DatatableWrapper
+                    queryKey={`${trashOf}-data-deleted`}
+                    fetchUrl={config.fetchUrl}
+                    initialPageSize={10}
+                    columnsConfig={columns}
+                    exportEndpoint={config.exportUrl}
+                    deleteEndpoint={config.deleteUrl}
+                    deleteType="PD"
+                    createAction={action}
+                />
+            </div>
         </div>
     )
 }

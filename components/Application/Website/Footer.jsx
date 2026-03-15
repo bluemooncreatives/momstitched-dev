@@ -2,14 +2,7 @@ import Image from 'next/image'
 import React from 'react'
 import logo from '@/public/assets/images/logo-black.png'
 import Link from 'next/link'
-import { IoLocationOutline } from "react-icons/io5";
-import { MdOutlinePhone } from "react-icons/md";
-import { MdOutlineMail } from "react-icons/md";
-import { AiOutlineYoutube } from "react-icons/ai";
-import { FaInstagram } from "react-icons/fa";
-import { FaWhatsapp } from "react-icons/fa";
-import { TiSocialFacebookCircular } from "react-icons/ti";
-import { FiTwitter } from "react-icons/fi";
+import { MapPin, Phone, Mail, Youtube, Instagram, MessageCircle, Facebook, Twitter } from 'lucide-react'
 
 import { USER_DASHBOARD, WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 const Footer = () => {
@@ -99,15 +92,15 @@ const Footer = () => {
                     <h4 className='text-xl font-bold uppercase mb-5'>Contact Us </h4>
                     <ul>
                         <li className='mb-2 text-gray-500 flex gap-2'>
-                            <IoLocationOutline size={20} />
+                            <MapPin className='size-5' />
                             <span className='text-sm'>MomStitched market Lucknow, India 256320</span>
                         </li>
                         <li className='mb-2 text-gray-500 flex gap-2'>
-                            <MdOutlinePhone size={20} />
+                            <Phone className='size-5' />
                             <Link href="tel:+91-8569874589" className='hover:text-primary text-sm'>+91-8569874589</Link>
                         </li>
                         <li className='mb-2 text-gray-500 flex gap-2'>
-                            <MdOutlineMail size={20} />
+                            <Mail className='size-5' />
                             <Link href="mailto:momstitched.official@gmail.com" className='hover:text-primary text-sm'>momstitched.official@gmail.com</Link>
                         </li>
 
@@ -117,19 +110,19 @@ const Footer = () => {
                     <div className='flex gap-5 mt-5'>
 
                         <Link href="">
-                            <AiOutlineYoutube className='text-primary' size={25} />
+                            <Youtube className='text-primary size-6' />
                         </Link>
                         <Link href="">
-                            <FaInstagram className='text-primary' size={25} />
+                            <Instagram className='text-primary size-6' />
                         </Link>
                         <Link href="">
-                            <FaWhatsapp className='text-primary' size={25} />
+                            <MessageCircle className='text-primary size-6' />
                         </Link>
                         <Link href="">
-                            <TiSocialFacebookCircular className='text-primary' size={25} />
+                            <Facebook className='text-primary size-6' />
                         </Link>
                         <Link href="">
-                            <FiTwitter className='text-primary' size={25} />
+                            <Twitter className='text-primary size-6' />
                         </Link>
 
                     </div>
