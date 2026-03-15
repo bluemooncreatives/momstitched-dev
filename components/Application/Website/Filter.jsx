@@ -1,5 +1,4 @@
 'use client'
-import useFetch from '@/hooks/useFetch'
 import { memo, useEffect, useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
@@ -10,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Minus, Plus } from 'lucide-react'
-const Filter = () => {
+const Filter = ({ filters }) => {
     const searchParams = useSearchParams()
 
     const [priceFilter, setPriceFilter] = useState({ minPrice: 0, maxPrice: 3000 })
@@ -18,9 +17,13 @@ const Filter = () => {
     const [selectedColor, setSelectedColor] = useState([])
     const [selectedSize, setSelectedSize] = useState([])
 
-    const { data: categoryData } = useFetch('/api/category/get-category')
-    const { data: colorData } = useFetch('/api/product-variant/colors')
-    const { data: sizeData } = useFetch('/api/product-variant/sizes')
+    const categories = filters?.categories ?? null
+    const colors = filters?.colors ?? null
+    const sizes = filters?.sizes ?? null
+
+    const categoriesReady = Array.isArray(categories)
+    const colorsReady = Array.isArray(colors)
+    const sizesReady = Array.isArray(sizes)
 
     const urlSearchParams = new URLSearchParams(searchParams.toString())
     const router = useRouter()
@@ -134,16 +137,13 @@ const Filter = () => {
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
                         <ul className="space-y-2.5">
-                            {!categoryData && (
+                            {!categoriesReady && (
                                 <li className="px-2 py-1.5 text-[12px] text-muted-foreground">Loading categories...</li>
                             )}
-                            {categoryData && !categoryData.success && (
+                            {categoriesReady && categories.length === 0 && (
                                 <li className="px-2 py-1.5 text-[12px] text-muted-foreground">No categories available.</li>
                             )}
-                            {categoryData && categoryData.success && categoryData.data.length === 0 && (
-                                <li className="px-2 py-1.5 text-[12px] text-muted-foreground">No categories available.</li>
-                            )}
-                            {categoryData && categoryData.success && categoryData.data.map((category) => {
+                            {categoriesReady && categories.map((category) => {
                                 const categoryId = `category-${category._id}`
                                 const active = selectedCategory.includes(category.slug)
                                 return (
@@ -176,16 +176,13 @@ const Filter = () => {
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
                         <ul className="space-y-2.5">
-                            {!colorData && (
+                            {!colorsReady && (
                                 <li className="px-2 py-1.5 text-[12px] text-muted-foreground">Loading colors...</li>
                             )}
-                            {colorData && !colorData.success && (
+                            {colorsReady && colors.length === 0 && (
                                 <li className="px-2 py-1.5 text-[12px] text-muted-foreground">No colors available.</li>
                             )}
-                            {colorData && colorData.success && colorData.data.length === 0 && (
-                                <li className="px-2 py-1.5 text-[12px] text-muted-foreground">No colors available.</li>
-                            )}
-                            {colorData && colorData.success && colorData.data.map((color) => {
+                            {colorsReady && colors.map((color) => {
                                 const safeColor = String(color).replace(/\s+/g, '-').toLowerCase()
                                 const colorId = `color-${safeColor}`
                                 const active = selectedColor.includes(color)
@@ -224,16 +221,13 @@ const Filter = () => {
                     </AccordionTrigger>
                     <AccordionContent className="pb-4">
                         <ul className="grid grid-cols-2 gap-2">
-                            {!sizeData && (
+                            {!sizesReady && (
                                 <li className="col-span-2 px-2 py-1.5 text-[12px] text-muted-foreground">Loading sizes...</li>
                             )}
-                            {sizeData && !sizeData.success && (
+                            {sizesReady && sizes.length === 0 && (
                                 <li className="col-span-2 px-2 py-1.5 text-[12px] text-muted-foreground">No sizes available.</li>
                             )}
-                            {sizeData && sizeData.success && sizeData.data.length === 0 && (
-                                <li className="col-span-2 px-2 py-1.5 text-[12px] text-muted-foreground">No sizes available.</li>
-                            )}
-                            {sizeData && sizeData.success && sizeData.data.map((size) => {
+                            {sizesReady && sizes.map((size) => {
                                 const safeSize = String(size).replace(/\s+/g, '-').toLowerCase()
                                 const sizeId = `size-${safeSize}`
                                 const active = selectedSize.includes(size)
