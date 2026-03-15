@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import {
     Select,
     SelectContent,
@@ -63,4 +63,4 @@ const Sorting = ({ limit, setLimit, sorting, setSorting, mobileFilterOpen, setMo
     )
 }
 
-export default Sorting
+export default memo(Sorting)

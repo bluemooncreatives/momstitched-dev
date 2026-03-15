@@ -17,6 +17,8 @@ const useFetch = (url, method = "GET", options = {}) => {
     }, [method, optionsString])
 
     useEffect(() => {
+        const controller = new AbortController()
+
         const apiCall = async () => {
             setLoading(true)
             setError(null)
@@ -24,6 +26,7 @@ const useFetch = (url, method = "GET", options = {}) => {
                 const { data: response } = await axios({
                     url,
                     method,
+                    signal: controller.signal,
                     ...(requestOptions)
                 })
 
@@ -33,6 +36,9 @@ const useFetch = (url, method = "GET", options = {}) => {
 
                 setData(response)
             } catch (error) {
+                if (axios.isCancel(error)) {
+                    return
+                }
                 setError(error.message)
             } finally {
                 setLoading(false)
@@ -40,6 +46,10 @@ const useFetch = (url, method = "GET", options = {}) => {
         }
 
         apiCall()
+
+        return () => {
+            controller.abort()
+        }
 
     }, [url, refreshIndex, requestOptions])
 

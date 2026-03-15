@@ -2,7 +2,7 @@
 import Filter from '@/components/Application/Website/Filter'
 import Sorting from '@/components/Application/Website/Sorting'
 import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
     Sheet,
     SheetContent,
@@ -10,7 +10,6 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet"
-import useWindowSize from '@/hooks/useWindowSize'
 import axios from 'axios'
 import { useSearchParams } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -24,44 +23,63 @@ const Shop = () => {
     const [limit, setLimit] = useState(9)
     const [sorting, setSorting] = useState('default_sorting')
     const [isMobileFilter, setIsMobileFilter] = useState(false)
-    const windowSize = useWindowSize()
+    const [isDesktop, setIsDesktop] = useState(false)
 
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(min-width: 1025px)')
 
-    const fetchProduct = async (pageParam) => {
-        const { data: getProduct } = await axios.get(`/api/shop?page=${pageParam}&limit=${limit}&sort=${sorting}&${searchParamString}`)
+        const onChange = (event) => {
+            setIsDesktop(event.matches)
+        }
+
+        setIsDesktop(mediaQuery.matches)
+        mediaQuery.addEventListener('change', onChange)
+
+        return () => {
+            mediaQuery.removeEventListener('change', onChange)
+        }
+    }, [])
+
+    const fetchProduct = useCallback(async (pageParam) => {
+        const { data: getProduct } = await axios.get('/api/shop', {
+            params: {
+                page: pageParam,
+                limit,
+                sort: sorting,
+                ...(searchParamString ? Object.fromEntries(new URLSearchParams(searchParamString)) : {}),
+            }
+        })
         if (!getProduct.success) {
             throw new Error(getProduct.message || 'Failed to load products.')
         }
         return getProduct.data
-    }
+    }, [limit, sorting, searchParamString])
 
-    const { error, data, isFetching, fetchNextPage, hasNextPage } = useInfiniteQuery({
+    const { error, data, isFetching, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
         queryKey: ['products', limit, sorting, searchParamString],
-        queryFn: async ({ pageParam }) => await fetchProduct(pageParam),
+        queryFn: ({ pageParam }) => fetchProduct(pageParam),
         initialPageParam: 0,
+        staleTime: 60 * 1000,
+        gcTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        retry: 1,
         getNextPageParam: (lastPage) => {
             return lastPage?.nextPage ?? undefined
         }
     })
 
-    const allProducts = data?.pages?.flatMap((page) => page.products) || []
+    const allProducts = useMemo(() => data?.pages?.flatMap((page) => page.products) || [], [data?.pages])
     const showEmptyState = !isFetching && !error && allProducts.length === 0
     const resultCount = !isFetching && !error ? allProducts.length : null
 
     return (
         <div>
             <section className="relative isolate h-[280px] overflow-hidden sm:h-[220px] lg:h-[280px]">
-                <video
-                    src="https://res.cloudinary.com/darrsi9y2/video/upload/v1773593235/vecteezy_pink-abstract-texture-background-blur-backdrop-of-gradient_48672445_t5pedw.mp4"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="absolute inset-0 h-full w-full object-cover"
-                />
+                <div className="absolute inset-0 bg-[var(--dark-red-2)]" />
                 <div className="absolute inset-x-0 top-3 z-10 flex justify-center sm:top-5 lg:top-6">
                     <div
-                        className="pointer-events-none select-none font-neue font-semibold uppercase tracking-[0.02em] text-white"
+                        className="pointer-events-none select-none font-neue font-semibold uppercase tracking-[0.02em] text-white/90"
                         style={{
                             fontSize: "clamp(7.5rem, 34vw, 30rem)",
                             lineHeight: 0.78,
@@ -79,7 +97,7 @@ const Shop = () => {
 
             <section className='website-gutter bg-white py-10 lg:py-14'>
                 <div className="grid w-full gap-6 lg:grid-cols-[290px_1fr] lg:gap-8">
-                    {windowSize.width > 1024 ? (
+                    {isDesktop ? (
                         <aside className='w-full'>
                             <div className='sticky top-6'>
                                 <Filter />
@@ -112,7 +130,7 @@ const Shop = () => {
                             />
                         </div>
 
-                        {isFetching && <div className='font-neue py-6 text-center text-sm text-muted-foreground'>Loading products...</div>}
+                        {(isLoading || isFetching) && <div className='font-neue py-6 text-center text-sm text-muted-foreground'>Loading products...</div>}
                         {error && <div className='font-neue py-6 text-center text-sm text-destructive'>Failed to load products. Please try again.</div>}
 
                         {showEmptyState ? (
