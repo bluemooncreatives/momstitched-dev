@@ -1,5 +1,5 @@
 'use client'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, ShoppingCartIcon } from 'lucide-react'
 import {
     Sheet,
     SheetContent,
@@ -45,64 +45,69 @@ const Cart = () => {
 
     return (
         <Sheet open={open} onOpenChange={setOpen} >
-            <SheetTrigger className="relative rounded p-2 flex items-center justify-center" style={{ backgroundColor: 'var(--secondary-base)' }}>
-                <ShoppingCart className="w-6 h-6" strokeWidth={1.75} style={{ color: 'var(--dark-red)' }} />
-                <span className="absolute bg-black text-white text-xs rounded-full w-4 h-4 flex justify-center items-center -right-2 -top-1">{cart.count}</span>
+            <SheetTrigger className="relative flex items-center justify-center rounded-md px-2.5 py-2 transition hover:bg-muted/40">
+                <ShoppingCart className="h-5 w-5 text-foreground" strokeWidth={1.75} />
+                <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[10px] font-semibold text-white">{cart.count}</span>
             </SheetTrigger>
-            <SheetContent className="sm:max-w-[450px] w-full">
-                <SheetHeader className='py-2'>
-                    <SheetTitle className="text-2xl">My Cart</SheetTitle>
+            <SheetContent className="w-full border-l border-border/70 bg-white p-0 sm:max-w-[460px]">
+                <SheetHeader className='border-b border-border/60 px-5 py-4'>
+                    <SheetTitle className="font-neue text-2xl font-semibold tracking-[0.01em]">My Cart</SheetTitle>
                     <SheetDescription></SheetDescription>
                 </SheetHeader>
 
-                <div className="h-[calc(100vh-40px)] pb-10 ">
-                    <div className="h-[calc(100%-128px)]  overflow-auto px-2">
-                        {cart.count === 0 && <div className="h-full flex justify-center items-center text-xl font-semibold">
-                            Your Cart Is Empty.
+                <div className="flex h-[calc(100dvh-80px)] flex-col">
+                    <div className="flex-1 overflow-auto px-5 py-4">
+                        {cart.count === 0 && <div className="flex h-full flex-col items-center justify-center rounded-md border border-dashed border-border/70 bg-muted/20 px-6 text-center">
+                            <ShoppingCartIcon className="font-neue text-3xl leading-none"/>
+                            <p className="mt-3 font-neue text-2xl font-semibold">Your cart is empty</p>
+                            <p className="mt-2 max-w-[280px] text-sm text-muted-foreground">Add pieces you love to see them here with pricing and quick checkout.</p>
                         </div>}
 
                         {cart.products?.map(product => (
-                            <div key={product.variantId} className="flex justify-between items-center gap-5 mb-4 border-b pb-4">
-                                <div className="flex gap-5 items-center">
-                                    <Image src={product?.media || imgPlaceholder.src} height={100} width={100} alt={product.name} className="w-20 h-20 rounded border" />
+                            <div key={product.variantId} className="mb-4 flex items-center justify-between gap-4 rounded-md border border-border/70 p-3">
+                                <div className="flex items-center gap-3.5">
+                                    <Image src={product?.media || imgPlaceholder.src} height={100} width={100} alt={product.name} className="h-20 w-20 rounded-md border border-border/60 object-cover" />
 
                                     <div >
-                                        <h4 className="text-lg mb-1">{product.name}</h4>
-                                        <p className="text-gray-500">
+                                        <h4 className="line-clamp-1 font-neue text-[15px] font-semibold">{product.name}</h4>
+                                        <p className="mt-0.5 text-xs uppercase tracking-[0.14em] text-muted-foreground">
                                             {product.size}/{product.color}
+                                        </p>
+                                        <p className="mt-2 text-sm font-semibold text-foreground">
+                                            {product.qty} x {product.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                         </p>
                                     </div>
 
                                 </div>
 
-                                <div>
-                                    <button type="button" className="text-red-500 underline underline-offset-1 mb-2 cursor-pointer"
+                                <div className="flex items-end">
+                                    <button type="button" className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--dark-red)] underline underline-offset-4 cursor-pointer"
                                         onClick={() => dispatch(removeFromCart({ productId: product.productId, variantId: product.variantId }))}
                                     >
                                         Remove
                                     </button>
-
-                                    <p className="font-semibold">
-                                        {product.qty} X {product.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                    </p>
-
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className="h-32 border-t pt-5 px-2">
-                        <h2 className="flex justify-between items-center text-lg font-semibold"><span >Subtotal</span> <span>{subtotal?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></h2>
-                        <h2 className="flex justify-between items-center text-lg font-semibold"><span >Discount</span> <span>{discount?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></h2>
+                    <div className="border-t border-border/60 bg-white px-5 py-4">
+                        <div className="space-y-1.5">
+                            <h2 className="flex items-center justify-between text-lg font-semibold"><span>Subtotal</span> <span>{subtotal?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></h2>
+                            <h2 className="flex items-center justify-between text-sm font-medium text-muted-foreground"><span>Discount</span> <span>{discount?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></h2>
+                        </div>
 
-                        <div className="flex justify-between mt-3 gap-5">
-                            <Button type="button" asChild variant="secondary" className="w-[200px]" onClick={() => setOpen(false)}>
+                        <div className="mt-4 grid grid-cols-2 gap-3">
+                            <Button type="button" asChild variant="outline" className="h-11 rounded-md border-border/70 font-semibold" onClick={() => setOpen(false)}>
                                 <Link href={WEBSITE_CART}>View Cart</Link>
                             </Button>
-                            <Button type="button" asChild className="w-[200px]" onClick={() => setOpen(false)}>
+                            <Button type="button" asChild className="h-11 rounded-md bg-[var(--dark-red)] font-semibold hover:bg-[var(--dark-red-2)]" onClick={() => setOpen(false)}>
                                 {cart.count ?
                                     <Link href={WEBSITE_CHECKOUT}>Checkout</Link>
                                     :
-                                    <button type="button" onClick={() => showToast('error', 'Your cart is empty!')}>Checkout</button>
+                                    <span onClick={(event) => {
+                                        event.preventDefault()
+                                        showToast('error', 'Your cart is empty!')
+                                    }}>Checkout</span>
                                 }
                             </Button>
                         </div>
