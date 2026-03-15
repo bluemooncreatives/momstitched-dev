@@ -15,19 +15,20 @@ const buildSearchParamString = (searchParams) => {
 }
 
 const Shop = async ({ searchParams }) => {
-    const initialSearchParamsString = buildSearchParamString(searchParams)
+    const resolvedSearchParams = (await searchParams) ?? {}
+    const initialSearchParamsString = buildSearchParamString(resolvedSearchParams)
     const [filters, { products, nextPage }] = await Promise.all([
         getShopFilters(),
         getShopProducts({
-            size: searchParams?.size,
-            color: searchParams?.color,
-            minPrice: searchParams?.minPrice,
-            maxPrice: searchParams?.maxPrice,
-            category: searchParams?.category,
-            q: searchParams?.q,
-            sort: searchParams?.sort,
-            limit: searchParams?.limit,
-            page: searchParams?.page,
+            size: resolvedSearchParams?.size,
+            color: resolvedSearchParams?.color,
+            minPrice: resolvedSearchParams?.minPrice,
+            maxPrice: resolvedSearchParams?.maxPrice,
+            category: resolvedSearchParams?.category,
+            q: resolvedSearchParams?.q,
+            sort: resolvedSearchParams?.sort,
+            limit: resolvedSearchParams?.limit,
+            page: resolvedSearchParams?.page,
         })
     ])
 
