@@ -25,7 +25,7 @@ export async function POST(request) {
         const { name, email, password } = validatedData.data
 
         // check already registered user 
-        const checkUser = await UserModel.exists({ email })
+        const checkUser = await UserModel.exists({ email, deletedAt: null })
         if (checkUser) {
             return response(true, 409, 'User already registered.')
         }

@@ -1,6 +1,6 @@
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
-import { catchError } from "@/lib/helperFunction"
+import { catchError, response } from "@/lib/helperFunction"
 import ReviewModel from "@/models/Review.model"
 
 import { NextResponse } from "next/server"
@@ -26,11 +26,15 @@ export async function GET(request) {
 
         // Build match query  
         let matchQuery = {}
+        let preMatchQuery = {}
+        let postMatchQuery = {}
 
         if (deleteType === 'SD') {
             matchQuery = { deletedAt: null }
+            preMatchQuery = { deletedAt: null }
         } else if (deleteType === 'PD') {
             matchQuery = { deletedAt: { $ne: null } }
+            preMatchQuery = { deletedAt: { $ne: null } }
         }
 
         // Global search 
@@ -43,6 +47,7 @@ export async function GET(request) {
                 { review: { $regex: globalFilter, $options: 'i' } },
 
             ]
+            postMatchQuery["$or"] = matchQuery["$or"]
         }
 
         //  Column filteration  
@@ -50,10 +55,13 @@ export async function GET(request) {
         filters.forEach(filter => {
             if (filter.id === 'product') {
                 matchQuery['productData.name'] = { $regex: filter.value, $options: 'i' }
+                postMatchQuery['productData.name'] = { $regex: filter.value, $options: 'i' }
             } else if (filter.id === 'user') {
                 matchQuery['userData.name'] = { $regex: filter.value, $options: 'i' }
+                postMatchQuery['userData.name'] = { $regex: filter.value, $options: 'i' }
             } else {
                 matchQuery[filter.id] = { $regex: filter.value, $options: 'i' }
+                preMatchQuery[filter.id] = { $regex: filter.value, $options: 'i' }
             }
         });
 
@@ -67,6 +75,7 @@ export async function GET(request) {
         // Aggregate pipeline  
 
         const aggregatePipeline = [
+            ...(Object.keys(preMatchQuery).length ? [{ $match: preMatchQuery }] : []),
             {
                 $lookup: {
                     from: 'products',
@@ -89,7 +98,7 @@ export async function GET(request) {
             {
                 $unwind: { path: '$userData', preserveNullAndEmptyArrays: true }
             },
-            { $match: matchQuery },
+            ...(Object.keys(postMatchQuery).length ? [{ $match: postMatchQuery }] : []),
             { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
             { $skip: start },
             { $limit: size },
@@ -112,8 +121,41 @@ export async function GET(request) {
 
         const getReview = await ReviewModel.aggregate(aggregatePipeline)
 
-        // Get totalRowCount  
-        const totalRowCount = await ReviewModel.countDocuments(matchQuery)
+        // Get totalRowCount with the same pre/post match logic
+        let totalRowCount = 0
+        if (Object.keys(postMatchQuery).length) {
+            const countPipeline = [
+                ...(Object.keys(preMatchQuery).length ? [{ $match: preMatchQuery }] : []),
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'product',
+                        foreignField: '_id',
+                        as: 'productData'
+                    }
+                },
+                {
+                    $unwind: { path: '$productData', preserveNullAndEmptyArrays: true }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'user',
+                        foreignField: '_id',
+                        as: 'userData'
+                    }
+                },
+                {
+                    $unwind: { path: '$userData', preserveNullAndEmptyArrays: true }
+                },
+                { $match: postMatchQuery },
+                { $count: 'count' }
+            ]
+            const countResult = await ReviewModel.aggregate(countPipeline)
+            totalRowCount = countResult[0]?.count ?? 0
+        } else {
+            totalRowCount = await ReviewModel.countDocuments(preMatchQuery)
+        }
 
         return NextResponse.json({
             success: true,

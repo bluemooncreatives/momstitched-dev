@@ -133,38 +133,6 @@ export async function GET(request) {
             },
             {
                 $lookup: {
-                    from: 'reviews',
-                    let: { productId: '$_id' },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        { $eq: ['$product', '$$productId'] },
-                                        { $eq: ['$deletedAt', null] }
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            $group: {
-                                _id: null,
-                                avg: { $avg: '$rating' },
-                                count: { $sum: 1 }
-                            }
-                        }
-                    ],
-                    as: 'reviewStats'
-                }
-            },
-            {
-                $addFields: {
-                    ratingAvg: { $ifNull: [{ $arrayElemAt: ['$reviewStats.avg', 0] }, 0] },
-                    ratingCount: { $ifNull: [{ $arrayElemAt: ['$reviewStats.count', 0] }, 0] }
-                }
-            },
-            {
-                $lookup: {
                     from: 'medias',
                     let: { mediaIds: '$media' },
                     pipeline: [
