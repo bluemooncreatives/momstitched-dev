@@ -1,8 +1,8 @@
 import GlobalProvider from "@/components/Application/GlobalProvider";
 import LenisProvider from '@/components/Application/LenisProvider'
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { Assistant, Geist } from 'next/font/google'
-import { ToastContainer } from 'react-toastify';
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         className={`${assistantFont.className} antialiased`}
       >
         <GlobalProvider>
-          <ToastContainer />
+          <Toaster />
           <LenisProvider>
             {children}
           </LenisProvider>

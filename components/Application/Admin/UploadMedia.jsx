@@ -6,6 +6,7 @@ import { CldUploadWidget } from 'next-cloudinary';
 import { Plus } from 'lucide-react'
 
 const UploadMedia = ({ isMultiple, queryClient }) => {
+    const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
     const handleOnError = (error) => {
         showToast('error', error.statusText)
@@ -18,6 +19,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
             secure_url: file.uploadInfo.secure_url,
             path: file.uploadInfo.path,
             thumbnail_url: file.uploadInfo.thumbnail_url,
+            bytes: file.uploadInfo.bytes,
         }))
 
         if (uploadedFiles.length > 0) {
@@ -52,15 +54,19 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
             options={{
                 multiple: isMultiple,
                 sources: ['local', 'url', 'unsplash', 'google_drive'],
+                maxFileSize: MAX_IMAGE_BYTES,
             }}
         >
 
             {({ open }) => {
                 return (
-                    <Button size="lg" onClick={() => open()}>
-                        <Plus className='size-4' />
-                        Upload Media
-                    </Button>
+                    <div className="flex flex-col items-start gap-2">
+                        <Button size="lg" onClick={() => open()}>
+                            <Plus className='size-4' />
+                            Upload Media
+                        </Button>
+                        <p className="text-xs text-muted-foreground">Max image size: 5 MB.</p>
+                    </div>
                 );
             }}
 

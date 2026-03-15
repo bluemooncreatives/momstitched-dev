@@ -10,9 +10,11 @@ const ProductPage = async ({ params, searchParams }) => {
 
     if (!productData) {
         return (
-            <div className='flex justify-center items-center py-10 h-[300px]'>
-                <h1 className='text-4xl font-semibold'>Data not found.</h1>
-            </div>
+            <section className='website-gutter py-14'>
+                <div className='website-content rounded-[var(--admin-shell-radius)] border border-border/60 bg-white p-12 text-center shadow-sm'>
+                    <h1 className='font-neue text-3xl font-semibold uppercase tracking-[0.06em]'>Data not found.</h1>
+                </div>
+            </section>
         )
     } else {
 

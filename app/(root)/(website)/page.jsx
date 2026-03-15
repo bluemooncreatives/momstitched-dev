@@ -1,13 +1,12 @@
 import HeroSection from '@/components/Application/Website/HeroSection'
 import Marquee from '@/components/Application/Website/Marquee'
 import CategoryArchiveSection from '@/components/Application/Website/CategoryArchiveSection'
-import Image from 'next/image'
 import React from 'react'
 import FeaturedProduct from '@/components/Application/Website/FeaturedProduct'
-import advertisingBanner from '@/public/assets/images/advertising-banner.png'
 import Testimonial from '@/components/Application/Website/Testimonial'
 import { RotateCcw, Truck, Headset, BadgePercent } from 'lucide-react'
 import ShopAllButton from '@/components/Application/Website/ShopAllButton'
+import InstagramReelsMarquee from '@/components/Application/Website/InstagramReelsMarquee'
 
 const Home = () => {
     return (
@@ -21,15 +20,7 @@ const Home = () => {
 
             <CategoryArchiveSection />
 
-            <section className='sm:pt-20 pt-5 pb-10'>
-                <Image
-                    src={advertisingBanner.src}
-                    height={advertisingBanner.height}
-                    width={advertisingBanner.width}
-                    alt='Advertisement'
-
-                />
-            </section>
+            <InstagramReelsMarquee />
 
             <Testimonial />
 

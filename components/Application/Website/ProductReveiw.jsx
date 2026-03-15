@@ -128,21 +128,19 @@ const ProductReveiw = ({ productId }) => {
 
 
     return (
-        <div className="shadow rounded border mb-20">
-            <div className="p-3 bg-gray-50 border-b">
-                <h2 className="font-semibold text-2xl">Rating & Reviews</h2>
+        <div className="mb-20 rounded-[var(--admin-shell-radius)] border border-border/60 bg-white shadow-sm">
+            <div className="border-b border-border/60 px-5 py-4">
+                <h2 className="text-xl font-semibold uppercase tracking-[0.04em]">Rating & Reviews</h2>
             </div>
-            <div className="p-5">
+            <div className="p-5 lg:p-6">
                 <div className='flex justify-between flex-wrap items-center'>
                     <div className='md:w-1/2 w-full md:flex md:gap-10 md:mb-0 mb-5'>
                         <div className='md:w-[200px] w-full md:mb-0 mb-5'>
                             <h4 className='text-center text-8xl font-semibold'>{reviewCount?.averageRating}</h4>
-                            <div className='flex justify-center gap-2'>
-                                <IoStar />
-                                <IoStar />
-                                <IoStar />
-                                <IoStar />
-                                <IoStar />
+                            <div className='flex justify-center gap-2 text-amber-500'>
+                                {Array.from({ length: 5 }).map((_, index) => (
+                                    <Star key={index} className="size-4 fill-amber-500 text-amber-500" />
+                                ))}
                             </div>
 
                             <p className='text-center mt-3'>
@@ -155,9 +153,9 @@ const ProductReveiw = ({ productId }) => {
 
                                 {[5, 4, 3, 2, 1].map(rating => (
                                     <div key={rating} className='flex items-center gap-2 mb-2'>
-                                        <div className='flex items-center gap-1'>
-                                            <p className='w-3'>{rating}</p>
-                                            <IoStar />
+                                        <div className='flex items-center gap-1 text-amber-500'>
+                                            <p className='w-3 text-foreground'>{rating}</p>
+                                            <Star className="size-3 fill-amber-500 text-amber-500" />
                                         </div>
                                         <Progress value={reviewCount?.percentage[rating]} />
                                         <span className='text-sm'>{reviewCount?.rating[rating]}</span>
@@ -172,7 +170,7 @@ const ProductReveiw = ({ productId }) => {
                     </div>
 
                     <div className='md:w-1/2 w-full md:text-end text-center'>
-                        <Button onClick={() => setIsReview(!isReview)} type="button" variant="outline" className="md:w-fit w-full py-6 px-10">
+                        <Button onClick={() => setIsReview(!isReview)} type="button" variant="outline" className="md:w-fit w-full rounded-md border-border/70 py-6 px-10 font-semibold uppercase tracking-[0.18em]">
                             Write Review
                         </Button>
                     </div>
@@ -181,14 +179,14 @@ const ProductReveiw = ({ productId }) => {
                 {isReview &&
 
 
-                    <div className='my-5'>
+                    <div className='my-5 rounded-md border border-border/70 bg-muted/20 p-4'>
                         <hr className='mb-5' />
-                        <h4 className='text-xl font-semibold mb-3'>Write A Review</h4>
+                        <h4 className='mb-3 text-lg font-semibold uppercase tracking-[0.06em]'>Write A Review</h4>
                         {!auth
                             ?
                             <>
                                 <p className='mb-2'>Login to submit review.</p>
-                                <Button type="button" asChild>
+                                <Button type="button" asChild className="rounded-md bg-[var(--dark-red)] hover:bg-[var(--dark-red-2)]">
                                     <Link href={`${WEBSITE_LOGIN}?callback=${currentUrl}`}>Login</Link>
                                 </Button>
                             </>
@@ -244,7 +242,7 @@ const ProductReveiw = ({ productId }) => {
                                         </div>
 
                                         <div className='mb-3'>
-                                            <ButtonLoading loading={loading} type="submit" text="Submit Review" className="cursor-pointer" />
+                                            <ButtonLoading loading={loading} type="submit" text="Submit Review" className="h-10 rounded-md bg-[var(--dark-red)] text-[11px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)] cursor-pointer" />
                                         </div>
 
                                     </form>
@@ -258,8 +256,8 @@ const ProductReveiw = ({ productId }) => {
                 }
 
 
-                <div className='mt-10 border-t pt-5'>
-                    <h5 className='text-xl font-semibold'>{data?.pages[0]?.totalReview || 0} Reviews</h5>
+                <div className='mt-10 border-t border-border/60 pt-5'>
+                    <h5 className='text-lg font-semibold uppercase tracking-[0.05em]'>{data?.pages[0]?.totalReview || 0} Reviews</h5>
 
                     <div className='mt-10'>
                         {data && data.pages.map(page => (
@@ -271,7 +269,7 @@ const ProductReveiw = ({ productId }) => {
                         ))}
 
                         {hasNextPage &&
-                            <ButtonLoading text="Load More" type="button" loading={isFetching} onClick={fetchNextPage} />
+                            <ButtonLoading text="Load More" type="button" loading={isFetching} onClick={fetchNextPage} className="h-10 rounded-md bg-[var(--dark-red)] text-[11px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)]" />
                         }
 
                     </div>
