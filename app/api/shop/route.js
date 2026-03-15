@@ -86,19 +86,18 @@ export async function GET(request) {
                         },
                         {
                             $project: {
-                                color: 1,
-                                size: 1,
-                                mrp: 1,
-                                sellingPrice: 1,
-                                discountPercentage: 1,
+                                _id: 1,
                             }
+                        },
+                        {
+                            $limit: 1
                         }
                     ],
-                    as: 'variants'
+                    as: 'matchedVariants'
                 }
             },
             {
-                $match: { 'variants.0': { $exists: true } }
+                $match: { 'matchedVariants.0': { $exists: true } }
             },
             {
                 $lookup: {
@@ -169,13 +168,6 @@ export async function GET(request) {
                         _id: 1,
                         secure_url: 1,
                         alt: 1
-                    },
-                    variants: {
-                        color: 1,
-                        size: 1,
-                        mrp: 1,
-                        sellingPrice: 1,
-                        discountPercentage: 1,
                     }
                 }
             }

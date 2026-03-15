@@ -1,10 +1,9 @@
 import Image from 'next/image'
-import React from 'react'
+import React, { memo } from 'react'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import Link from 'next/link'
 import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
 import { Eye, Star } from 'lucide-react'
-import ShopAllButton from '@/components/Application/Website/ShopAllButton'
 const ProductBox = ({ product }) => {
     const hasDiscount = product?.mrp > product?.sellingPrice
     const discount = hasDiscount ? Math.round(((product.mrp - product.sellingPrice) / product.mrp) * 100) : 0
@@ -28,6 +27,7 @@ const ProductBox = ({ product }) => {
                             height={750}
                             alt={product?.media[0]?.alt || product?.name}
                             title={product?.media[0]?.title || product?.name}
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                             className='h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105'
                         />
                     </Link>
@@ -49,13 +49,12 @@ const ProductBox = ({ product }) => {
                             )
                         })}
                     </div>
-                    <ShopAllButton
-                        label="Buy Product"
+                    <Link
                         href={WEBSITE_PRODUCT_DETAILS(product.slug)}
-                        radius="sm"
-                        colorScheme="dark-red"
-                        className="mt-1 min-w-[160px] text-[10px] tracking-[0.32em]"
-                    />
+                        className="mt-1 inline-flex min-w-[160px] items-center justify-center rounded-sm border border-[var(--dark-red)] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--dark-red)] transition-colors hover:bg-[var(--dark-red)] hover:text-white"
+                    >
+                        Buy Product
+                    </Link>
                     <div className='mt-1 flex items-center gap-2 text-sm'>
                         <span className='text-[15px] font-semibold text-foreground'>
                             {product?.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
@@ -72,4 +71,4 @@ const ProductBox = ({ product }) => {
     )
 }
 
-export default ProductBox
+export default memo(ProductBox)
