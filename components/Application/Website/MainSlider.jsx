@@ -1,5 +1,4 @@
 'use client'
-import React from 'react'
 import Image from 'next/image'
 import heroCenter from '@/public/assets/images/visual1.png'
 import heroLeft from '@/public/assets/images/banner1.png'

@@ -1,4 +1,3 @@
-import React from 'react'
 import ProductDetails from './ProductDetails'
 import { getProductDetailsBySlug } from '@/lib/services/productService'
 

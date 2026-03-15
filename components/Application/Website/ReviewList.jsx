@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import React from 'react'
 import usericon from '@/public/assets/images/user.png'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'

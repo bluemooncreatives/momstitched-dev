@@ -1,6 +1,5 @@
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
-import React from 'react'
 import { Pencil } from 'lucide-react'
 const EditAction = ({ href }) => {
     return (

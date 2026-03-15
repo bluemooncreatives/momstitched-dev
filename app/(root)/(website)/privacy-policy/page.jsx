@@ -1,5 +1,4 @@
 import WebsiteBreadcrumb from '@/components/Application/Website/WebsiteBreadcrumb'
-import React from 'react'
 
 const breadcrumb = {
     title: 'Privacy Policy',

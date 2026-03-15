@@ -1,5 +1,4 @@
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import React from 'react'
 import { Trash2 } from 'lucide-react'
 const DeleteAction = ({ handleDelete, row, deleteType }) => {
     return (

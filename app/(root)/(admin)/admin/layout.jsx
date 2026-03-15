@@ -5,7 +5,6 @@ import Topbar from '@/components/Application/Admin/Topbar'
 import Main from '@/components/Application/Admin/layout/Main'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import React from 'react'
 
 const layout = ({ children }) => {
     return (

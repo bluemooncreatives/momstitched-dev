@@ -1,4 +1,3 @@
-import React from 'react'
 import CountOverview from './CountOverview'
 import QuickAdd from './QuickAdd'
 import PageHeader from '@/components/Application/Admin/PageHeader'

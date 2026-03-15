@@ -1,4 +1,3 @@
-import React from 'react'
 import { cn } from '@/lib/utils'
 
 const Main = ({ fixed = false, fluid = false, className, ...props }) => {

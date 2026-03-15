@@ -1,6 +1,6 @@
 'use client'
 import useFetch from '@/hooks/useFetch'
-import React, { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import ButtonLoading from '../ButtonLoading'

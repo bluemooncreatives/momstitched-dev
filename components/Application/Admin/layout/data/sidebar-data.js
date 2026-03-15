@@ -1,4 +1,3 @@
-import React from 'react'
 import { adminNavGroups } from '@/lib/adminSidebarMenu'
 import { Command, Crown } from 'lucide-react'
 import { cn } from '@/lib/utils'

@@ -1,4 +1,3 @@
-import React from 'react'
 import UserPanelNavigation from './UserPanelNavigation'
 
 const UserPanelLayout = ({ children }) => {

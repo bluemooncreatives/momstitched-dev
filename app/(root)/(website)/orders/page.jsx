@@ -1,11 +1,9 @@
 'use client'
-import Loading from '@/components/Application/Loading'
 import UserPanelLayout from '@/components/Application/Website/UserPanelLayout'
 import WebsiteBreadcrumb from '@/components/Application/Website/WebsiteBreadcrumb'
 import useFetch from '@/hooks/useFetch'
 import { WEBSITE_ORDER_DETAILS } from '@/routes/WebsiteRoute'
 import Link from 'next/link'
-import React from 'react'
 const breadCrumbData = {
     title: 'Orders',
     links: [{ label: 'Orders' }]

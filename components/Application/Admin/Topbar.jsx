@@ -1,5 +1,4 @@
 'use client'
-import React from 'react'
 import { usePathname } from 'next/navigation'
 import ThemeSwitch from './ThemeSwitch'
 import UserDropdown from './UserDropdown'

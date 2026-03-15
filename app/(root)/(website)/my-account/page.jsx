@@ -4,7 +4,6 @@ import WebsiteBreadcrumb from '@/components/Application/Website/WebsiteBreadcrum
 import useFetch from '@/hooks/useFetch';
 import { WEBSITE_ORDER_DETAILS } from '@/routes/WebsiteRoute';
 import Link from 'next/link';
-import React from 'react'
 import { ShoppingBag, ShoppingCart } from 'lucide-react'
 import { useSelector } from 'react-redux';
 

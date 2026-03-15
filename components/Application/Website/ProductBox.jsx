@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import React, { memo } from 'react'
+import { memo } from 'react'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import Link from 'next/link'
 import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'

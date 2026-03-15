@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Search } from 'lucide-react'
 import SearchModel from './SearchModel';
 const AdminMobileSearch = () => {

@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import React from 'react'
 import logo from '@/public/assets/images/logo-black.png'
 import Link from 'next/link'
 import { MapPin, Phone, Mail, Youtube, Instagram, MessageCircle, Facebook, Twitter } from 'lucide-react'

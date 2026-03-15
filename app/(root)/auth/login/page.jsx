@@ -1,6 +1,6 @@
 'use client'
 import { Card, CardContent } from '@/components/ui/card'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Logo from '@/public/assets/images/logo-white.png'
 import Image from 'next/image'
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { useForm } from 'react-hook-form'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import { z } from 'zod'
-import { Eye, EyeOff, SunIcon as Sunburst } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { USER_DASHBOARD, WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from '@/routes/WebsiteRoute'
 import axios from 'axios'

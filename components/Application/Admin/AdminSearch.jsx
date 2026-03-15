@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Search } from 'lucide-react'
 import SearchModel from './SearchModel';
 

@@ -1,6 +1,6 @@
 'use client'
 import { Card, CardContent } from '@/components/ui/card'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Logo from '@/public/assets/images/logo-black.png'
 import Image from 'next/image'
 import { zodResolver } from "@hookform/resolvers/zod"

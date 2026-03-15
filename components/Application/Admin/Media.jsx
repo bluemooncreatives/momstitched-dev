@@ -4,7 +4,6 @@ import { ADMIN_MEDIA_EDIT } from '@/routes/AdminPanelRoute';
 
 import Image from 'next/image'
 import Link from 'next/link';
-import React from 'react'
 import { MoreVertical, Pencil, Link2, Trash2 } from 'lucide-react'
 import { showToast } from '@/lib/showToast';
 

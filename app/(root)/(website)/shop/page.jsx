@@ -2,7 +2,7 @@
 import Filter from '@/components/Application/Website/Filter'
 import Sorting from '@/components/Application/Website/Sorting'
 import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
     Sheet,
     SheetContent,

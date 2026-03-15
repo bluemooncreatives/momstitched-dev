@@ -6,7 +6,7 @@ import {
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import Link from 'next/link'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Recycle, Trash2, RotateCcw, Trash, Download, MoreHorizontal } from 'lucide-react'
 import useDeleteMutation from '@/hooks/useDeleteMutation'
 import ButtonLoading from '../ButtonLoading'
