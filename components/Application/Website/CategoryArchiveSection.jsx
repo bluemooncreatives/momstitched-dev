@@ -166,10 +166,6 @@ const CategoryArchiveSection = () => {
     useEffect(() => {
         if (!containerRef.current) return
 
-        const prefersReducedMotion =
-            typeof window !== 'undefined' &&
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
         gsap.registerPlugin(ScrollTrigger)
         updateArchiveRect()
 
@@ -190,7 +186,6 @@ const CategoryArchiveSection = () => {
                 start: 'top 75%',
                 once: true,
                 onEnter: () => {
-                    if (prefersReducedMotion) return
                     // Phase 1: Header text reveals
                     const headerTl = gsap.timeline({
                         defaults: { ease: 'power3.out' },
@@ -260,7 +255,7 @@ const CategoryArchiveSection = () => {
         }
 
         const handleMouseMove = (event) => {
-            if (prefersReducedMotion || !archiveVisibleRef.current) return
+            if (!archiveVisibleRef.current) return
             mousePosRef.current = { x: event.clientX, y: event.clientY }
             if (pointerRafRef.current) return
             pointerRafRef.current = requestAnimationFrame(() => {

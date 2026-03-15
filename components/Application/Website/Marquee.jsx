@@ -17,7 +17,6 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
 
     useEffect(() => {
         if (!containerRef.current || !innerRef.current) return
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
         gsap.registerPlugin(ScrollTrigger)
 
@@ -77,16 +76,11 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
             trigger: containerRef.current,
             start: 'top bottom',
             end: 'bottom top',
-            onEnter: () => {
-                if (!prefersReducedMotion) startTicker()
-            },
-            onEnterBack: () => {
-                if (!prefersReducedMotion) startTicker()
-            },
+            onEnter: startTicker,
+            onEnterBack: startTicker,
             onLeave: stopTicker,
             onLeaveBack: stopTicker,
             onUpdate: (self) => {
-                if (prefersReducedMotion) return
                 const nextDirection = self.direction === 1 ? 1 : -1
                 if (nextDirection === directionRef.current) return
                 directionRef.current = nextDirection
@@ -99,7 +93,7 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
         }
         ScrollTrigger.addEventListener('refreshInit', handleRefresh)
         ScrollTrigger.refresh()
-        if (trigger.isActive && !prefersReducedMotion) {
+        if (trigger.isActive) {
             startTicker()
         }
 
