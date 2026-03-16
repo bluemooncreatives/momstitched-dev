@@ -9,14 +9,8 @@ import { zSchema } from '@/lib/zodSchema'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
-import slugify from 'slugify'
 import { showToast } from '@/lib/showToast'
 import axios from 'axios'
-import useFetch from '@/hooks/useFetch'
-import Select from '@/components/Application/Select'
-import Editor from '@/components/Application/Admin/Editor'
-import MediaModal from '@/components/Application/Admin/MediaModal'
-import Image from 'next/image'
 const breadcrumbData = [
   { href: ADMIN_DASHBOARD, label: 'Home' },
   { href: ADMIN_COUPON_SHOW, label: 'Coupons' },

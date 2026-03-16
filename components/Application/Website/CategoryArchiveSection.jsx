@@ -82,6 +82,9 @@ const CategoryArchiveSection = () => {
     const archiveRectRef = useRef(null)
     const mousePosRef = useRef({ x: 0, y: 0 })
     const mouseTimeoutRef = useRef(null)
+    const pointerRafRef = useRef(null)
+    const rectRafRef = useRef(null)
+    const archiveVisibleRef = useRef(false)
 
     const clearMouseTimeout = () => {
         if (mouseTimeoutRef.current) {
@@ -207,34 +210,68 @@ const CategoryArchiveSection = () => {
                     })
                 }
             })
+
+            ScrollTrigger.create({
+                trigger: containerRef.current,
+                start: 'top bottom',
+                end: 'bottom top',
+                onEnter: () => {
+                    archiveVisibleRef.current = true
+                },
+                onEnterBack: () => {
+                    archiveVisibleRef.current = true
+                },
+                onLeave: () => {
+                    archiveVisibleRef.current = false
+                    clearMouseTimeout()
+                    removeAllImages()
+                },
+                onLeaveBack: () => {
+                    archiveVisibleRef.current = false
+                    clearMouseTimeout()
+                    removeAllImages()
+                }
+            })
         }, containerRef)
 
-        const handleResize = () => updateArchiveRect()
+        const scheduleRectUpdate = () => {
+            if (rectRafRef.current) return
+            rectRafRef.current = requestAnimationFrame(() => {
+                rectRafRef.current = null
+                updateArchiveRect()
+
+                const { x, y } = mousePosRef.current
+                if (!isInsideArchive(x, y)) {
+                    clearMouseTimeout()
+                    removeAllImages()
+                }
+            })
+        }
+
+        const handleResize = () => scheduleRectUpdate()
 
         const handleScroll = () => {
-            updateArchiveRect()
-
-            const { x, y } = mousePosRef.current
-            if (!isInsideArchive(x, y)) {
-                clearMouseTimeout()
-                removeAllImages()
-            }
+            scheduleRectUpdate()
         }
 
         const handleMouseMove = (event) => {
+            if (!archiveVisibleRef.current) return
             mousePosRef.current = { x: event.clientX, y: event.clientY }
-            updateArchiveRect()
+            if (pointerRafRef.current) return
+            pointerRafRef.current = requestAnimationFrame(() => {
+                pointerRafRef.current = null
+                const { x, y } = mousePosRef.current
+                if (!isInsideArchive(x, y)) {
+                    clearMouseTimeout()
+                    removeAllImages()
+                    return
+                }
 
-            if (!isInsideArchive(event.clientX, event.clientY)) {
                 clearMouseTimeout()
-                removeAllImages()
-                return
-            }
-
-            clearMouseTimeout()
-            mouseTimeoutRef.current = setTimeout(() => {
-                cleanupOldImages()
-            }, 2000)
+                mouseTimeoutRef.current = setTimeout(() => {
+                    cleanupOldImages()
+                }, 2000)
+            })
         }
 
         document.addEventListener('mousemove', handleMouseMove)
@@ -244,6 +281,14 @@ const CategoryArchiveSection = () => {
         return () => {
             clearMouseTimeout()
             removeAllImages()
+            if (pointerRafRef.current) {
+                cancelAnimationFrame(pointerRafRef.current)
+                pointerRafRef.current = null
+            }
+            if (rectRafRef.current) {
+                cancelAnimationFrame(rectRafRef.current)
+                rectRafRef.current = null
+            }
             document.removeEventListener('mousemove', handleMouseMove)
             window.removeEventListener('resize', handleResize)
             window.removeEventListener('scroll', handleScroll)

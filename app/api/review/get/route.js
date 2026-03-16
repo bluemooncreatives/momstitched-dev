@@ -22,6 +22,10 @@ export async function GET(request) {
         // aggregation 
 
         const aggregation = [
+            { $match: matchQuery },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit + 1 },
             {
                 $lookup: {
                     from: "users",
@@ -33,12 +37,6 @@ export async function GET(request) {
             {
                 $unwind: { path: '$userData', preserveNullAndEmptyArrays: true }
             },
-            {
-                $match: matchQuery
-            },
-            { $sort: { createdAt: -1 } },
-            { $skip: skip },
-            { $limit: limit + 1 },
             {
                 $project: {
                     _id: 1,

@@ -13,6 +13,7 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
 
     const directionRef = useRef(1) // 1 = right/down, -1 = left/up
     const xRef = useRef(0)
+    const tickingRef = useRef(false)
 
     useEffect(() => {
         if (!containerRef.current || !innerRef.current) return
@@ -48,23 +49,10 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
             gsap.set(inner, { x: xRef.current })
         }
 
-        gsap.ticker.add(tick)
-
-        // Scroll detection: update direction based on scroll
-        let lastScroll = window.scrollY
-        const handleScroll = () => {
-            const currentScroll = window.scrollY
-            if (currentScroll > lastScroll) {
-                directionRef.current = 1 // Scrolling down → move right
-            } else if (currentScroll < lastScroll) {
-                directionRef.current = -1 // Scrolling up → move left
-            }
-            lastScroll = currentScroll
-
-            // Toggle arrow rotation
+        const updateArrowDirection = (direction) => {
             arrowsRef.current.forEach((arrow) => {
                 if (!arrow) return
-                if (directionRef.current === 1) {
+                if (direction === 1) {
                     arrow.classList.remove('active')
                 } else {
                     arrow.classList.add('active')
@@ -72,11 +60,47 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
             })
         }
 
-        window.addEventListener('scroll', handleScroll, { passive: true })
+        const startTicker = () => {
+            if (tickingRef.current) return
+            gsap.ticker.add(tick)
+            tickingRef.current = true
+        }
+
+        const stopTicker = () => {
+            if (!tickingRef.current) return
+            gsap.ticker.remove(tick)
+            tickingRef.current = false
+        }
+
+        const trigger = ScrollTrigger.create({
+            trigger: containerRef.current,
+            start: 'top bottom',
+            end: 'bottom top',
+            onEnter: startTicker,
+            onEnterBack: startTicker,
+            onLeave: stopTicker,
+            onLeaveBack: stopTicker,
+            onUpdate: (self) => {
+                const nextDirection = self.direction === 1 ? 1 : -1
+                if (nextDirection === directionRef.current) return
+                directionRef.current = nextDirection
+                updateArrowDirection(nextDirection)
+            }
+        })
+
+        const handleRefresh = () => {
+            itemWidth = getBounds()
+        }
+        ScrollTrigger.addEventListener('refreshInit', handleRefresh)
+        ScrollTrigger.refresh()
+        if (trigger.isActive) {
+            startTicker()
+        }
 
         return () => {
-            gsap.ticker.remove(tick)
-            window.removeEventListener('scroll', handleScroll)
+            stopTicker()
+            ScrollTrigger.removeEventListener('refreshInit', handleRefresh)
+            trigger.kill()
         }
     }, [speed])
 

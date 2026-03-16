@@ -14,7 +14,7 @@ import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 import useFetch from '@/hooks/useFetch'
 import Select from '@/components/Application/Select'
-import Editor from '@/components/Application/Admin/Editor'
+import Editor from '@/components/Application/Admin/LazyEditor'
 import MediaModal from '@/components/Application/Admin/MediaModal'
 import Image from 'next/image'
 const breadcrumbData = [

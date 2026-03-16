@@ -19,7 +19,7 @@ export async function POST(request) {
 
         const { email } = validatedData.data
 
-        const getUser = await UserModel.findOne({ email })
+        const getUser = await UserModel.findOne({ email, deletedAt: null })
         if (!getUser) {
             return response(false, 404, 'User not found.')
         }

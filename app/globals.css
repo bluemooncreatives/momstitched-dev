@@ -102,12 +102,14 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 }
+
 html,
 body {
   overflow-x: hidden;
 }
 :root {
-  --radius: 0.625rem;
+  --admin-shell-radius: 8px;
+  --radius: var(--admin-shell-radius);
   --website-gutter: clamp(1rem, 2.8vw, 4rem);
   --website-content-max: 1280px;
   /* Use PP Neue Montreal as the main sans font for theme variables */
@@ -286,7 +288,7 @@ body {
 
 /* Admin theme overrides scoped to the admin layout */
 .admin-theme {
-  --radius: 0.3rem;
+  --radius: 0.3rem
   --admin-shell-radius: 8px;
   --background: oklch(1 0 0);
   --foreground: oklch(0.16 0.02 25);

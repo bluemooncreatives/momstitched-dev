@@ -79,6 +79,11 @@ const FeaturedProductCard = ({ product, size = 'medium' }) => {
                         src={product?.media[0]?.secure_url || imgPlaceholder.src}
                         fill
                         alt={product?.name}
+                        sizes={
+                            size === 'large'
+                                ? '(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw'
+                                : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
+                        }
                         className="object-cover object-center group-hover:scale-110 transition-transform duration-300"
                         onLoad={() => setImageLoaded(true)}
                         priority={size === 'large'}
