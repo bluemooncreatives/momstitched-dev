@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import { z } from 'zod'
 import { Eye, EyeOff } from 'lucide-react'
+import { FcGoogle } from "react-icons/fc"
 import Link from 'next/link'
 import { USER_DASHBOARD, WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from '@/routes/WebsiteRoute'
 import axios from 'axios'
@@ -27,6 +28,8 @@ import { useDispatch } from 'react-redux'
 import { login } from '@/store/reducer/authReducer'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ADMIN_DASHBOARD } from '@/routes/AdminPanelRoute'
+import { signIn } from 'next-auth/react'
+import { Button } from '@/components/ui/button'
 const LoginPage = () => {
     const dispatch = useDispatch()
     const searchParams = useSearchParams()
@@ -173,6 +176,25 @@ const LoginPage = () => {
                                     <div className='pt-1'>
                                         <ButtonLoading loading={loading} type="submit" text="Login" className="h-10 w-full cursor-pointer rounded-lg" />
                                     </div>
+
+                                    <div className="relative my-1">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <span className="w-full border-t" />
+                                        </div>
+                                        <div className="relative flex justify-center text-xs uppercase">
+                                            <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="h-10 w-full rounded-lg"
+                                        onClick={() => signIn('google', { callbackUrl: searchParams.get('callback') || USER_DASHBOARD })}
+                                    >
+                                        <FcGoogle className="mr-2 h-5 w-5" />
+                                        Login with Google
+                                    </Button>
 
                                     <div className='space-y-3 text-center text-sm'>
                                         <div className='flex justify-center items-center gap-1'>

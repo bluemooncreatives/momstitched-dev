@@ -3,7 +3,9 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
+import { isAuthenticated } from "@/lib/authentication";
 import OrderModel from "@/models/Order.model";
+import UserModel from "@/models/User.model";
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils";
 import { z } from "zod";
 
@@ -42,6 +44,17 @@ export async function POST(request) {
         }
 
         const validatedData = validate.data
+        const auth = await isAuthenticated('user', request)
+
+        // Use authenticated user (custom JWT or NextAuth) when available.
+        let resolvedUserId = auth.isAuth ? auth.userId : validatedData.userId
+
+        if (!resolvedUserId && validatedData.email) {
+            const linkedUser = await UserModel.findOne({ email: validatedData.email }).select('_id').lean()
+            if (linkedUser?._id) {
+                resolvedUserId = linkedUser._id
+            }
+        }
 
         // payment verification 
         const verification = validatePaymentVerification({
@@ -55,7 +68,7 @@ export async function POST(request) {
         }
 
         const newOrder = await OrderModel.create({
-            user: validatedData.userId,
+            user: resolvedUserId,
             name: validatedData.name,
             email: validatedData.email,
             phone: validatedData.phone,

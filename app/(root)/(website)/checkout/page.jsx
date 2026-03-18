@@ -36,6 +36,7 @@ const Checkout = () => {
     const authStore = useSelector(store => store.authStore)
     const [verifiedCartData, setVerifiedCartData] = useState([])
     const { data: getVerifiedCartData } = useFetch('/api/cart-verification', 'POST', { data: cart.products })
+    const { data: profileData } = useFetch('/api/profile/get')
 
     const [isCouponApplied, setIsCouponApplied] = useState(false)
     const [subtotal, setSubTotal] = useState(0)
@@ -160,6 +161,16 @@ const Checkout = () => {
             orderForm.setValue('userId', authStore?.auth?._id)
         }
     }, [authStore])
+
+    useEffect(() => {
+        if (profileData?.success) {
+            const user = profileData.data
+            orderForm.setValue('userId', user?._id || '')
+            orderForm.setValue('name', user?.name || '')
+            orderForm.setValue('email', user?.email || '')
+            orderForm.setValue('phone', user?.phone || '')
+        }
+    }, [profileData])
 
     // get order id 
     const getOrderId = async (amount) => {

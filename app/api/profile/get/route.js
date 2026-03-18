@@ -3,10 +3,10 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import UserModel from "@/models/User.model";
 
-export async function GET() {
+export async function GET(request) {
     try {
         await connectDB()
-        const auth = await isAuthenticated('user')
+        const auth = await isAuthenticated('user', request)
         if (!auth.isAuth) {
             return response(false, 401, 'Unauthorized')
         }

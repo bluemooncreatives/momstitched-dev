@@ -20,9 +20,40 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
         select: false
+    },
+    googleId: {
+        type: String,
+        trim: true,
+        sparse: true
+    },
+    googleProfile: {
+        givenName: {
+            type: String,
+            trim: true,
+        },
+        familyName: {
+            type: String,
+            trim: true,
+        },
+        locale: {
+            type: String,
+            trim: true,
+        },
+        picture: {
+            type: String,
+            trim: true,
+        },
+        emailVerified: {
+            type: Boolean,
+            default: false,
+        },
+        raw: {
+            type: mongoose.Schema.Types.Mixed,
+            default: {},
+        },
     },
     avatar: {
         url: {
