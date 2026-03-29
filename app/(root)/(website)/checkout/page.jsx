@@ -21,6 +21,8 @@ import { z } from 'zod'
 import { Textarea } from '@/components/ui/textarea'
 import Script from 'next/script'
 import { useRouter } from 'next/navigation'
+import { FaShippingFast } from 'react-icons/fa'
+import { MdPayment } from 'react-icons/md'
 
 import loading from '@/public/assets/images/loading.svg'
 const breadCrumb = {
@@ -45,6 +47,10 @@ const Checkout = () => {
     const [totalAmount, setTotalAmount] = useState(0)
     const [couponLoading, setCouponLoading] = useState(false)
     const [couponCode, setCouponCode] = useState('')
+
+    const [paymentMethod, setPaymentMethod] = useState('full')
+    const [payableAmount, setPayableAmount] = useState(0)
+    const [remainingAmount, setRemainingAmount] = useState(0)
 
     const [placingOrder, setPlacingOrder] = useState(false)
     const [savingOrder, setSavingOrder] = useState(false)
@@ -74,6 +80,16 @@ const Checkout = () => {
         couponForm.setValue('minShoppingAmount', subTotalAmount)
 
     }, [cart])
+
+    useEffect(() => {
+        if (paymentMethod === 'cod') {
+            setPayableAmount(0)
+            setRemainingAmount(totalAmount)
+        } else {
+            setPayableAmount(totalAmount)
+            setRemainingAmount(0)
+        }
+    }, [paymentMethod, totalAmount])
 
 
 
@@ -191,7 +207,47 @@ const Checkout = () => {
  
         setPlacingOrder(true)
         try {
-            const generateOrderId = await getOrderId(totalAmount)
+            const products = verifiedCartData.map((cartItem) => ({
+                productId: cartItem.productId,
+                variantId: cartItem.variantId,
+                name: cartItem.name,
+                qty: cartItem.qty,
+                mrp: cartItem.mrp,
+                sellingPrice: cartItem.sellingPrice,
+            }))
+
+            if (paymentMethod === 'cod') {
+                setSavingOrder(true)
+                const codOrderId = `COD_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+
+                const { data: orderResponse } = await axios.post('/api/payment/save-order', {
+                    ...formData,
+                    products,
+                    subtotal,
+                    discount,
+                    couponDiscountAmount,
+                    totalAmount,
+                    paymentMethod: 'cod',
+                    partialPaymentPercentage: 100,
+                    paidAmount: 0,
+                    remainingAmount: totalAmount,
+                    order_id: codOrderId
+                })
+
+                if (orderResponse.success) {
+                    showToast('success', orderResponse.message)
+                    dispatch(clearCart())
+                    orderForm.reset()
+                    router.push(WEBSITE_ORDER_DETAILS(codOrderId))
+                } else {
+                    showToast('error', orderResponse.message)
+                }
+
+                setSavingOrder(false)
+                return
+            }
+
+            const generateOrderId = await getOrderId(payableAmount)
             if (!generateOrderId.success) {
                 throw new Error(generateOrderId.message)
             }
@@ -200,33 +256,27 @@ const Checkout = () => {
 
             const razOption = {
                 "key": process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-                "amount": totalAmount * 100,
+                "amount": payableAmount * 100,
                 "currency": "INR",
                 "name": "E-store",
-                "description": "Payment for order",
+                "description": 'Full Payment for order',
                 "image": "https://res.cloudinary.com/dg7efdu9o/image/upload/v1750052410/logo-black_mb1rve.webp",
                 "order_id": order_id,
                 "handler": async function (response) {
                     setSavingOrder(true)
-                    const products = verifiedCartData.map((cartItem) => (
-                        {
-                            productId: cartItem.productId,
-                            variantId: cartItem.variantId,
-                            name: cartItem.name,
-                            qty: cartItem.qty,
-                            mrp: cartItem.mrp,
-                            sellingPrice: cartItem.sellingPrice,
-                        }
-                    ))
 
                     const { data: paymentResponseData } = await axios.post('/api/payment/save-order', {
                         ...formData,
                         ...response,
-                        products: products,
-                        subtotal: subtotal,
-                        discount: discount,
-                        couponDiscountAmount: couponDiscountAmount,
-                        totalAmount: totalAmount
+                        products,
+                        subtotal,
+                        discount,
+                        couponDiscountAmount,
+                        totalAmount,
+                        paymentMethod: 'full',
+                        partialPaymentPercentage: 100,
+                        paidAmount: payableAmount,
+                        remainingAmount: 0
                     })
 
                     if (paymentResponseData.success) {
@@ -251,7 +301,11 @@ const Checkout = () => {
                 }
             }
 
-            const rzp = new Razorpay(razOption)
+            if (typeof window === 'undefined' || !window.Razorpay) {
+                throw new Error('Payment gateway is not ready. Please refresh and try again.')
+            }
+
+            const rzp = new window.Razorpay(razOption)
             rzp.on('payment.failed', function (response) {
                 showToast('error', response.error.description)
             });
@@ -435,7 +489,7 @@ const Checkout = () => {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Textarea placeholder="Enter order note" />
+                                                        <Textarea placeholder="Enter order note" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -445,8 +499,61 @@ const Checkout = () => {
                                         </FormField>
                                     </div>
 
+                                    <div className='col-span-2 mb-3'>
+                                        <div className='flex font-semibold gap-2 items-center mb-3'>
+                                            <MdPayment size={25} /> Select Payment Method:
+                                        </div>
+                                        <div className='space-y-3 bg-gray-50 p-4 rounded-lg'>
+                                            <label className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === 'full' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'}`}>
+                                                <input
+                                                    type="radio"
+                                                    name="paymentMethod"
+                                                    value="full"
+                                                    checked={paymentMethod === 'full'}
+                                                    onChange={() => setPaymentMethod('full')}
+                                                    className="w-4 h-4 text-primary"
+                                                />
+                                                <div className='flex-1'>
+                                                    <p className='font-medium'>Full Payment</p>
+                                                    <p className='text-sm text-gray-500'>Pay {totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} now</p>
+                                                </div>
+                                                <span className='font-semibold text-primary'>{totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
+                                            </label>
+
+                                            <label className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === 'cod' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'}`}>
+                                                <input
+                                                    type="radio"
+                                                    name="paymentMethod"
+                                                    value="cod"
+                                                    checked={paymentMethod === 'cod'}
+                                                    onChange={() => setPaymentMethod('cod')}
+                                                    className="w-4 h-4 text-primary"
+                                                />
+                                                <div className='flex-1'>
+                                                    <p className='font-medium'>Cash on Delivery</p>
+                                                    <p className='text-sm text-gray-500'>Pay {totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} when you receive the order</p>
+                                                </div>
+                                                <span className='font-semibold text-green-600'>COD</span>
+                                            </label>
+                                        </div>
+
+                                        {paymentMethod !== 'cod' && (
+                                            <div className='mt-4 p-3 bg-primary/10 rounded-lg'>
+                                                <div className='flex justify-between text-sm'>
+                                                    <span>Pay Now:</span>
+                                                    <span className='font-semibold'>{payableAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className='mb-3'>
-                                        <ButtonLoading type="submit" text="Place Order" loading={placingOrder} className="bg-black rounded-full px-5 cursor-pointer" />
+                                        <ButtonLoading
+                                            type="submit"
+                                            text={paymentMethod === 'cod' ? 'Place Order (COD)' : `Pay ${payableAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}`}
+                                            loading={placingOrder}
+                                            className="bg-black rounded-full px-5 cursor-pointer"
+                                        />
                                     </div>
 
                                 </form>

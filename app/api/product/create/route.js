@@ -17,6 +17,7 @@ export async function POST(request) {
 
         const schema = zSchema.pick({
             name: true,
+            parentSku: true,
             slug: true,
             category: true,
             mrp: true,
@@ -36,6 +37,7 @@ export async function POST(request) {
 
         const newProduct = new ProductModel({
             name: productData.name,
+            parentSku: productData.parentSku,
             slug: productData.slug,
             category: productData.category,
             mrp: productData.mrp,
@@ -47,7 +49,7 @@ export async function POST(request) {
 
         await newProduct.save()
 
-        return response(true, 200, 'Product added successfully.')
+        return response(true, 200, 'Product added successfully.', { _id: newProduct._id })
 
     } catch (error) {
         return catchError(error)

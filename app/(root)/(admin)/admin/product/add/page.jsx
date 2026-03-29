@@ -1,10 +1,11 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import PageHeader from '@/components/Application/Admin/PageHeader'
-import { ADMIN_CATEGORY_SHOW, ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW } from '@/routes/AdminPanelRoute'
+import { ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW, ADMIN_PRODUCT_VARIANT_ADD } from '@/routes/AdminPanelRoute'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import ButtonLoading from '@/components/Application/ButtonLoading'
+import { Button } from '@/components/ui/button'
 import { zSchema } from '@/lib/zodSchema'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,6 +18,7 @@ import Select from '@/components/Application/Select'
 import Editor from '@/components/Application/Admin/LazyEditor'
 import MediaModal from '@/components/Application/Admin/MediaModal'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 const breadcrumbData = [
   { href: ADMIN_DASHBOARD, label: 'Home' },
   { href: ADMIN_PRODUCT_SHOW, label: 'Products' },
@@ -24,7 +26,9 @@ const breadcrumbData = [
 ]
 
 const AddProduct = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [createdProductId, setCreatedProductId] = useState('')
   const [categoryOption, setCategoryOption] = useState([])
   const { data: getCategory } = useFetch('/api/category?deleteType=SD&&size=10000')
 
@@ -42,6 +46,7 @@ const AddProduct = () => {
 
   const formSchema = zSchema.pick({
     name: true,
+    parentSku: true,
     slug: true,
     category: true,
     mrp: true,
@@ -54,6 +59,7 @@ const AddProduct = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      parentSku: "",
       slug: "",
       category: "",
       mrp: 0,
@@ -102,13 +108,27 @@ const AddProduct = () => {
         throw new Error(response.message)
       }
 
+      const productId = response?.data?._id
+      setCreatedProductId(productId || '')
+
       form.reset()
+      setSelectedMedia([])
       showToast('success', response.message)
     } catch (error) {
       showToast('error', error.message)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleAddVariant = async () => {
+    if (!createdProductId) {
+      await form.trigger()
+      showToast('error', 'Create the product first, then add variants.')
+      return
+    }
+
+    router.push(`${ADMIN_PRODUCT_VARIANT_ADD}?productId=${createdProductId}`)
   }
 
   return (
@@ -151,6 +171,23 @@ const AddProduct = () => {
                       </FormLabel>
                       <FormControl>
                         <Input type="text" placeholder="Enter slug" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div>
+                <FormField
+                  control={form.control}
+                  name="parentSku"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Parent SKU <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="text" placeholder="Enter parent SKU" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -269,8 +306,22 @@ const AddProduct = () => {
               </div>
             </div>
 
-            <div className="mb-3 mt-5">
+            <p className="mt-5 text-sm text-muted-foreground">
+              To show your product on the website, you need to add at least one variant after creating the product.
+            </p>
+
+            <div className="mb-3 mt-4 flex flex-wrap items-center gap-3">
               <ButtonLoading loading={loading} type="submit" text="Add Product" className="h-9 cursor-pointer" size="lg" />
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={handleAddVariant}
+                disabled={!createdProductId || loading}
+                className="h-9 cursor-pointer"
+              >
+                Add Variant
+              </Button>
             </div>
           </form>
         </Form>

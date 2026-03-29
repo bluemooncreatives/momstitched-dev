@@ -17,16 +17,19 @@ export async function POST(request) {
             return response(false, 400, 'Invalid or missing fields.', validate.error)
         }
 
-        const { amount } = validate.data
+        const normalizedAmount = Number(validate.data.amount)
+        if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+            return response(false, 400, 'Invalid amount.')
+        }
 
         const razInstance = new Razorpay({
-            key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+            key_id: process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
             key_secret: process.env.RAZORPAY_KEY_SECRET
         })
 
 
         const razOption = {
-            amount: Number(amount) * 100,
+            amount: Math.round(normalizedAmount * 100),
             currency: 'INR'
         }
 

@@ -70,6 +70,31 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    paymentMethod: {
+        type: String,
+        enum: ['cod', 'full', 'partial'],
+        required: true,
+        default: 'full'
+    },
+    partialPaymentPercentage: {
+        type: Number,
+        enum: [30, 50, 100],
+        default: 100
+    },
+    paidAmount: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    remainingAmount: {
+        type: Number,
+        default: 0
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['unpaid', 'partial_paid', 'fully_paid'],
+        default: 'unpaid'
+    },
     status: {
         type: String,
         enum: orderStatus,
@@ -77,7 +102,7 @@ const orderSchema = new mongoose.Schema({
     },
     payment_id: {
         type: String,
-        required: true
+        required: false
     },
     order_id: {
         type: String,

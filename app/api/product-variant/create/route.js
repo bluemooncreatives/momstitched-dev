@@ -2,6 +2,7 @@ import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
 import { zSchema } from "@/lib/zodSchema"
+import ProductModel from "@/models/Product.model"
 import ProductVariantModel from "@/models/ProductVariant.model"
 
 export async function POST(request) {
@@ -32,12 +33,41 @@ export async function POST(request) {
         }
 
         const variantData = validate.data
+        const product = await ProductModel.findOne({ _id: variantData.product, deletedAt: null }).select('parentSku').lean()
+
+        if (!product) {
+            return response(false, 404, 'Product not found.')
+        }
+
+        const parentSku = (product.parentSku || '').trim()
+        const sku = (variantData.sku || '').trim()
+        const skuPrefix = `${parentSku}-`
+
+        if (!parentSku) {
+            return response(false, 400, 'Selected product parent SKU is missing.')
+        }
+
+        if (!sku) {
+            return response(false, 400, 'SKU is required.')
+        }
+
+        if (!sku.startsWith(skuPrefix)) {
+            return response(false, 400, 'SKU must start with parent SKU.')
+        }
+
+        if (sku === parentSku) {
+            return response(false, 400, 'SKU cannot be same as parent SKU.')
+        }
+
+        if (sku === skuPrefix || !sku.slice(skuPrefix.length).trim()) {
+            return response(false, 400, 'Please add a suffix to SKU.')
+        }
 
         const newProductVariant = new ProductVariantModel({
             product: variantData.product,
             color: variantData.color,
             size: variantData.size,
-            sku: variantData.sku,
+            sku,
             mrp: variantData.mrp,
             sellingPrice: variantData.sellingPrice,
             discountPercentage: variantData.discountPercentage,

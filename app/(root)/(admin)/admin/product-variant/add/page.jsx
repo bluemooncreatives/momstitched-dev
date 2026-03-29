@@ -1,7 +1,7 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import PageHeader from '@/components/Application/Admin/PageHeader'
-import { ADMIN_CATEGORY_SHOW, ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW, ADMIN_PRODUCT_VARIANT_SHOW } from '@/routes/AdminPanelRoute'
+import { ADMIN_DASHBOARD, ADMIN_PRODUCT_VARIANT_SHOW } from '@/routes/AdminPanelRoute'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import ButtonLoading from '@/components/Application/ButtonLoading'
@@ -15,6 +15,7 @@ import useFetch from '@/hooks/useFetch'
 import Select from '@/components/Application/Select'
 import MediaModal from '@/components/Application/Admin/MediaModal'
 import Image from 'next/image'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { sizes } from '@/lib/utils'
 const breadcrumbData = [
   { href: ADMIN_DASHBOARD, label: 'Home' },
@@ -23,21 +24,18 @@ const breadcrumbData = [
 ]
 
 const AddProduct = () => {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const productId = searchParams.get('productId') || ''
   const [loading, setLoading] = useState(false)
   const [productOption, setProductOption] = useState([])
+  const [parentSku, setParentSku] = useState('')
   const { data: getProduct } = useFetch('/api/product?deleteType=SD&&size=10000')
 
   // media modal states  
   const [open, setOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState([])
-
-  useEffect(() => {
-    if (getProduct && getProduct.success) {
-      const data = getProduct.data
-      const options = data.map((product) => ({ label: product.name, value: product._id }))
-      setProductOption(options)
-    }
-  }, [getProduct])
 
   const formSchema = zSchema.pick({
     product: true,
@@ -62,6 +60,63 @@ const AddProduct = () => {
     },
   })
 
+  const selectedProductId = form.watch('product')
+
+  useEffect(() => {
+    if (!selectedProductId) {
+      if (productId) {
+        router.replace(pathname, { scroll: false })
+      }
+      return
+    }
+
+    if (selectedProductId !== productId) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('productId', selectedProductId)
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    }
+  }, [selectedProductId, productId, searchParams, router, pathname])
+
+  useEffect(() => {
+    if (getProduct && getProduct.success) {
+      const data = getProduct.data
+      const options = data.map((product) => ({ label: product.name, value: product._id }))
+      setProductOption(options)
+
+      if (productId && options.some((item) => item.value === productId)) {
+        form.setValue('product', productId)
+      }
+    }
+  }, [getProduct, productId, form])
+
+  useEffect(() => {
+    const fetchSelectedProduct = async () => {
+      if (!selectedProductId) {
+        setParentSku('')
+        form.setValue('sku', '')
+        return
+      }
+
+      try {
+        const { data: response } = await axios.get(`/api/product/get/${selectedProductId}`)
+        if (!response.success) {
+          throw new Error(response.message)
+        }
+
+        const selectedParentSku = (response.data?.parentSku || '').trim()
+        setParentSku(selectedParentSku)
+        form.setValue('sku', selectedParentSku ? `${selectedParentSku}-` : '')
+        form.clearErrors('sku')
+      } catch (error) {
+        setParentSku('')
+        form.setValue('sku', '')
+        showToast('error', error.message)
+      }
+    }
+
+    fetchSelectedProduct()
+  }, [selectedProductId, form])
+
 
 
   // discount percentage calculation 
@@ -85,8 +140,37 @@ const AddProduct = () => {
         return showToast('error', 'Please select media.')
       }
 
+      const sku = (values.sku || '').trim()
+      const skuPrefix = parentSku ? `${parentSku}-` : ''
+
+      if (!parentSku) {
+        form.setError('product', { type: 'manual', message: 'Please select a valid product.' })
+        return
+      }
+
+      if (!sku) {
+        form.setError('sku', { type: 'manual', message: 'SKU is required.' })
+        return
+      }
+
+      if (!sku.startsWith(skuPrefix)) {
+        form.setError('sku', { type: 'manual', message: 'SKU must start with parent SKU.' })
+        return
+      }
+
+      if (sku === parentSku) {
+        form.setError('sku', { type: 'manual', message: 'SKU cannot be same as parent SKU.' })
+        return
+      }
+
+      if (sku === skuPrefix || !sku.slice(skuPrefix.length).trim()) {
+        form.setError('sku', { type: 'manual', message: 'Please add a suffix to SKU.' })
+        return
+      }
+
       const mediaIds = selectedMedia.map(media => media._id)
       values.media = mediaIds
+      values.sku = sku
 
       const { data: response } = await axios.post('/api/product-variant/create', values)
       if (!response.success) {
@@ -94,6 +178,8 @@ const AddProduct = () => {
       }
 
       form.reset()
+      setParentSku('')
+      setSelectedMedia([])
       showToast('success', response.message)
     } catch (error) {
       showToast('error', error.message)
@@ -147,7 +233,33 @@ const AddProduct = () => {
                         SKU<span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input type="text" placeholder="Enter sku" {...field} />
+                        <div className="flex h-10 items-stretch overflow-hidden rounded-md border border-input bg-background shadow-xs transition-[color,box-shadow] has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-[3px] has-[input:focus-visible]:ring-ring/50">
+                          {parentSku && (
+                            <span className="flex h-full shrink-0 items-center whitespace-nowrap border-r px-3 text-sm text-muted-foreground">
+                              {`${parentSku}-`}
+                            </span>
+                          )}
+                          <Input
+                            type="text"
+                            placeholder={parentSku ? 'Enter SKU suffix' : 'Enter sku'}
+                            value={parentSku && field.value?.startsWith(`${parentSku}-`) ? field.value.slice(`${parentSku}-`.length) : (field.value || '')}
+                            onChange={(event) => {
+                              const value = event.target.value
+
+                              if (!parentSku) {
+                                field.onChange(value)
+                                return
+                              }
+
+                              field.onChange(`${parentSku}-${value}`)
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                            ref={field.ref}
+                            disabled={!parentSku}
+                            className="h-full border-0 shadow-none focus-visible:ring-0"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
