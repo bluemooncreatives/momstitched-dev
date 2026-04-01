@@ -105,16 +105,19 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
     }, [speed])
 
     return (
-        <section ref={containerRef} className='relative bg-[#3E000D] text-[#FFECD1] py-8 overflow-hidden'>
+        <section
+            ref={containerRef}
+            className='marquee-shell relative overflow-hidden bg-[#3E000D] px-3 py-5 text-[#FFECD1] shadow-[0_16px_36px_rgba(62,0,13,0.18)] sm:mx-0 sm:rounded-none sm:border-0 sm:px-0 sm:py-8 sm:shadow-none'
+        >
             <div className='marquee__inner' ref={innerRef}>
                 {Array.from({ length: repeatCount }).map((_, index) => (
                     <div key={index} className='marquee__part flex items-center flex-shrink-0 px-1 whitespace-nowrap'>
-                        <span className='font-semibold text-2xl sm:text-4xl uppercase whitespace-nowrap'>
+                        <span className='marquee__label font-semibold uppercase whitespace-nowrap'>
                             {text}
                         </span>
                         <div
                             ref={(el) => (arrowsRef.current[index] = el)}
-                            className='arrow w-12 sm:w-16 h-16 sm:h-20 mx-4'
+                            className='arrow'
                         >
                             <ArrowRight className='w-full h-full' strokeWidth={1.5} />
                         </div>
@@ -123,12 +126,20 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
             </div>
 
             <style jsx>{`
+                .marquee-shell {
+                    isolation: isolate;
+                }
                 .marquee__inner {
                     display: flex;
                     width: fit-content;
                     flex: auto;
                     flex-direction: row;
                     will-change: transform;
+                }
+                .marquee__label {
+                    font-size: 1.5rem;
+                    letter-spacing: 0.04em;
+                    line-height: 1;
                 }
                 .marquee__part {
                     display: flex;
@@ -146,9 +157,48 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
                     align-items: center;
                     justify-content: center;
                     color: currentColor;
+                    flex-shrink: 0;
                 }
                 .arrow.active {
                     transform: rotate(-135deg);
+                }
+                @media (min-width: 640px) {
+                    .marquee__label {
+                        font-size: 2.25rem;
+                        letter-spacing: 0.02em;
+                    }
+                }
+                @media (max-width: 639px) {
+                    .marquee-shell::before,
+                    .marquee-shell::after {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        width: 1.1rem;
+                        z-index: 2;
+                        pointer-events: none;
+                    }
+                    .marquee-shell::before {
+                        left: 0;
+                        background: linear-gradient(90deg, #3E000D 35%, rgba(62, 0, 13, 0));
+                    }
+                    .marquee-shell::after {
+                        right: 0;
+                        background: linear-gradient(270deg, #3E000D 35%, rgba(62, 0, 13, 0));
+                    }
+                    .marquee__label {
+                        font-size: 1.25rem;
+                        letter-spacing: 0.05em;
+                    }
+                    .marquee__part {
+                        padding: 0 2px;
+                    }
+                    .arrow {
+                        width: 42px;
+                        height: 42px;
+                        margin: 0 0.7rem;
+                    }
                 }
             `}</style>
         </section>

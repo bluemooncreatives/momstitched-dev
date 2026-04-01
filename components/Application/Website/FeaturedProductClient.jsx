@@ -89,7 +89,7 @@ const FeaturedProductClient = ({ products = [] }) => {
                                         fill
                                         alt={product?.name || 'Product'}
                                         className="object-cover object-center"
-                                        sizes="(max-width: 900px) 100vw, 33vw"
+                                        sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 33vw"
                                     />
                                     <div className="fp-project-title">
                                         <h3>{product?.name}</h3>
@@ -121,7 +121,7 @@ const FeaturedProductClient = ({ products = [] }) => {
         <section className="fp-section bg-white" ref={containerRef}>
             <div className="fp-container">
                 {renderProductRows()}
-                <div className="mt-4 flex justify-center">
+                <div className="fp-actions">
                     <ShopAllButton colorScheme="dark-red" radius="md" />
                 </div>
             </div>
