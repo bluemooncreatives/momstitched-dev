@@ -1,42 +1,58 @@
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { showToast } from '@/lib/showToast';
-import { WEBSITE_LOGIN } from '@/routes/WebsiteRoute';
-import { logout } from '@/store/reducer/authReducer';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { LogOut } from 'lucide-react'
-import { useDispatch } from 'react-redux';
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { showToast } from "@/lib/showToast";
+import { WEBSITE_LOGIN } from "@/routes/WebsiteRoute";
+import { logout } from "@/store/reducer/authReducer";
+import { persistor } from "@/store/store";
+
+import axios from "axios";
+import { LogOut } from "lucide-react";
+import { useDispatch } from "react-redux";
 
 const LogoutButton = () => {
-    const dispatch = useDispatch()
-    const router = useRouter()
-    const handleLogout = async () => {
-        try {
-            const { data: logoutResponse } = await axios.post('/api/auth/logout', {}, {
-                withCredentials: true,
-            })
-            if (!logoutResponse.success) {
-                throw new Error(logoutResponse.message)
-            }
+  const dispatch = useDispatch();
 
-            dispatch(logout())
-            showToast('success', logoutResponse.message)
-            router.replace(WEBSITE_LOGIN)
-            router.refresh()
-
-            // Force a full navigation to avoid stale client state in production.
-            window.location.assign(WEBSITE_LOGIN)
-        } catch (error) {
-            showToast('error', error.message)
+  const handleLogout = async () => {
+    try {
+      const { data } = await axios.post(
+        "/api/auth/logout",
+        {},
+        {
+          withCredentials: true,
         }
+      );
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      // Clear redux auth state
+      dispatch(logout());
+
+      // Remove persisted storage
+      await persistor.purge();
+
+      // Optional cleanup
+      localStorage.clear();
+      sessionStorage.clear();
+
+      showToast("success", data.message);
+
+      // Hard redirect
+      window.location.replace(WEBSITE_LOGIN);
+    } catch (error) {
+      showToast("error", error.message || "Logout failed");
     }
+  };
 
-    return (
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-            <LogOut className='size-4 text-red-500' />
-            Logout
-        </DropdownMenuItem>
-    )
-}
+  return (
+    <DropdownMenuItem
+      onClick={handleLogout}
+      className="cursor-pointer"
+    >
+      <LogOut className="size-4 text-red-500" />
+      Logout
+    </DropdownMenuItem>
+  );
+};
 
-export default LogoutButton
+export default LogoutButton;
