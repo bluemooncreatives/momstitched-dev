@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server"
 import { USER_DASHBOARD, WEBSITE_LOGIN } from "./routes/WebsiteRoute"
-import { jwtVerify } from "jose"
+import { jwtVerify } from "jose/jwt/verify"
 import { ADMIN_DASHBOARD } from "./routes/AdminPanelRoute"
 import { getToken } from "next-auth/jwt"
 
 export async function middleware(request) {
     try {
         const pathname = request.nextUrl.pathname
+        const isAuthRoute = pathname.startsWith('/auth')
+        const isUserProtectedRoute =
+            pathname.startsWith('/my-account') ||
+            pathname.startsWith('/profile') ||
+            pathname.startsWith('/orders') ||
+            pathname.startsWith('/order-details')
         const hasToken = request.cookies.has('access_token')
         const nextAuthToken = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
 
@@ -30,7 +36,7 @@ export async function middleware(request) {
 
         if (!role) {
             // if the user is not loggedin and trying to access a protected route, redirect to login page. 
-            if (!pathname.startsWith('/auth')) {
+            if (!isAuthRoute) {
                 const response = NextResponse.redirect(new URL(WEBSITE_LOGIN, request.nextUrl))
                 if (invalidCustomToken) {
                     response.cookies.delete('access_token')
@@ -45,7 +51,7 @@ export async function middleware(request) {
         }
 
         // prevent logged-in users from accessing auth routes 
-        if (pathname.startsWith('/auth')) {
+        if (isAuthRoute) {
             return NextResponse.redirect(new URL(role === 'admin' ? ADMIN_DASHBOARD : USER_DASHBOARD, request.nextUrl))
         }
 
@@ -58,7 +64,7 @@ export async function middleware(request) {
 
         // protect user route  
 
-        if (pathname.startsWith('/my-account') && role !== 'user') {
+        if (isUserProtectedRoute && role !== 'user') {
             return NextResponse.redirect(new URL(WEBSITE_LOGIN, request.nextUrl))
         }
 
@@ -75,5 +81,5 @@ export async function middleware(request) {
 
 
 export const config = {
-    matcher: ['/admin/:path*', '/my-account/:path*', '/auth/:path*']
+    matcher: ['/admin/:path*', '/my-account/:path*', '/profile/:path*', '/orders/:path*', '/order-details/:path*', '/auth/:path*']
 }

@@ -12,14 +12,20 @@ const LogoutButton = () => {
     const router = useRouter()
     const handleLogout = async () => {
         try {
-            const { data: logoutResponse } = await axios.post('/api/auth/logout')
+            const { data: logoutResponse } = await axios.post('/api/auth/logout', {}, {
+                withCredentials: true,
+            })
             if (!logoutResponse.success) {
                 throw new Error(logoutResponse.message)
             }
 
             dispatch(logout())
             showToast('success', logoutResponse.message)
-            router.push(WEBSITE_LOGIN)
+            router.replace(WEBSITE_LOGIN)
+            router.refresh()
+
+            // Force a full navigation to avoid stale client state in production.
+            window.location.assign(WEBSITE_LOGIN)
         } catch (error) {
             showToast('error', error.message)
         }
