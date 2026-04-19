@@ -3,15 +3,17 @@ import { Button } from '@/components/ui/button'
 import { showToast } from '@/lib/showToast'
 import { USER_DASHBOARD, USER_ORDERS, USER_PROFILE, WEBSITE_LOGIN } from '@/routes/WebsiteRoute'
 import { logout } from '@/store/reducer/authReducer'
+import { persistor } from '@/store/store'
 import axios from 'axios'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
+import { usePathname } from 'next/navigation'
 import { useDispatch } from 'react-redux'
 
 const UserPanelNavigation = () => {
     const pathname = usePathname()
     const dispatch = useDispatch()
-    const router = useRouter()
+
     const handleLogout = async () => {
         try {
             const { data: logoutResponse } = await axios.post('/api/auth/logout', {}, {
@@ -22,12 +24,16 @@ const UserPanelNavigation = () => {
             }
 
             dispatch(logout())
+            await persistor.purge()
+
+            await signOut({
+                redirect: false,
+            })
+
             showToast('success', logoutResponse.message)
-            router.replace(WEBSITE_LOGIN)
-            router.refresh()
 
             // Force a full navigation to avoid stale client state in production.
-            window.location.assign(WEBSITE_LOGIN)
+            window.location.replace(WEBSITE_LOGIN)
         } catch (error) {
             showToast('error', error.message)
         }

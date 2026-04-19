@@ -30,8 +30,12 @@ export async function middleware(request) {
             }
         }
 
-        if (!role && nextAuthToken) {
-            role = nextAuthToken.role || 'user'
+        const hasNextAuthIdentity = Boolean(
+            nextAuthToken && (nextAuthToken.userId || nextAuthToken.sub || nextAuthToken.email)
+        )
+
+        if (!role && hasNextAuthIdentity) {
+            role = typeof nextAuthToken.role === 'string' ? nextAuthToken.role : 'user'
         }
 
         if (!role) {
