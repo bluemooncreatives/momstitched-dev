@@ -3,6 +3,7 @@ import { showToast } from "@/lib/showToast";
 import { WEBSITE_LOGIN } from "@/routes/WebsiteRoute";
 import { logout } from "@/store/reducer/authReducer";
 import { persistor } from "@/store/store";
+import { signOut } from "next-auth/react";
 
 import axios from "axios";
 import { LogOut } from "lucide-react";
@@ -31,9 +32,10 @@ const LogoutButton = () => {
       // Remove persisted storage
       await persistor.purge();
 
-      // Optional cleanup
-      localStorage.clear();
-      sessionStorage.clear();
+      // Sign out NextAuth session as well.
+      await signOut({
+        redirect: false,
+      });
 
       showToast("success", data.message);
 
