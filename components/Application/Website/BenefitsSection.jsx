@@ -111,6 +111,9 @@ const BenefitsSection = () => {
     return (
         <section ref={sectionRef} className="relative overflow-hidden bg-[var(--dark-red)] website-gutter py-16 lg:py-24">
 
+            {/* white-to-transparent top bleed */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-70 bg-gradient-to-b from-white to-transparent" />
+
             {/* large watermark number */}
             <div
                 aria-hidden
