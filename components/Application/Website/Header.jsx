@@ -4,6 +4,7 @@ import Navbar from '@/components/ui/navbar'
 import { WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 
 const menu = [
+  { title: 'Home', url: WEBSITE_HOME },
   { title: 'Shop', url: WEBSITE_SHOP },
   { title: 'About Us', url: '/about-us' },
   { title: 'Contact', url: '/contact' },

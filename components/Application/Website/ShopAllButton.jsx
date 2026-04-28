@@ -7,8 +7,9 @@ import { cn } from "@/lib/utils"
 import { WEBSITE_SHOP } from "@/routes/WebsiteRoute"
 
 const SCHEMES = {
-    "dark-red": { border: "var(--dark-red)", fill: "var(--dark-red-2)" },
-    black:      { border: "#000",            fill: "#222"              },
+    "dark-red": { border: "var(--dark-red)", fill: "var(--dark-red-2)", hoverText: "#fff"              },
+    black:      { border: "#000",            fill: "#222",              hoverText: "#fff"              },
+    white:      { border: "#fff",            fill: "#fff",              hoverText: "var(--dark-red)"   },
 }
 
 const ShopAllButton = ({
@@ -22,7 +23,7 @@ const ShopAllButton = ({
     const fillRef = useRef(null)
     const router  = useRouter()
 
-    const { border, fill } = SCHEMES[colorScheme] ?? SCHEMES.black
+    const { border, fill, hoverText } = SCHEMES[colorScheme] ?? SCHEMES.black
     const radiusClass = radius === "sm" ? "rounded-sm" : radius === "md" ? "rounded-md" : "rounded-full"
 
     // Callback ref — runs gsap.set once on mount, no useEffect needed
@@ -34,7 +35,7 @@ const ShopAllButton = ({
 
     const onEnter = () => {
         gsap.to(fillRef.current, { scaleX: 1, duration: 0.45, ease: "power3.out", overwrite: true })
-        gsap.to(btnRef.current,  { color: "#fff", duration: 0.2, overwrite: true })
+        gsap.to(btnRef.current,  { color: hoverText, duration: 0.2, overwrite: true })
     }
 
     const onLeave = () => {
