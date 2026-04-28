@@ -5,7 +5,8 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowRight } from 'lucide-react'
 
-// Seamless, scroll-direction controlled marquee using GSAP ticker + ScrollTrigger
+gsap.registerPlugin(ScrollTrigger)
+
 const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) => {
     const containerRef = useRef(null)
     const innerRef = useRef(null)
@@ -17,8 +18,6 @@ const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) =>
 
     useEffect(() => {
         if (!containerRef.current || !innerRef.current) return
-
-        gsap.registerPlugin(ScrollTrigger)
 
         const inner = innerRef.current
 

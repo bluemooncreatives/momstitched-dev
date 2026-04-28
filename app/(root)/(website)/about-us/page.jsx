@@ -10,6 +10,12 @@ import SplitType from "@/lib/SplitType/index";
 import styles from "./about-us.module.css";
 import { cvItems } from "./cvItems";
 
+gsap.registerPlugin(CustomEase, ScrollTrigger);
+CustomEase.create(
+  "hop",
+  "M0,0 C0.354,0 0.464,0.133 0.498,0.502 0.532,0.872 0.651,1 1,1"
+);
+
 const AboutUsPage = () => {
   const container = useRef();
   const aboutCopyRef = useRef(null);
@@ -19,12 +25,6 @@ const AboutUsPage = () => {
   const heroImgRef = useRef(null);
 
   useEffect(() => {
-    gsap.registerPlugin(CustomEase, ScrollTrigger);
-    CustomEase.create(
-      "hop",
-      "M0,0 C0.354,0 0.464,0.133 0.498,0.502 0.532,0.872 0.651,1 1,1"
-    );
-
     const splitInstances = [];
     const pageTriggers = [];
 
@@ -105,23 +105,26 @@ const AboutUsPage = () => {
     }
 
     if (heroImgRef.current) {
-      const heroTrigger = ScrollTrigger.create({
-        trigger: heroImgRef.current,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: true,
-        onUpdate: (self) => {
-          const scale = 1 + self.progress * 0.5;
-
-          gsap.to(heroImgRef.current.querySelector("img"), {
-            scale,
+      const heroImg = heroImgRef.current.querySelector("img");
+      if (heroImg) {
+        const heroTween = gsap.fromTo(
+          heroImg,
+          { scale: 1 },
+          {
+            scale: 1.5,
             ease: "none",
-            duration: 0.1,
-          });
-        },
-      });
-
-      pageTriggers.push(heroTrigger);
+            scrollTrigger: {
+              trigger: heroImgRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          }
+        );
+        if (heroTween.scrollTrigger) {
+          pageTriggers.push(heroTween.scrollTrigger);
+        }
+      }
     }
 
     return () => {

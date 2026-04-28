@@ -100,7 +100,7 @@ const Cart = () => {
                             <Button type="button" asChild variant="outline" className="h-11 rounded-md border-border/70 font-semibold" onClick={() => setOpen(false)}>
                                 <Link href={WEBSITE_CART}>View Cart</Link>
                             </Button>
-                            <Button type="button" asChild className="h-11 rounded-md bg-[var(--dark-red)] font-semibold hover:bg-[var(--dark-red-2)]" onClick={() => setOpen(false)}>
+                            <Button type="button" asChild variant="brand" className="h-11 font-semibold" onClick={() => setOpen(false)}>
                                 {cart.count ?
                                     <Link href={WEBSITE_CHECKOUT}>Checkout</Link>
                                     :

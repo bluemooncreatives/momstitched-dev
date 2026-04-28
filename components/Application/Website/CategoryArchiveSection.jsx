@@ -7,6 +7,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import styles from './CategoryArchiveSection.module.css'
 
+gsap.registerPlugin(ScrollTrigger)
+
 const CATEGORIES = [
     {
         id: 'mens',
@@ -166,7 +168,6 @@ const CategoryArchiveSection = () => {
     useEffect(() => {
         if (!containerRef.current) return
 
-        gsap.registerPlugin(ScrollTrigger)
         updateArchiveRect()
 
         const context = gsap.context(() => {

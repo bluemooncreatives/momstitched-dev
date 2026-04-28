@@ -275,7 +275,7 @@ const Filter = ({ filters }) => {
                                 {priceFilter.maxPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                             </div>
                         </div>
-                        <ButtonLoading onClick={handlePriceFilter} type="button" text="Apply Price" className="h-9 w-full rounded-none bg-[var(--dark-red)] text-[11px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)]" />
+                        <ButtonLoading onClick={handlePriceFilter} type="button" text="Apply Price" variant="brand" className="h-9 w-full rounded-none text-[11px] font-semibold uppercase tracking-[0.2em]" />
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

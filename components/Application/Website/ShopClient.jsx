@@ -154,7 +154,7 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                                     Try adjusting your filters or start a fresh search.
                                 </p>
                                 {searchParams.size > 0 && (
-                                    <Button asChild className="mt-4 rounded-md bg-[var(--dark-red)] hover:bg-[var(--dark-red-2)]">
+                                    <Button asChild variant="brand" className="mt-4">
                                         <Link href={WEBSITE_SHOP}>Clear Filters</Link>
                                     </Button>
                                 )}
@@ -174,7 +174,8 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                                     loading={isFetching}
                                     text="Load More"
                                     onClick={fetchNextPage}
-                                    className="h-10 rounded-md bg-[var(--dark-red)] px-7 text-[11px] font-semibold uppercase tracking-[0.24em] hover:bg-[var(--dark-red-2)]"
+                                    variant="brand"
+                                    className="h-10 px-7 text-[11px] font-semibold uppercase tracking-[0.24em]"
                                 />
                             ) : (
                                 !isFetching && !showEmptyState && <span className="text-sm text-muted-foreground">No more data to load.</span>

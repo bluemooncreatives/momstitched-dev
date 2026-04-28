@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
+
 const instagramVideos = [
     "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260204-WA0385_bzffp6.mp4",
     "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260223-WA0435_unfxuc.mp4",
@@ -11,7 +13,29 @@ const instagramVideos = [
 ]
 
 const InstagramReelsMarquee = () => {
+    const trackRef = useRef(null)
     const reels = [...instagramVideos, ...instagramVideos]
+
+    useEffect(() => {
+        if (!trackRef.current) return
+        const videos = Array.from(trackRef.current.querySelectorAll('video'))
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.play().catch(() => {})
+                    } else {
+                        entry.target.pause()
+                    }
+                })
+            },
+            { rootMargin: '0px 200px 0px 200px', threshold: 0 }
+        )
+
+        videos.forEach((v) => observer.observe(v))
+        return () => observer.disconnect()
+    }, [])
 
     return (
         <section className="relative overflow-hidden bg-white py-12">
@@ -24,16 +48,15 @@ const InstagramReelsMarquee = () => {
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#ffffff] via-[#fff]/70 to-transparent sm:w-24" />
 
             <div className="instagram-marquee">
-                <div className="instagram-track">
+                <div className="instagram-track" ref={trackRef}>
                     {reels.map((video, index) => (
                         <div key={`${video}-${index}`} className="instagram-card">
                             <video
                                 src={video}
                                 muted
                                 playsInline
-                                autoPlay
                                 loop
-                                preload="metadata"
+                                preload="none"
                                 className="h-full w-full object-cover"
                             />
                         </div>
@@ -74,10 +97,10 @@ const InstagramReelsMarquee = () => {
                 }
                 @keyframes insta-marquee {
                     0% {
-                        transform: translateX(-50%);
+                        transform: translateX(0%);
                     }
                     100% {
-                        transform: translateX(0%);
+                        transform: translateX(-50%);
                     }
                 }
             `}</style>

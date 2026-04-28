@@ -186,7 +186,7 @@ const ProductReveiw = ({ productId }) => {
                             ?
                             <>
                                 <p className='mb-2'>Login to submit review.</p>
-                                <Button type="button" asChild className="rounded-md bg-[var(--dark-red)] hover:bg-[var(--dark-red-2)]">
+                                <Button type="button" asChild variant="brand">
                                     <Link href={`${WEBSITE_LOGIN}?callback=${currentUrl}`}>Login</Link>
                                 </Button>
                             </>
@@ -242,7 +242,7 @@ const ProductReveiw = ({ productId }) => {
                                         </div>
 
                                         <div className='mb-3'>
-                                            <ButtonLoading loading={loading} type="submit" text="Submit Review" className="h-10 rounded-md bg-[var(--dark-red)] text-[11px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)] cursor-pointer" />
+                                            <ButtonLoading loading={loading} type="submit" text="Submit Review" variant="brand" className="h-10 cursor-pointer text-[11px] font-semibold uppercase tracking-[0.2em]" />
                                         </div>
 
                                     </form>
@@ -269,7 +269,7 @@ const ProductReveiw = ({ productId }) => {
                         ))}
 
                         {hasNextPage &&
-                            <ButtonLoading text="Load More" type="button" loading={isFetching} onClick={fetchNextPage} className="h-10 rounded-md bg-[var(--dark-red)] text-[11px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)]" />
+                            <ButtonLoading text="Load More" type="button" loading={isFetching} onClick={fetchNextPage} variant="brand" className="h-10 text-[11px] font-semibold uppercase tracking-[0.2em]" />
                         }
 
                     </div>

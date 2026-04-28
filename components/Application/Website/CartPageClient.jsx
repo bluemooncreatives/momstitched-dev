@@ -67,7 +67,7 @@ const CartPageClient = () => {
                                     <p>Explore the shop and add items you love to see them here.</p>
                                 </CardContent>
                                 <CardFooter className="flex justify-start">
-                                    <Button type="button" asChild className="rounded-md bg-[var(--dark-red)] px-6 text-[11px] font-semibold uppercase tracking-[0.22em] hover:bg-[var(--dark-red-2)]">
+                                    <Button type="button" asChild variant="brand" className="px-6 text-[11px] font-semibold uppercase tracking-[0em]">
                                         <Link href={WEBSITE_SHOP}>Continue Shopping</Link>
                                     </Button>
                                 </CardFooter>
@@ -102,7 +102,7 @@ const CartPageClient = () => {
                                             </div>
                                         </CardContent>
                                         <CardFooter className="flex flex-col gap-3">
-                                            <Button type="button" asChild className="h-11 w-full rounded-md bg-[var(--dark-red)] text-[11px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)]">
+                                            <Button type="button" asChild variant="brand" className="h-11 w-full text-[11px] font-semibold uppercase tracking-[0.2em]">
                                                 <Link href={WEBSITE_CHECKOUT}>Proceed to Checkout</Link>
                                             </Button>
                                             <Button type="button" variant="link" asChild className="h-auto p-0 text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground">

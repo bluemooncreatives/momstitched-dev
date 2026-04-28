@@ -209,9 +209,9 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
 
                     <div className="mt-5">
                         {!isAddedIntoCart ?
-                            <ButtonLoading type="button" text="Add To Cart" className="h-11 w-full rounded-md bg-[var(--dark-red)] text-[12px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)]" onClick={handleAddToCart} />
+                            <ButtonLoading type="button" text="Add To Cart" variant="brand" className="h-11 w-full text-[12px] font-semibold uppercase tracking-[0.2em]" onClick={handleAddToCart} />
                             :
-                            <Button className="h-11 w-full rounded-md bg-[var(--dark-red)] text-[12px] font-semibold uppercase tracking-[0.2em] hover:bg-[var(--dark-red-2)]" type="button" asChild>
+                            <Button variant="brand" className="h-11 w-full text-[12px] font-semibold uppercase tracking-[0.2em]" type="button" asChild>
                                 <Link href={WEBSITE_CART}>Go To Cart</Link>
                             </Button>
                         }

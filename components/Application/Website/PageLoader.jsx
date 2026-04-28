@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
+import CustomEase from "gsap/CustomEase"
+
+gsap.registerPlugin(CustomEase)
+CustomEase.create("hop", "0.9, 0, 0.1, 1")
 
 const PageLoader = ({ onReady, onComplete }) => {
     const loaderRef = useRef(null)
     const [count, setCount] = useState(0)
     const [isLoaded, setIsLoaded] = useState(false)
-    const [animationReady, setAnimationReady] = useState(false)
     const countRef = useRef(0)
     const tlRef = useRef(null)
 
@@ -19,10 +22,8 @@ const PageLoader = ({ onReady, onComplete }) => {
             }
         }
 
-        // Check if already loaded
         checkLoaded()
 
-        // Listen for load events
         const onLoad = () => setIsLoaded(true)
         window.addEventListener('load', onLoad)
         document.addEventListener('readystatechange', checkLoaded)
@@ -33,24 +34,10 @@ const PageLoader = ({ onReady, onComplete }) => {
         }
     }, [])
 
-    // Counter animation that syncs with loading
+    // Counter animation — starts immediately, no async delay
     useEffect(() => {
-        const registerPlugins = async () => {
-            const CustomEase = (await import("gsap/dist/CustomEase")).default
-            gsap.registerPlugin(CustomEase)
-            CustomEase.create("hop", "0.9, 0, 0.1, 1")
-            setAnimationReady(true)
-        }
-        registerPlugins()
-    }, [])
-
-    useEffect(() => {
-        if (!animationReady) return
-
-        // Minimum load time of 1.5 seconds, counter goes to 90 during loading
         const counterTl = gsap.timeline()
-        
-        // Animate to 90% over minimum time or until loaded
+
         counterTl.to(countRef, {
             current: 90,
             duration: 1.5,
@@ -65,11 +52,11 @@ const PageLoader = ({ onReady, onComplete }) => {
         return () => {
             counterTl.kill()
         }
-    }, [animationReady])
+    }, [])
 
     // When page is loaded, complete the counter to 100 and reveal
     useEffect(() => {
-        if (!isLoaded || !animationReady) return
+        if (!isLoaded) return
 
         // Kill any running counter animation
         if (tlRef.current) {
@@ -167,17 +154,15 @@ const PageLoader = ({ onReady, onComplete }) => {
             }
         })
 
-    }, [isLoaded, animationReady, onReady, onComplete])
+    }, [isLoaded, onReady, onComplete])
 
-    const loaderContent = (
+    return (
         <div ref={loaderRef} className="loader fixed top-0 left-0 w-full h-svh overflow-hidden z-[120] pointer-events-none">
-            {/* Overlay Blocks */}
             <div className="overlay absolute top-0 w-full h-full flex">
                 <div className="block w-full h-full bg-[#8E1616] [clip-path:polygon(0%_0%,100%_0%,100%_100%,0%_100%)]"></div>
                 <div className="block w-full h-full bg-[#8E1616] [clip-path:polygon(0%_0%,100%_0%,100%_100%,0%_100%)]"></div>
             </div>
 
-            {/* Logo Text */}
             <div className="intro-logo absolute inset-0">
                 <div className="word absolute top-1/2 right-1/2 -translate-y-1/2 pr-3 [clip-path:polygon(0_0,100%_0,100%_100%,0%_100%)]" id="word-1">
                     <h1 className="text-3xl text-white font-header -translate-y-[120%] will-change-transform">
@@ -189,10 +174,8 @@ const PageLoader = ({ onReady, onComplete }) => {
                 </div>
             </div>
 
-            {/* Divider Line */}
             <div className="divider absolute top-0 left-1/2 origin-top w-px h-full bg-white -translate-x-1/2 scale-y-0 will-change-transform"></div>
 
-            {/* Loading Counter */}
             <div className="counter absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2]">
                 <h1 className="font-header text-[12rem] max-md:text-[8rem] max-sm:text-[5rem] font-normal text-white will-change-transform">
                     {count.toString().padStart(2, '0')}
@@ -200,8 +183,6 @@ const PageLoader = ({ onReady, onComplete }) => {
             </div>
         </div>
     )
-
-    return loaderContent
 }
 
 export default PageLoader

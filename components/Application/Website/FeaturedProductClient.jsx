@@ -11,7 +11,8 @@ import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
 import './FeaturedProduct.css'
 import ShopAllButton from '@/components/Application/Website/ShopAllButton'
 
-// Assign sizes in a repeating pattern for the row layout
+gsap.registerPlugin(ScrollTrigger)
+
 const sizePattern = ['lg', 'sm', 'lg', 'sm', 'lg', 'lg', 'lg', 'lg', 'sm']
 
 const FeaturedProductClient = ({ products = [] }) => {
@@ -19,7 +20,6 @@ const FeaturedProductClient = ({ products = [] }) => {
 
     useGSAP(() => {
         if (!products.length || !containerRef.current) return
-        gsap.registerPlugin(ScrollTrigger)
 
         const cols = containerRef.current.querySelectorAll('.fp-col')
         const hoverHandlers = []
