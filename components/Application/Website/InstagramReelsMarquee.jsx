@@ -40,8 +40,8 @@ const InstagramReelsMarquee = () => {
     return (
         <section className="relative overflow-hidden bg-white py-12">
             <div className="website-gutter mb-6">
-                <h1 className="text-left text-[3.8rem] font-medium uppercase text-[var(--dark-red-2)]">
-                    Product Gallery
+                <h1 className="text-left text-[3.8rem] font-medium uppercase text-[var(--dark-red-2)] z-50">
+                    Gallery
                 </h1>
             </div>
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#ffffff] via-[#fff]/70 to-transparent sm:w-24" />

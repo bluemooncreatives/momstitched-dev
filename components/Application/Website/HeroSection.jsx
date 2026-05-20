@@ -21,7 +21,7 @@ const SLIDES = [
     headline: "Mother's Love",
     title: "The Revival Ensemble",
     writeup: "A 12-column rhythm that keeps every element balanced and readable.",
-    src: "/assets/images/hero/01.jpg",
+    src: "/assets/images/hero/01.png",
     alt: "Hero slide one",
   },
   {
@@ -37,7 +37,7 @@ const SLIDES = [
     headline: "Elegance",
     title: "Harmony in Every Note",
     writeup: "Motion and content progression aligned to keep visual hierarchy intact.",
-    src: "/assets/images/hero/03.jpg",
+    src: "/assets/images/hero/03.png",
     alt: "Hero slide three",
   },
   {
@@ -45,7 +45,7 @@ const SLIDES = [
     headline: "Eternelle",
     title: "Redefining Imagination",
     writeup: "A consistent editorial layout supporting product, story, and identity.",
-    src: "/assets/images/hero/04.jpg",
+    src: "/assets/images/hero/04.png",
     alt: "Hero slide four",
   },
 ];
