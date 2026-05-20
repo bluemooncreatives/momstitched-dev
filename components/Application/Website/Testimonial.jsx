@@ -188,13 +188,13 @@ const Testimonial = () => {
                     <p className="text-[1rem] font-semibold uppercase text-[var(--dark-red)]/50">
                         Customer Reviews
                     </p>
-                    <h2 className="mt-1.5 font-neue text-[3rem] font-medium uppercase text-[var(--dark-red-2)] sm:text-[3.8rem]">
+                    <h2 className="mt-1.5 font-neue text-[clamp(1.8rem,4.8vw,3.8rem)] font-medium uppercase text-[var(--dark-red-2)]">
                         What They Say
                     </h2>
                 </div>
                 <span className="font-neue text-[var(--dark-red)]">
-                    <span className="text-3xl font-semibold sm:text-4xl">{PAD(active + 1)}</span>
-                    <span className="text-base"> / {PAD(TOTAL)}</span>
+                    <span className="text-2xl font-semibold sm:text-3xl">{PAD(active + 1)}</span>
+                    <span className="text-sm"> / {PAD(TOTAL)}</span>
                 </span>
             </div>
 

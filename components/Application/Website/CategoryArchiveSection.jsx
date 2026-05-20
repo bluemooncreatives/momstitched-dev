@@ -16,7 +16,7 @@ const CATEGORIES = [
         collection: 'Core Essentials',
         year: '2025',
         href: `${WEBSITE_SHOP}?category=mens`,
-        previewImage: '/assets/images/hero/01.png'
+        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1779221853/mtonkotfj50dwoswlr2j.jpg'
     },
     {
         id: 'womens',
@@ -24,7 +24,7 @@ const CATEGORIES = [
         collection: 'Tailored Icons',
         year: '2025',
         href: `${WEBSITE_SHOP}?category=womens`,
-        previewImage: '/assets/images/hero/02.jpg'
+        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1773413317/ybacm7phf5v1rwmh2brn.jpg'
     },
     {
         id: 'kids',
@@ -32,7 +32,7 @@ const CATEGORIES = [
         collection: 'Play Collection',
         year: '2025',
         href: `${WEBSITE_SHOP}?category=kids`,
-        previewImage: '/assets/images/hero/03.jpg'
+        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1767809739/3_yor7mf.jpg'
     },
     {
         id: 'outwear',
@@ -40,7 +40,7 @@ const CATEGORIES = [
         collection: 'All-Season Layers',
         year: '2025',
         href: `${WEBSITE_SHOP}?category=outwear`,
-        previewImage: '/assets/images/slider-1.png'
+        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1768029766/njlqt8ppnjuxjklvdst5.jpg'
     },
     {
         id: 'hoodies',
@@ -48,7 +48,7 @@ const CATEGORIES = [
         collection: 'Off-Duty Comfort',
         year: '2025',
         href: `${WEBSITE_SHOP}?category=hoodies`,
-        previewImage: '/assets/images/slider-2.png'
+        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1779221853/f8yysmcswpvraytlu75i.jpg'
     },
     {
         id: 'dresses',
@@ -56,7 +56,7 @@ const CATEGORIES = [
         collection: 'Flow & Form',
         year: '2025',
         href: `${WEBSITE_SHOP}?category=dresses`,
-        previewImage: '/assets/images/slider-3.png'
+        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1767809739/3_yor7mf.jpg'
     },
     {
         id: 'tshirts',
@@ -64,7 +64,7 @@ const CATEGORIES = [
         collection: 'Daily Uniform',
         year: '2025',
         href: `${WEBSITE_SHOP}?category=t-shirts`,
-        previewImage: '/assets/images/slider-4.png'
+        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1779221853/mtonkotfj50dwoswlr2j.jpg'
     },
     {
         id: 'trousers',
@@ -72,7 +72,7 @@ const CATEGORIES = [
         collection: 'Relaxed Fit',
         year: '2025',
         href: `${WEBSITE_SHOP}?category=trousers`,
-        previewImage: '/assets/images/banner1.png'
+        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1773413317/ybacm7phf5v1rwmh2brn.jpg'
     }
 ]
 
@@ -209,13 +209,14 @@ const CategoryArchiveSection = () => {
                             index * 0.05
                         )
                     })
+
                 }
             })
 
             ScrollTrigger.create({
                 trigger: containerRef.current,
                 start: 'top bottom',
-                end: 'bottom top',
+                end: 'bottom 10%',
                 onEnter: () => {
                     archiveVisibleRef.current = true
                 },
@@ -233,13 +234,53 @@ const CategoryArchiveSection = () => {
                     removeAllImages()
                 }
             })
+
+            // Scroll-triggered preview for touch / mobile — mirrors the desktop hover effect
+            if (window.matchMedia('(hover: none), (pointer: coarse)').matches) {
+                const showScrollPreview = (category) => {
+                    cleanupOldImages()
+                    if (!previewRef.current) return
+                    const img = document.createElement('img')
+                    img.src = category.previewImage
+                    img.alt = ''
+                    img.dataset.preview = 'true'
+                    img.className = styles.previewImage
+                    img.style.zIndex = String(Date.now())
+                    previewRef.current.appendChild(img)
+                    gsap.to(img, { scale: 1, duration: 0.4, ease: 'power2.out' })
+                }
+
+                const allItems = Array.from(items)
+                const lastIndex = allItems.length - 1
+
+                allItems.forEach((item, index) => {
+                    const category = CATEGORIES[index % CATEGORIES.length]
+                    ScrollTrigger.create({
+                        trigger: item,
+                        start: 'top 55%',
+                        end: 'bottom 45%',
+                        onEnter: () => showScrollPreview(category),
+                        onEnterBack: () => showScrollPreview(category),
+                        // Remove when last item exits downward (section ends)
+                        onLeave: () => { if (index === lastIndex) removeAllImages() },
+                        // Remove when first item exits upward (section starts)
+                        onLeaveBack: () => { if (index === 0) removeAllImages() }
+                    })
+                })
+            }
         }, containerRef)
+
+        const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches
 
         const scheduleRectUpdate = () => {
             if (rectRafRef.current) return
             rectRafRef.current = requestAnimationFrame(() => {
                 rectRafRef.current = null
                 updateArchiveRect()
+
+                // On touch devices mousePosRef is always {0,0} — skip the pointer check
+                // or it would call removeAllImages() on every scroll event
+                if (isTouchDevice) return
 
                 const { x, y } = mousePosRef.current
                 if (!isInsideArchive(x, y)) {
@@ -360,6 +401,8 @@ const CategoryArchiveSection = () => {
                             ))
                         )}
                     </div>
+
+
                 </div>
                 <div className={styles.emptyCol}></div>
             </div>

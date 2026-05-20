@@ -1,13 +1,18 @@
+import { notFound } from 'next/navigation'
 import WebsiteBreadcrumb from "@/components/Application/Website/WebsiteBreadcrumb"
 import Image from "next/image"
 import placeholderImg from '@/public/assets/images/img-placeholder.webp'
 import Link from "next/link"
 import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute"
 import { getOrderDetailsByOrderId } from "@/lib/services/orderService"
+
 const OrderDetails = async ({ params }) => {
     const { orderid } = await params
     const order = await getOrderDetailsByOrderId(orderid)
-    const orderData = { success: Boolean(order), data: order }
+
+    if (!order) notFound()
+
+    const orderData = order
 
     const breadcrumb = {
         title: 'Order Details',
@@ -17,16 +22,11 @@ const OrderDetails = async ({ params }) => {
         <div>
             <WebsiteBreadcrumb props={breadcrumb} />
             <div className="lg:px-32 px-5 my-20">
-                {orderData && !orderData.success ?
-                    <div className="flex justify-center items-center py-32">
-                        <h4 className="text-red-500 text-xl font-semibold">Order Not Found</h4>
-                    </div>
-                    :
                     <div>
                         <div className="mb-5">
-                            <p><b>Order Id:</b> {orderData?.data?.order_id}</p>
-                            <p><b>Transaction Id:</b> {orderData?.data?.payment_id}</p>
-                            <p className="capitalize"><b>Status:</b> {orderData?.data?.status}</p>
+                            <p><b>Order Id:</b> {orderData?.order_id}</p>
+                            <p><b>Transaction Id:</b> {orderData?.payment_id}</p>
+                            <p className="capitalize"><b>Status:</b> {orderData?.status}</p>
                         </div>
                         <table className="w-full border">
                             <thead className="border-b bg-gray-50 md:table-header-group hidden">
@@ -38,7 +38,7 @@ const OrderDetails = async ({ params }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {orderData && orderData?.data?.products?.map((product) => (
+                                {orderData?.products?.map((product) => (
                                     <tr key={product.variantId._id} className="md:table-row block border-b">
                                         <td className="p-3">
                                             <div className="flex items-center gap-5">
@@ -77,39 +77,39 @@ const OrderDetails = async ({ params }) => {
                                         <tbody>
                                             <tr>
                                                 <td className="font-medium py-2">Name</td>
-                                                <td className="text-end py-2">{orderData?.data?.name}</td>
+                                                <td className="text-end py-2">{orderData?.name}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Email</td>
-                                                <td className="text-end py-2">{orderData?.data?.email}</td>
+                                                <td className="text-end py-2">{orderData?.email}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Phone</td>
-                                                <td className="text-end py-2">{orderData?.data?.phone}</td>
+                                                <td className="text-end py-2">{orderData?.phone}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Country</td>
-                                                <td className="text-end py-2">{orderData?.data?.country}</td>
+                                                <td className="text-end py-2">{orderData?.country}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">State</td>
-                                                <td className="text-end py-2">{orderData?.data?.state}</td>
+                                                <td className="text-end py-2">{orderData?.state}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">City</td>
-                                                <td className="text-end py-2">{orderData?.data?.city}</td>
+                                                <td className="text-end py-2">{orderData?.city}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Pincode</td>
-                                                <td className="text-end py-2">{orderData?.data?.pincode}</td>
+                                                <td className="text-end py-2">{orderData?.pincode}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Landmark</td>
-                                                <td className="text-end py-2">{orderData?.data?.landmark}</td>
+                                                <td className="text-end py-2">{orderData?.landmark}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Order note</td>
-                                                <td className="text-end py-2">{orderData?.data?.ordernote || '---'}</td>
+                                                <td className="text-end py-2">{orderData?.ordernote || '---'}</td>
                                             </tr>
 
                                         </tbody>
@@ -123,19 +123,19 @@ const OrderDetails = async ({ params }) => {
                                         <tbody>
                                             <tr>
                                                 <td className="font-medium py-2">Subtotal</td>
-                                                <td className="text-end py-2">{orderData?.data?.subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+                                                <td className="text-end py-2">{orderData?.subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Discount</td>
-                                                <td className="text-end py-2">{orderData?.data?.discount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+                                                <td className="text-end py-2">{orderData?.discount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Coupon Discount</td>
-                                                <td className="text-end py-2">{orderData?.data?.couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+                                                <td className="text-end py-2">{orderData?.couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-medium py-2">Total</td>
-                                                <td className="text-end py-2">{orderData?.data?.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+                                                <td className="text-end py-2">{orderData?.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                                             </tr>
 
 
@@ -146,7 +146,6 @@ const OrderDetails = async ({ params }) => {
                         </div>
 
                     </div>
-                }
             </div>
         </div>
     )

@@ -151,8 +151,10 @@
     display: none;
   }
 
+  /* Keep preview visible on tablet/mobile — scroll-trigger drives it on touch devices */
   .preview {
-    display: none;
+    width: 42%;
+    aspect-ratio: 5 / 3;
   }
 }
 
@@ -164,5 +166,12 @@
   .writeup {
     font-size: 0.9rem;
     line-height: 1.5;
+  }
+
+  .preview {
+    width: 50%;
+    aspect-ratio: 4 / 3;
+    bottom: 0.75em;
+    right: 0.75em;
   }
 }

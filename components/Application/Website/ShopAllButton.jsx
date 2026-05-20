@@ -13,7 +13,7 @@ const SCHEMES = {
 }
 
 const ShopAllButton = ({
-    label = "Shop All Products",
+    label = "More Products",
     href = WEBSITE_SHOP,
     colorScheme = "black",
     radius = "full",

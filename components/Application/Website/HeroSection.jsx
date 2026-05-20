@@ -18,6 +18,7 @@ CustomEase.create(
 const AUTO_SLIDE_MS = 6000;
 const MAX_ACTIVE_SLIDES = 2;
 const DESKTOP_HEADLINE_STEP = 172;
+const MOBILE_TITLE_STEP = 160;
 const LOADER_SESSION_KEY = "momstitched_loader_seen";
 
 const SLIDES = [
@@ -25,48 +26,67 @@ const SLIDES = [
     id: 1,
     headline: "Mother's Love",
     title: "The Revival Ensemble",
-    writeup: "A 12-column rhythm that keeps every element balanced and readable.",
+    writeup: "Where tradition meets modern femininity — handcrafted women's wear stitched with a mother's devotion and an artist's eye.",
     src: "/assets/images/hero/01.png",
-    alt: "Hero slide one",
+    alt: "MomStitched festive ethnic wear collection for women",
   },
   {
     id: 2,
     headline: "Timeless",
-    title: "Above The Canvas",
-    writeup: "Structured spacing and typography that scale cleanly across breakpoints.",
+    title: "Heritage in Every Thread",
+    writeup: "Festive ethnic wear and everyday elegance, curated for the woman who carries grace in every step she takes.",
     src: "/assets/images/hero/02.png",
-    alt: "Hero slide two",
+    alt: "MomStitched timeless women's ethnic wear collection",
   },
   {
     id: 3,
     headline: "Elegance",
-    title: "Harmony in Every Note",
-    writeup: "Motion and content progression aligned to keep visual hierarchy intact.",
+    title: "The Art of Refined Dressing",
+    writeup: "Premium fabrics, thoughtful silhouettes, and meticulous detailing — women's fashion that speaks before you say a word.",
     src: "/assets/images/hero/03.png",
-    alt: "Hero slide three",
+    alt: "MomStitched elegant designer women's wear",
   },
   {
     id: 4,
     headline: "Eternelle",
-    title: "Redefining Imagination",
-    writeup: "A consistent editorial layout supporting product, story, and identity.",
+    title: "Crafted to Be Cherished",
+    writeup: "Timeless Indian women's fashion that transcends seasons — pieces made to accompany every celebration, big and small.",
     src: "/assets/images/hero/04.png",
-    alt: "Hero slide four",
+    alt: "MomStitched eternal women's fashion collection",
   },
 ];
 
 const TOTAL_SLIDES = SLIDES.length;
 
 const splitToChars = (text) =>
-  text.split("").map((char, index) => (
-    <span
-      key={`${char}-${index}`}
-      className="char inline-block will-change-transform"
-      style={{ transformOrigin: "50% 100%" }}
-    >
-      {char === " " ? "\u00A0" : char}
-    </span>
-  ));
+  text.split(" ").flatMap((word, wordIndex, words) => {
+    const wordGroup = (
+      <span key={`word-${wordIndex}`} className="inline-block whitespace-nowrap">
+        {word.split("").map((char, charIndex) => (
+          <span
+            key={`${wordIndex}-${charIndex}`}
+            className="char inline-block will-change-transform"
+            style={{ transformOrigin: "50% 100%" }}
+          >
+            {char}
+          </span>
+        ))}
+      </span>
+    );
+    if (wordIndex < words.length - 1) {
+      return [
+        wordGroup,
+        <span
+          key={`sp-${wordIndex}`}
+          className="char inline-block will-change-transform"
+          style={{ transformOrigin: "50% 100%" }}
+        >
+          {"\u00A0"}
+        </span>,
+      ];
+    }
+    return [wordGroup];
+  });
 
 const HeroSection = () => {
   const sliderRef = useRef(null);
@@ -239,7 +259,7 @@ const HeroSection = () => {
         });
 
         gsap.to(mobileTitleTrackRef.current, {
-          y: -64 * currentIndex,
+          y: -MOBILE_TITLE_STEP * currentIndex,
           duration: 0.95,
           ease: "hop2",
           force3D: true,
@@ -471,12 +491,14 @@ const HeroSection = () => {
         </div>
 
         {/* Mobile title */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-16 w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden lg:hidden">
-          <div ref={mobileTitleTrackRef} className="relative top-0 w-full text-center will-change-transform">
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-40 w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden px-8 lg:hidden">
+          <div ref={mobileTitleTrackRef} className="relative top-0 w-full will-change-transform">
             {SLIDES.map((slide) => (
-              <p key={slide.id} className="h-16 text-[34px] leading-[64px] font-medium text-white">
-                {splitToChars(slide.title)}
-              </p>
+              <div key={slide.id} className="flex h-40 flex-col items-center justify-center">
+                <p className="text-center text-[38px] font-medium leading-tight text-white">
+                  {splitToChars(slide.title)}
+                </p>
+              </div>
             ))}
           </div>
         </div>
@@ -500,8 +522,8 @@ const HeroSection = () => {
           <div ref={writeupTrackRef} className="relative top-0 will-change-transform">
             {SLIDES.map((slide) => (
               <div key={slide.id} className="flex h-[176px] flex-col gap-3">
-                <p className="writeup-title text-[44px] font-medium leading-[46px] text-white">{slide.title}</p>
-                <p className="writeup-desc max-w-[380px] text-base font-medium leading-6 text-white/80">{slide.writeup}</p>
+                <p className="writeup-title text-[44px] font-medium leading-[46px] text-[var(--dark-red-2)]">{slide.title}</p>
+                <p className="writeup-desc max-w-[380px] text-base font-medium leading-6 text-[var(--dark-red)]">{slide.writeup}</p>
               </div>
             ))}
           </div>

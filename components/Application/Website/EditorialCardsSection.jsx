@@ -105,7 +105,7 @@ const EditorialCardsSection = () => {
                     <p className="text-[1rem] font-semibold uppercase text-[var(--dark-red)]/60">
                         Explore More
                     </p>
-                    <h2 className="mt-1.5 font-neue text-[3rem] font-medium uppercase text-[var(--dark-red-2)] sm:text-[3.8rem]">
+                    <h2 className="mt-1.5 font-neue text-[clamp(1.8rem,4.8vw,3.8rem)] font-medium uppercase text-[var(--dark-red-2)]">
                         The Full Picture
                     </h2>
                 </div>
