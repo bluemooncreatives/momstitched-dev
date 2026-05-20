@@ -177,7 +177,7 @@ const Testimonial = () => {
             <div
                 ref={bigQuoteRef}
                 aria-hidden
-                className="pointer-events-none absolute -top-6 left-2 select-none font-neue text-[16rem] leading-none text-[var(--dark-red)]/[0.055] lg:left-6 lg:text-[20rem]"
+                className="pointer-events-none absolute -top-6 left-2 select-none font-neue text-[16rem] leading-none text-[var(--dark-red)]/20 lg:left-6 lg:text-[20rem]"
             >
                 &ldquo;
             </div>
@@ -192,7 +192,7 @@ const Testimonial = () => {
                         What They Say
                     </h2>
                 </div>
-                <span className="font-neue tabular-nums text-[var(--dark-red)]/20">
+                <span className="font-neue text-[var(--dark-red)]">
                     <span className="text-3xl font-semibold sm:text-4xl">{PAD(active + 1)}</span>
                     <span className="text-base"> / {PAD(TOTAL)}</span>
                 </span>
@@ -203,7 +203,7 @@ const Testimonial = () => {
 
             {/* slide content */}
             <div ref={contentRef} className="relative min-h-[200px] lg:min-h-[160px]">
-                <blockquote className="max-w-[54rem]">
+                <blockquote className="max-w">
                     <p className="font-neue text-[1.3rem] font-medium leading-[1.7] tracking-[0.01em] text-[var(--dark-red)] sm:text-[1.55rem] lg:text-[1.7rem]">
                         &ldquo;{item.review}&rdquo;
                     </p>

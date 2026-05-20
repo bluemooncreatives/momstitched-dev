@@ -1,3 +1,4 @@
+import './admin.css'
 import AppSidebar from '@/components/Application/Admin/AppSidebar'
 import SkipToMain from '@/components/Application/Admin/SkipToMain'
 import ThemeProvider from '@/components/Application/Admin/ThemeProvider'

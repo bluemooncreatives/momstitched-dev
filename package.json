@@ -74,6 +74,13 @@
     "three": "^0.181.2",
     "zod": "^3.24.4"
   },
+  "browserslist": [
+    "chrome >= 90",
+    "firefox >= 90",
+    "safari >= 14",
+    "edge >= 90",
+    "not dead"
+  ],
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@faker-js/faker": "^9.8.0",

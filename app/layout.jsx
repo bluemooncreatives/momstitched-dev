@@ -21,6 +21,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
+      <head>
+        {/* Preload the two most-used PP Neue Montreal weights and the display font
+            so they join the critical path instead of loading after CSS parse. */}
+        <link rel="preload" href="/assets/font/PPNeueMontreal-Book.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/font/PPNeueMontreal-Medium.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/font/Felixti.TTF" as="font" type="font/truetype" crossOrigin="anonymous" />
+      </head>
       <body
         className={`${assistantFont.className} antialiased`}
       >

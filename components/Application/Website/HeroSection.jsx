@@ -10,6 +10,11 @@ import PageLoader from "./PageLoader";
 
 gsap.registerPlugin(useGSAP, CustomEase);
 
+CustomEase.create(
+  "hop2",
+  "M0,0 C0.071,0.505 0.192,0.726 0.318,0.852 0.45,0.984 0.504,1 1,1"
+);
+
 const AUTO_SLIDE_MS = 6000;
 const MAX_ACTIVE_SLIDES = 2;
 const DESKTOP_HEADLINE_STEP = 172;
@@ -104,11 +109,6 @@ const HeroSection = () => {
   useGSAP(
     () => {
       if (!loaderComplete) return;
-
-      CustomEase.create(
-        "hop2",
-        "M0,0 C0.071,0.505 0.192,0.726 0.318,0.852 0.45,0.984 0.504,1 1,1"
-      );
 
       let currentIndex = 0;
       let indicatorRotation = 0;

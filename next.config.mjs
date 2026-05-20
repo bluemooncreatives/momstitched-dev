@@ -3,6 +3,20 @@ const nextConfig = {
     experimental: {
         optimizePackageImports: ['lucide-react', 'gsap', '@gsap/react'],
     },
+    async headers() {
+        return [
+            {
+                // Cache custom fonts for 1 year — they're content-addressed filenames
+                source: '/assets/font/:path*',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+            },
+            {
+                // Cache hero and other static images for 1 week
+                source: '/assets/images/:path*',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }],
+            },
+        ]
+    },
     images: {
         formats: ['image/avif', 'image/webp'],
         minimumCacheTTL: 60 * 60 * 24 * 7,

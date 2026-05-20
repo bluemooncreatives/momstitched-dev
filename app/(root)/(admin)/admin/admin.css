@@ -1,0 +1,104 @@
+/* Admin-only theme overrides — imported only by the admin layout,
+   not loaded on website pages. */
+.admin-theme {
+  --radius: 0.3rem;
+  --admin-shell-radius: 8px;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.16 0.02 25);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 25);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 25);
+  --primary: oklch(0.46 0.18 27);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.95 0.01 15);
+  --secondary-foreground: oklch(0.2 0.02 25);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.5 0.02 25);
+  --accent: oklch(0.94 0.01 15);
+  --accent-foreground: oklch(0.24 0.04 27);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.46 0.18 27);
+  --chart-1: oklch(0.46 0.18 27);
+  --chart-2: oklch(0.25 0.04 25);
+  --chart-3: oklch(0.62 0.16 35);
+  --chart-4: oklch(0.36 0.08 18);
+  --chart-5: oklch(0.2 0 0);
+  --sidebar: var(--dark-red);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.98 0 0);
+  --sidebar-primary-foreground: var(--dark-red);
+  --sidebar-accent: oklch(0.28 0.06 25);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.24 0.05 25);
+  --sidebar-ring: oklch(0.98 0 0);
+  --font-sans: 'PP Neue Montreal', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --font-serif: Georgia, serif;
+  --font-mono: JetBrains Mono, monospace;
+  font-family: var(--font-sans);
+  --tracking-normal: 0px;
+  --spacing: 0.25rem;
+}
+
+.dark .admin-theme {
+  --admin-shell-radius: 8px;
+  --background: oklch(0.12 0.02 20);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.16 0.02 20);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.16 0.02 20);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.46 0.18 27);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.22 0.03 20);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.2 0.02 20);
+  --muted-foreground: oklch(0.8 0.01 20);
+  --accent: oklch(0.22 0.03 20);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.52 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.26 0.02 20);
+  --input: oklch(0.26 0.02 20);
+  --ring: oklch(0.46 0.18 27);
+  --chart-1: oklch(0.46 0.18 27);
+  --chart-2: oklch(0.28 0.03 20);
+  --chart-3: oklch(0.9 0 0);
+  --chart-4: oklch(0.62 0.16 35);
+  --chart-5: oklch(0.36 0.08 18);
+  --sidebar: var(--dark-red);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.98 0 0);
+  --sidebar-primary-foreground: var(--dark-red);
+  --sidebar-accent: oklch(0.28 0.06 25);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.24 0.05 25);
+  --sidebar-ring: oklch(0.98 0 0);
+  --font-sans: 'PP Neue Montreal', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --font-serif: Georgia, serif;
+  --font-mono: JetBrains Mono, monospace;
+}
+
+/* Radix UI Collapsible animation — used by the admin sidebar */
+.CollapsibleContent {
+  overflow: hidden;
+}
+.CollapsibleContent[data-state='open'] {
+  animation: slideDown 300ms ease-out;
+}
+.CollapsibleContent[data-state='closed'] {
+  animation: slideUp 300ms ease-out;
+}
+
+@keyframes slideDown {
+  from { height: 0; }
+  to { height: var(--radix-collapsible-content-height); }
+}
+
+@keyframes slideUp {
+  from { height: var(--radix-collapsible-content-height); }
+  to { height: 0; }
+}
