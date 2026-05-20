@@ -7,7 +7,7 @@ import { ArrowRight } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const Marquee = ({ text = 'luxury collection', repeatCount = 12, speed = 1 }) => {
+const Marquee = ({ text = 'freshly arrived', repeatCount = 12, speed = 1 }) => {
     const containerRef = useRef(null)
     const innerRef = useRef(null)
     const arrowsRef = useRef([])
