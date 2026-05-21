@@ -3,67 +3,58 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ShoppingCart, Eye } from 'lucide-react'
+import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
-import ShopAllButton from '@/components/Application/Website/ShopAllButton'
 import styles from './BestsellersSection.module.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const CARD_SIZES = ['sm', 'lg', 'md', 'xl']
-
 const BestsellersSectionClient = ({ products = [] }) => {
     const sectionRef = useRef(null)
-    const headerRef  = useRef(null)
-    const gridRef    = useRef(null)
+    const sidebarRef = useRef(null)
+    const trackRef   = useRef(null)
+
+    const scroll = (dir) => {
+        if (!trackRef.current) return
+        const amount = trackRef.current.clientWidth * 0.75
+        trackRef.current.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' })
+    }
 
     useGSAP(() => {
         if (!sectionRef.current) return
 
-        // Header fade-in
         gsap.fromTo(
-            headerRef.current,
-            { autoAlpha: 0, y: 20 },
+            sidebarRef.current,
+            { autoAlpha: 0, x: -20 },
             {
-                autoAlpha: 1, y: 0,
+                autoAlpha: 1, x: 0,
                 duration: 0.85, ease: 'power3.out',
                 scrollTrigger: { trigger: sectionRef.current, start: 'top 78%', once: true },
             }
         )
 
-        const cards = gridRef.current?.querySelectorAll(`.${styles.card}`)
+        const cards = trackRef.current?.querySelectorAll(`.${styles.card}`)
         if (!cards?.length) return
 
-        // Card reveal — exact match to FeaturedProduct
         gsap.fromTo(cards,
-            { y: 120, opacity: 0, clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)' },
+            { y: 40, opacity: 0 },
             {
                 y: 0, opacity: 1,
-                clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)',
-                duration: 1.2, ease: 'power4.out', stagger: 0.12,
-                scrollTrigger: { trigger: gridRef.current, start: 'top 75%', once: true },
+                duration: 0.75, ease: 'power3.out', stagger: 0.08,
+                scrollTrigger: { trigger: trackRef.current, start: 'top 80%', once: true },
             }
         )
 
-        // Hover — exact match to FeaturedProduct
         const handlers = []
         cards.forEach((card) => {
-            const img     = card.querySelector('img')
-            const titleEl = card.querySelector(`.${styles.productName}`)
+            const img = card.querySelector('img')
             if (!img) return
-
-            const enter = () => {
-                gsap.to(img, { scale: 1.25, duration: 2, ease: 'power4.out' })
-                if (titleEl) gsap.to(titleEl, { y: 0, duration: 1, ease: 'power4.out' })
-            }
-            const leave = () => {
-                gsap.to(img, { scale: 1, duration: 2, ease: 'power4.out' })
-                if (titleEl) gsap.to(titleEl, { y: 28, duration: 1, ease: 'power4.out' })
-            }
+            const enter = () => gsap.to(img, { scale: 1.07, duration: 0.55, ease: 'power2.out' })
+            const leave = () => gsap.to(img, { scale: 1,    duration: 0.55, ease: 'power2.out' })
             card.addEventListener('mouseenter', enter)
             card.addEventListener('mouseleave', leave)
             handlers.push({ card, enter, leave })
@@ -80,80 +71,79 @@ const BestsellersSectionClient = ({ products = [] }) => {
     const formatPrice = (price) =>
         price ? `₹${price.toLocaleString('en-IN')}` : null
 
+    const items = products.length > 0 ? products : Array(9).fill(null)
+
     return (
         <section ref={sectionRef} className={styles.section}>
+            <div className={styles.inner}>
 
-            {/* Header */}
-            <div ref={headerRef} className={styles.header}>
-                <h2 className={styles.heading}>Bestsellers</h2>
-                <Link href="/shop" className={styles.seeAll}>
-                    See All
-                </Link>
-            </div>
+                {/* ── Left: heading + arrows ── */}
+                <div ref={sidebarRef} className={styles.sidebar}>
+                    <h2 className={styles.heading}>Bestsellers</h2>
+                    <div className={styles.navControls}>
+                        <button className={styles.navBtn} onClick={() => scroll('left')} aria-label="Scroll left">
+                            <ChevronLeft size={18} strokeWidth={1.8} />
+                        </button>
+                        <button className={styles.navBtn} onClick={() => scroll('right')} aria-label="Scroll right">
+                            <ChevronRight size={18} strokeWidth={1.8} />
+                        </button>
+                    </div>
+                </div>
 
-            {/* 4-card grid */}
-            <div ref={gridRef} className={styles.grid}>
-                {CARD_SIZES.map((size, i) => {
-                    const product = products[i]
-                    const href    = product ? WEBSITE_PRODUCT_DETAILS(product.slug) : '#'
-                    const imgSrc  = product?.media?.[0]?.secure_url || imgPlaceholder
-                    const imgAlt  = product?.media?.[0]?.alt || product?.name || 'Product'
+                {/* ── Right: scrollable product cards ── */}
+                <div ref={trackRef} className={styles.track}>
+                    {items.map((product, i) => {
+                        const href   = product ? WEBSITE_PRODUCT_DETAILS(product.slug) : '#'
+                        const imgSrc = product?.media?.[0]?.secure_url || imgPlaceholder
+                        const imgAlt = product?.media?.[0]?.alt || product?.name || 'Product'
 
-                    return (
-                        <div key={i} className={`${styles.card} ${styles[size]}`}>
+                        return (
+                            <div key={i} className={styles.card}>
 
-                            {/* Full-card image link */}
-                            <Link href={href} className={styles.cardImageLink} aria-label={product?.name || 'View product'}>
-                                <div className={styles.imgWrapper}>
-                                    <Image
-                                        src={imgSrc}
-                                        alt={imgAlt}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 768px) 50vw, 25vw"
-                                    />
+                                <div className={styles.imgContainer}>
+                                    <Link href={href} className={styles.imgLink} aria-label={product?.name || 'View product'}>
+                                        <div className={styles.imgWrapper}>
+                                            <Image
+                                                src={imgSrc}
+                                                alt={imgAlt}
+                                                fill
+                                                className="object-cover"
+                                                sizes="260px"
+                                            />
+                                        </div>
+                                    </Link>
+
+                                    <div className={styles.cardButtons}>
+                                        <Link href={href} className={styles.viewBtn}>
+                                            View Product
+                                        </Link>
+                                        <button
+                                            className={styles.cartBtn}
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation() }}
+                                            aria-label="Add to cart"
+                                        >
+                                            <ShoppingCart size={15} strokeWidth={1.8} />
+                                        </button>
+                                    </div>
                                 </div>
-                            </Link>
 
-                            {/* Product name + price — slides up on hover */}
-                            <div className={styles.productInfo}>
-                                {product?.name && (
-                                    <p className={styles.productName}>{product.name}</p>
-                                )}
-                                {formatPrice(product?.sellingPrice) && (
-                                    <p className={styles.productPrice}>{formatPrice(product.sellingPrice)}</p>
-                                )}
+                                <div className={styles.cardBody}>
+                                    <p className={styles.productName}>
+                                        {product?.name || 'Product Name'}
+                                    </p>
+                                    {formatPrice(product?.sellingPrice) && (
+                                        <p className={styles.productPrice}>
+                                            {formatPrice(product.sellingPrice)}
+                                        </p>
+                                    )}
+                                </div>
+
                             </div>
+                        )
+                    })}
+                </div>
 
-                            {/* Action buttons — appear on hover */}
-                            <div className={styles.cardActions}>
-                                <Link href={href} className={styles.viewProduct} aria-label="View product">
-                                    <Eye size={17} strokeWidth={1.8} />
-                                </Link>
-                                <button
-                                    className={styles.addToCart}
-                                    onClick={(e) => { e.preventDefault(); e.stopPropagation() }}
-                                    aria-label="Add to cart"
-                                >
-                                    <ShoppingCart size={17} strokeWidth={1.8} />
-                                </button>
-                            </div>
-
-                        </div>
-                    )
-                })}
             </div>
-
-            {/* CTA */}
-            <div className={styles.actions}>
-                <ShopAllButton
-                    label="More Products"
-                    colorScheme="dark-red"
-                    radius="md"
-                    className="rounded-lg"
-                />
-            </div>
-
         </section>
     )
 }

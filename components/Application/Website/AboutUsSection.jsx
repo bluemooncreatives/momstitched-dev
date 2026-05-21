@@ -29,7 +29,6 @@ const CONTENT = {
         'MomStitched is a family-owned contemporary women\'s fashion brand, founded by a devoted mother and her passion for handcrafted clothing. Our journey began with a mission to create garments that transcend trends and serve as a celebration of femininity, culture, and grace. Every stitch carries a story - of care, of craft, and of a deep love for the women who wear our pieces.',
         'We take pride in working with the finest fabrics and artisan techniques. Our collections are as unique as they are wearable - pieces designed to make every woman feel confident, beautiful, and deeply seen in what she wears. From delicate hand-embroidery to thoughtfully draped silhouettes, each garment is shaped by generations of tradition and a modern eye for elegance.',
     ],
-    caption: 'Our collections are handcrafted with devotion',
     date: 'Est. 2019',
 }
 
