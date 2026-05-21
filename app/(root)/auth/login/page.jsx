@@ -103,12 +103,12 @@ const LoginPage = () => {
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-transparent to-black/60" />
                 <div className="pointer-events-none absolute left-0 top-0 z-10 hidden overflow-hidden backdrop-blur-2xl md:flex">
                 </div>
-                <div className="relative hidden overflow-hidden bg-sidebar p-8 text-sidebar-foreground md:block md:w-1/2 md:p-12">
+                <div className="relative hidden overflow-hidden bg-[#3E000D] p-8 text-sidebar-foreground md:block md:w-1/2 md:p-12">
                     <div
                         className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[64%]"
                         style={{
                             backgroundImage:
-                                "radial-gradient(66% 112% at 6% 100%, color-mix(in oklch, var(--chart-1) 88%, transparent), transparent 78%), radial-gradient(56% 102% at 22% 100%, color-mix(in oklch, var(--chart-2) 84%, transparent), transparent 80%), radial-gradient(48% 96% at 42% 100%, color-mix(in oklch, var(--chart-3) 82%, transparent), transparent 82%), radial-gradient(44% 92% at 64% 100%, color-mix(in oklch, var(--chart-4) 76%, transparent), transparent 84%), radial-gradient(42% 88% at 86% 100%, color-mix(in oklch, var(--chart-5) 68%, transparent), transparent 86%), linear-gradient(0deg, rgb(255 255 255 / 0.2), transparent 62%)",
+                                "radial-gradient(66% 112% at 6% 100%, color-mix(in srgb, #8E1616 88%, transparent), transparent 78%), radial-gradient(56% 102% at 22% 100%, color-mix(in srgb, #a01c1c 84%, transparent), transparent 80%), radial-gradient(48% 96% at 42% 100%, color-mix(in srgb, #8E1616 82%, transparent), transparent 82%), radial-gradient(44% 92% at 64% 100%, color-mix(in srgb, #6b1010 76%, transparent), transparent 84%), radial-gradient(42% 88% at 86% 100%, color-mix(in srgb, #3E000D 68%, transparent), transparent 86%), linear-gradient(0deg, rgb(255 255 255 / 0.08), transparent 62%)",
                         }}
                     />
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[56%] bg-[linear-gradient(0deg,rgba(255,255,255,0.18),transparent_74%)] blur-2xl" />
@@ -119,9 +119,9 @@ const LoginPage = () => {
                                 Sign in to review orders, manage your profile, and keep every interaction with MomStitched connected in one place.
                             </p>
                         </div>
-                        <div className="space-y-2">
-                            <p className="text-5xl font-semibold leading-none">Welcome Back</p>
-                            <p className="max-w-sm text-sm text-white/75">Secure login with OTP verification keeps your account protected.</p>
+                        <div className="space-y-3">
+                            <p className="font-header text-5xl leading-none text-white">Welcome Back</p>
+                            <p className="max-w-sm text-[15px] leading-relaxed text-white/70">Secure login with OTP verification keeps your account protected.</p>
                         </div>
                     </div>
                 </div>
@@ -130,8 +130,8 @@ const LoginPage = () => {
                     {!otpEmail ? (
                         <>
                             <div className='mb-8 flex flex-col items-start'>
-                                <h1 className='text-5xl font-semibold tracking-tight text-foreground'>Sign In</h1>
-                                <p className='mt-2 text-left text-sm text-muted-foreground opacity-90'>Login into your account by filling out the form below.</p>
+                                <h1 className='font-header text-5xl text-foreground'>Sign In</h1>
+                                <p className='mt-2 text-left text-[15px] leading-relaxed text-muted-foreground'>Login into your account by filling out the form below.</p>
                             </div>
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(handleLoginSubmit)} className='space-y-5'>

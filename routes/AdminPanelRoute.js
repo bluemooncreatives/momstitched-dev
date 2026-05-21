@@ -44,6 +44,10 @@ export const ADMIN_ORDER_SHOW = '/admin/orders'
 export const ADMIN_ORDER_DETAILS = (order_id) => order_id ? `/admin/orders/details/${order_id}` : ''
 
 
-// Trash route 
+// Contact Queries routes
+export const ADMIN_CONTACTS_SHOW = '/admin/contacts'
+export const ADMIN_CONTACT_DETAILS = (id) => id ? `/admin/contacts/details/${id}` : ''
+
+// Trash route
 
 export const ADMIN_TRASH = '/admin/trash'

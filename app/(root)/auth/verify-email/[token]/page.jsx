@@ -77,8 +77,8 @@ const EmailVerification = ({ params }) => {
                     <span className="relative z-10">{ui.icon}</span>
                 </div>
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold text-foreground">{ui.title}</h1>
-                    <p className="text-sm text-muted-foreground">{ui.description}</p>
+                    <h1 className="font-header text-2xl text-foreground">{ui.title}</h1>
+                    <p className="text-[15px] leading-relaxed text-muted-foreground">{ui.description}</p>
                 </div>
                 {ui.showButton && (
                     <Button asChild size="lg" className="mt-2 w-full">
