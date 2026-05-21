@@ -47,7 +47,6 @@ const ContactPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -55,7 +54,6 @@ const ContactPage = () => {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-
       if (data.success) {
         toast.success("Message sent! We'll get back to you soon.");
         setForm({ name: "", email: "", subject: "", message: "" });
@@ -72,62 +70,19 @@ const ContactPage = () => {
   return (
     <div className={`${styles.contactPage} website-gutter`} ref={container}>
 
-      {/* ── Info section ── */}
-      <div className={styles.infoSection}>
+      {/* 1. Heading */}
+      <div className={styles.headingSection}>
         <div className={styles.container}>
-
-          {/* Left column */}
-          <div className={styles.col}>
-            <div>
-              <div className={styles.sectionLabel}><p>Where</p></div>
-              <div className={styles.divider} />
-              <div className={styles.item}><p>MomStitched</p></div>
-              <div className={styles.item}><p>Market, Lucknow</p></div>
-              <div className={styles.item}><p>India — 256320</p></div>
-            </div>
-
-            <div>
-              <div className={styles.sectionLabel}><p>Phone</p></div>
-              <div className={styles.divider} />
-              <div className={styles.item}>
-                <a href="tel:+918569874589">+91 85698 74589</a>
-              </div>
-            </div>
-          </div>
-
-          {/* Right column */}
-          <div className={styles.col}>
+          <div className={styles.headingSpacer} />
+          <div className={styles.headingRight}>
             <div className={styles.contactHeading}>
               <h1 className="font-header">Contact</h1>
             </div>
-
-            <div>
-              <div className={styles.sectionLabel}><p>Socials</p></div>
-              <div className={styles.divider} />
-              <div className={styles.item}>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>
-              </div>
-              <div className={styles.item}>
-                <a href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a>
-              </div>
-              <div className={styles.item}>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer">YouTube</a>
-              </div>
-            </div>
-
-            <div>
-              <div className={styles.sectionLabel}><p>Mail</p></div>
-              <div className={styles.divider} />
-              <div className={styles.item}>
-                <a href="mailto:momstitched.official@gmail.com">momstitched.official@gmail.com</a>
-              </div>
-            </div>
           </div>
-
         </div>
       </div>
 
-      {/* ── Form section ── */}
+      {/* 2. Form */}
       <div className={styles.formSection}>
         <div className={styles.formInner}>
 
@@ -136,7 +91,7 @@ const ContactPage = () => {
             <div className={styles.divider} />
           </div>
 
-          <form onSubmit={handleSubmit} noValidate className={styles.form}>
+          <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label htmlFor="name" className={styles.label}>Name</label>
@@ -169,7 +124,9 @@ const ContactPage = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="subject" className={styles.label}>Subject <span className={styles.optional}>(optional)</span></label>
+              <label htmlFor="subject" className={styles.label}>
+                Subject <span className={styles.optional}>(optional)</span>
+              </label>
               <input
                 id="subject"
                 name="subject"
@@ -196,11 +153,67 @@ const ContactPage = () => {
             </div>
 
             <div className={styles.formFooter}>
-              <button type="submit" disabled={loading} className={styles.submitBtn}>
-                {loading ? "Sending…" : "Send Message"}
+              <button
+                type="submit"
+                disabled={loading}
+                aria-busy={loading}
+                className={styles.submitBtn}
+              >
+                {loading ? "Sending..." : "Send Message"}
               </button>
             </div>
           </form>
+
+        </div>
+      </div>
+
+      {/* 3. Details */}
+      <div className={styles.infoSection}>
+        <div className={styles.container}>
+
+          {/* Left column */}
+          <div className={styles.col}>
+            <div>
+              <div className={styles.sectionLabel}><p>Where</p></div>
+              <div className={styles.divider} />
+              <div className={styles.item}><p>MomStitched</p></div>
+              <div className={styles.item}><p>Market, Lucknow</p></div>
+              <div className={styles.item}><p>India - 256320</p></div>
+            </div>
+
+            <div>
+              <div className={styles.sectionLabel}><p>Phone</p></div>
+              <div className={styles.divider} />
+              <div className={styles.item}>
+                <a href="tel:+918569874589">+91 85698 74589</a>
+              </div>
+            </div>
+          </div>
+
+          {/* Right column */}
+          <div className={styles.col}>
+            <div>
+              <div className={styles.sectionLabel}><p>Socials</p></div>
+              <div className={styles.divider} />
+              <div className={styles.item}>
+                <a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>
+              </div>
+              <div className={styles.item}>
+                <a href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a>
+              </div>
+              <div className={styles.item}>
+                <a href="https://youtube.com" target="_blank" rel="noreferrer">YouTube</a>
+              </div>
+            </div>
+
+            <div>
+              <div className={styles.sectionLabel}><p>Mail</p></div>
+              <div className={styles.divider} />
+              <div className={styles.item}>
+                <a href="mailto:momstitched.official@gmail.com">momstitched.official@gmail.com</a>
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
