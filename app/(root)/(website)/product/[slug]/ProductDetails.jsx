@@ -21,6 +21,7 @@ import { showToast } from "@/lib/showToast";
 import { Button } from "@/components/ui/button";
 import loadingSvg from '@/public/assets/images/loading.svg'
 import ProductReveiw from "@/components/Application/Website/ProductReveiw";
+import SizeGuideModal from "@/components/Application/Website/SizeGuideModal";
 const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
 
     const dispatch = useDispatch()
@@ -30,6 +31,7 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
     const [qty, setQty] = useState(1)
     const [isAddedIntoCart, setIsAddedIntoCart] = useState(false)
     const [isProductLoading, setIsProductLoading] = useState(false)
+    const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false)
     useEffect(() => {
         setActiveThumb(variant?.media[0]?.secure_url)
     }, [variant])
@@ -180,7 +182,17 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
                         </div>
 
                         <div>
-                            <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Size: <span className="text-foreground">{variant?.size}</span></p>
+                            <div className="mb-2 flex items-center justify-between gap-3">
+                                <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Size: <span className="text-foreground">{variant?.size}</span></p>
+                                <Button
+                                    type="button"
+                                    variant="link"
+                                    className="h-auto p-0 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--dark-red)]"
+                                    onClick={() => setIsSizeGuideOpen(true)}
+                                >
+                                    Size Guide
+                                </Button>
+                            </div>
                             <div className="flex flex-wrap gap-2">
                                 {sizes.map(size => (
                                     <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${variant.color}&size=${size}`}
@@ -218,6 +230,12 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
                     </div>
                 </div>
             </div>
+
+            <SizeGuideModal
+                open={isSizeGuideOpen}
+                onOpenChange={setIsSizeGuideOpen}
+                sizeGuide={product?.sizeGuide}
+            />
 
             <div className="mb-10 rounded-[var(--admin-shell-radius)] border border-border/60 bg-white shadow-sm">
                 <div className="border-b border-border/60 px-5 py-4">

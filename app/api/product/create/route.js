@@ -14,12 +14,16 @@ export async function POST(request) {
 
         await connectDB()
         const payload = await request.json()
+        if (payload && payload.sizeGuide === '') {
+            payload.sizeGuide = null
+        }
 
         const schema = zSchema.pick({
             name: true,
             parentSku: true,
             slug: true,
             category: true,
+            sizeGuide: true,
             mrp: true,
             sellingPrice: true,
             discountPercentage: true,
@@ -40,6 +44,7 @@ export async function POST(request) {
             parentSku: productData.parentSku,
             slug: productData.slug,
             category: productData.category,
+            sizeGuide: productData.sizeGuide ?? null,
             mrp: productData.mrp,
             sellingPrice: productData.sellingPrice,
             discountPercentage: productData.discountPercentage,
