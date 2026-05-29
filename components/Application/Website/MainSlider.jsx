@@ -6,7 +6,7 @@ import heroRight from '@/public/assets/images/banner2.png'
 
 const MainSlider = () => {
     return (
-        <section className='w-full bg-[#8E1616] text-white'>
+        <section className='w-full bg-[var(--brand-primary-hover)] text-white'>
             <div className='relative flex items-center justify-center h-screen'>
 
                 {/* top-left small image */}

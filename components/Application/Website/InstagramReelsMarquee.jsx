@@ -75,8 +75,8 @@ const InstagramReelsMarquee = () => {
                     </Link>
                 </div>
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#ffffff] via-[#fff]/70 to-transparent sm:w-24" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#ffffff] via-[#fff]/70 to-transparent sm:w-24" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background via-background/70 to-transparent sm:w-24" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background via-background/70 to-transparent sm:w-24" />
 
             <div className="instagram-marquee">
                 <div className="instagram-track" ref={trackRef}>
@@ -113,7 +113,7 @@ const InstagramReelsMarquee = () => {
                     aspect-ratio: 9 / 16;
                     border-radius: var(--admin-shell-radius);
                     overflow: hidden;
-                    background: #efe9e2;
+                    background: var(--brand-warm-bg);
                     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
                 }
                 @media (min-width: 640px) {

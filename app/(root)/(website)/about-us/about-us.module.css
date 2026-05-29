@@ -1,6 +1,6 @@
 .aboutPage {
-  background-color: #fff;
-  color: #111;
+  background-color: var(--background);
+  color: var(--foreground);
   padding-top: 9rem;
 }
 
@@ -102,7 +102,7 @@
   display: flex;
   justify-content: space-between;
   gap: 2em;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.35);
+  border-bottom: 1px solid var(--border);
 }
 
 .cvName .lineWrapper > span,

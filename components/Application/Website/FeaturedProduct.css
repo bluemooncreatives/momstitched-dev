@@ -24,7 +24,7 @@
     overflow: hidden;
     border-radius: var(--radius);
     clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%);
-    background: #f3f3f3;
+    background: var(--product-card-bg);
 }
 
 .fp-col a {

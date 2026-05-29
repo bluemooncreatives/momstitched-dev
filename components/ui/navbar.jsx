@@ -68,7 +68,7 @@ export default function Navbar({
               <Link
                 key={item.title}
                 href={item.url}
-                className="text-base font-semibold text-[#3E000D] transition-colors hover:text-[#8E1616]"
+                className="text-base font-semibold text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-primary-hover)]"
               >
                 {item.title}
               </Link>
@@ -77,7 +77,7 @@ export default function Navbar({
 
           <Link
             href={logo.url}
-            className="font-header text-3xl leading-none tracking-wide text-[#3E000D] transition-colors hover:text-[#8E1616]"
+            className="font-header text-3xl leading-none tracking-wide text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-primary-hover)]"
             aria-label={logo.alt}
           >
             {logo.title}
@@ -87,7 +87,7 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setOpenSearch(true)}
-              className="text-stone-600 transition-colors hover:text-[#8E1616]"
+              className="text-stone-600 transition-colors hover:text-[var(--brand-primary-hover)]"
               aria-label="Open search"
             >
               <SearchIcon className="h-6 w-6" strokeWidth={1.75} />
@@ -100,7 +100,7 @@ export default function Navbar({
             {!user ? (
               <Link
                 href={auth.login.url}
-                className="text-stone-600 transition-colors hover:text-[#8E1616]"
+                className="text-stone-600 transition-colors hover:text-[var(--brand-primary-hover)]"
                 aria-label={auth.login.text}
               >
                 <UserRound className="h-6 w-6" strokeWidth={1.75} />
@@ -118,7 +118,7 @@ export default function Navbar({
         <div className="flex items-center justify-between lg:hidden">
           <Link
             href={logo.url}
-            className="font-header text-2xl leading-none tracking-wide text-[#3E000D]"
+            className="font-header text-2xl leading-none tracking-wide text-[var(--brand-primary)]"
             aria-label={logo.alt}
           >
             {logo.title}
@@ -129,7 +129,7 @@ export default function Navbar({
               variant="ghost"
               size="icon"
               onClick={() => setOpenSearch(true)}
-              className="text-stone-700 hover:text-[#8E1616]"
+              className="text-stone-700 hover:text-[var(--brand-primary-hover)]"
               aria-label="Open search"
             >
               <SearchIcon className="size-5" strokeWidth={1.75} />
@@ -144,7 +144,7 @@ export default function Navbar({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-stone-700 hover:text-[#8E1616]"
+                  className="text-stone-700 hover:text-[var(--brand-primary-hover)]"
                   aria-label="Open menu"
                 >
                   <Menu className="size-5" strokeWidth={1.75} />
@@ -152,7 +152,7 @@ export default function Navbar({
               </SheetTrigger>
               <SheetContent className="overflow-y-auto">
                 <SheetHeader>
-                  <SheetTitle className="font-header text-2xl text-[#3E000D]">{logo.title}</SheetTitle>
+                  <SheetTitle className="font-header text-2xl text-[var(--brand-primary)]">{logo.title}</SheetTitle>
                 </SheetHeader>
 
                 <div className="my-8 flex flex-col gap-3">
@@ -160,7 +160,7 @@ export default function Navbar({
                     <Link
                       key={item.title}
                       href={item.url}
-                      className="rounded-md px-3 py-2 text-base font-medium text-[#3E000D] transition-colors hover:bg-stone-100 hover:text-[#8E1616]"
+                      className="rounded-md px-3 py-2 text-base font-medium text-[var(--brand-primary)] transition-colors hover:bg-stone-100 hover:text-[var(--brand-primary-hover)]"
                     >
                       {item.title}
                     </Link>
@@ -173,7 +173,7 @@ export default function Navbar({
                       <Link
                         key={`${link.name}-${link.url}`}
                         href={link.url}
-                        className="rounded-md px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-100 hover:text-[#8E1616]"
+                        className="rounded-md px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-100 hover:text-[var(--brand-primary-hover)]"
                       >
                         {link.name}
                       </Link>
@@ -185,7 +185,7 @@ export default function Navbar({
                   <Button asChild variant="outline" className="rounded-full">
                     <Link href={auth.login.url}>{auth.login.text}</Link>
                   </Button>
-                  <Button asChild className="rounded-full bg-[#3E000D] text-white hover:bg-[#8E1616]">
+                  <Button asChild className="rounded-full bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]">
                     <Link href={auth.signup.url}>{auth.signup.text}</Link>
                   </Button>
                 </div>

@@ -5,7 +5,7 @@ const Layout = ({ children }) => {
     return (
         <div className='font-neue overflow-x-hidden'>
             <Header />
-            <main className='relative min-h-screen bg-[#ffffff]'>
+            <main className='relative min-h-screen bg-background'>
                 {children}
             </main>
             <Footer />

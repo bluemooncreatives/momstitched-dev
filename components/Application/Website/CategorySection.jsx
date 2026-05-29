@@ -140,7 +140,7 @@ const CategorySection = () => {
     return (
         <section 
             ref={wrapperRef}
-            className="relative w-full py-16 lg:py-24 px-4 sm:px-8 lg:px-10 overflow-hidden bg-[#FFECD1]"
+            className="relative w-full py-16 lg:py-24 px-4 sm:px-8 lg:px-10 overflow-hidden bg-[var(--brand-cream)]"
         >
             {/* Images container */}
             <div className="images-container absolute inset-0 pointer-events-none z-50">
@@ -165,7 +165,7 @@ const CategorySection = () => {
             {/* Main Content */}
             <div className="relative z-10 max-w mx-auto">
                 {/* Title */}
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal mb-12 lg:mb-16 tracking-wide text-[#2A2A2A]">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal mb-12 lg:mb-16 tracking-wide text-foreground/85">
                     CATEGORIES
                 </h2>
 
@@ -174,7 +174,7 @@ const CategorySection = () => {
                     {CATEGORIES.map((category, index) => (
                         <div key={category.label}>
                             {/* Divider */}
-                            <div className="w-full h-[1px] bg-[#D0D0D0]" />
+                            <div className="w-full h-[1px] bg-foreground/20" />
                             
                             {/* Category Row */}
                             <Link
@@ -185,14 +185,14 @@ const CategorySection = () => {
                             >
                                 {/* Left: Number */}
                                 <div className="w-16 sm:w-20 lg:w-24 flex-shrink-0">
-                                    <span className="text-xl sm:text-2xl lg:text-3xl font-light text-[#888888] group-hover:text-[#2A2A2A] transition-colors">
+                                    <span className="text-xl sm:text-2xl lg:text-3xl font-light text-foreground/45 group-hover:text-foreground/85 transition-colors">
                                         {String(index + 1).padStart(2, '0')}
                                     </span>
                                 </div>
 
                                 {/* Middle: Category Name */}
                                 <div className="flex-1">
-                                    <h3 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-light tracking-wide text-[#2A2A2A] group-hover:text-[#000000] transition-colors">
+                                    <h3 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-light tracking-wide text-foreground/85 group-hover:text-foreground transition-colors">
                                         {category.name}
                                     </h3>
                                 </div>
@@ -200,8 +200,8 @@ const CategorySection = () => {
                                 {/* Right: Arrow */}
                                 <div className="w-12 sm:w-16 lg:w-20 flex justify-end flex-shrink-0">
                                     <div className="transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300">
-                                        <ArrowUpRight 
-                                            className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#888888] group-hover:text-[#2A2A2A]" 
+                                        <ArrowUpRight
+                                            className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-foreground/45 group-hover:text-foreground/85"
                                             strokeWidth={1.5}
                                         />
                                     </div>
@@ -211,7 +211,7 @@ const CategorySection = () => {
                     ))}
                     
                     {/* Final Bottom Divider */}
-                    <div className="w-full h-[1px] bg-[#D0D0D0]" />
+                    <div className="w-full h-[1px] bg-foreground/20" />
                 </div>
             </div>
         </section>

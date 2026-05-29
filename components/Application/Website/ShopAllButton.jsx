@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils"
 import { WEBSITE_SHOP } from "@/routes/WebsiteRoute"
 
 const SCHEMES = {
-    "dark-red": { border: "var(--dark-red)", fill: "var(--dark-red-2)", hoverText: "#fff"              },
-    black:      { border: "#000",            fill: "#222",              hoverText: "#fff"              },
-    white:      { border: "#fff",            fill: "#fff",              hoverText: "var(--dark-red)"   },
+    "dark-red": { border: "var(--brand-primary)",       fill: "var(--brand-primary-hover)", hoverText: "var(--brand-white)"   },
+    black:      { border: "var(--brand-ink)",           fill: "var(--brand-ink-soft)",      hoverText: "var(--brand-white)"   },
+    white:      { border: "var(--brand-white)",         fill: "var(--brand-white)",         hoverText: "var(--brand-primary)" },
 }
 
 const ShopAllButton = ({

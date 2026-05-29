@@ -159,8 +159,8 @@ const PageLoader = ({ onReady, onComplete }) => {
     return (
         <div ref={loaderRef} className="loader fixed top-0 left-0 w-full h-svh overflow-hidden z-[120] pointer-events-none">
             <div className="overlay absolute top-0 w-full h-full flex">
-                <div className="block w-full h-full bg-[#8E1616] [clip-path:polygon(0%_0%,100%_0%,100%_100%,0%_100%)]"></div>
-                <div className="block w-full h-full bg-[#8E1616] [clip-path:polygon(0%_0%,100%_0%,100%_100%,0%_100%)]"></div>
+                <div className="block w-full h-full bg-[var(--brand-primary-hover)] [clip-path:polygon(0%_0%,100%_0%,100%_100%,0%_100%)]"></div>
+                <div className="block w-full h-full bg-[var(--brand-primary-hover)] [clip-path:polygon(0%_0%,100%_0%,100%_100%,0%_100%)]"></div>
             </div>
 
             <div className="intro-logo absolute inset-0">

@@ -2,7 +2,7 @@
 .section {
     position: relative;
     width: 100%;
-    background: #fff;
+    background: var(--background);
     padding: clamp(1.25rem, 2.5vw, 2rem) var(--website-gutter) clamp(2rem, 4vw, 3.5rem);
     overflow: hidden;
 }
@@ -22,7 +22,7 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    color: #8E1616;
+    color: var(--brand-primary-hover);
     line-height: 1.1;
 }
 
@@ -35,10 +35,10 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #8E1616;
+    color: var(--brand-primary-hover);
     text-decoration: none;
     white-space: nowrap;
-    transition: opacity 0.25s ease;
+    transition: opacity var(--duration-fast) var(--ease-in-out);
 }
 .seeAll:hover { opacity: 0.6; }
 
@@ -59,7 +59,7 @@
     aspect-ratio: 9 / 10;
     border-radius: var(--radius, 8px);
     overflow: hidden;
-    background: #f0ebe5;
+    background: var(--brand-warm-bg);
 }
 
 /* ── Col 2: small portrait image + blank space below ────────────── */
@@ -76,7 +76,7 @@
     aspect-ratio: 4 / 5;
     border-radius: var(--radius, 8px);
     overflow: hidden;
-    background: #f0ebe5;
+    background: var(--brand-warm-bg);
     flex-shrink: 0;
 }
 
@@ -104,7 +104,7 @@
     margin: 0;
     font-size: clamp(0.95rem, 1.15vw, 1.05rem);
     line-height: 1.55;
-    color: #4a4a4a;
+    color: var(--text-body);
     text-align: justify;
 }
 
@@ -122,7 +122,7 @@
     aspect-ratio: 4 / 3;
     border-radius: var(--radius, 8px);
     overflow: hidden;
-    background: #f0ebe5;
+    background: var(--brand-warm-bg);
 }
 
 .captionRow {
@@ -138,7 +138,7 @@
     text-transform: uppercase;
     letter-spacing: -0.008rem;
     line-height: 1;
-    color: #1a1a1a;
+    color: var(--brand-ink-soft);
     -webkit-font-smoothing: antialiased;
 }
 
@@ -149,7 +149,7 @@
     text-transform: uppercase;
     letter-spacing: -0.008rem;
     line-height: 1;
-    color: rgba(62, 0, 13, 0.45);
+    color: color-mix(in srgb, var(--brand-primary) 45%, transparent);
     -webkit-font-smoothing: antialiased;
 }
 

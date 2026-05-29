@@ -1,7 +1,7 @@
 .section {
   position: relative;
   width: 100%;
-  background-color: #fff;
+  background-color: var(--background);
   padding: clamp(1.25rem, 2.5vw, 2rem) 0 clamp(2rem, 4vw, 3.5rem);
   overflow: hidden;
 }
@@ -34,14 +34,14 @@
   font-weight: 500;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: #8E1616;
+  color: var(--brand-primary-hover);
 }
 
 .writeup {
   margin: 0.75rem 0 0;
   font-size: clamp(0.95rem, 1.15vw, 1.05rem);
   line-height: 1.55;
-  color: #4a4a4a;
+  color: var(--text-body);
 }
 
 .archiveItems {
@@ -110,10 +110,10 @@
   font-weight: 600;
   letter-spacing: -0.008rem;
   line-height: 1;
-  color: #000;
+  color: var(--foreground);
   will-change: transform;
   -webkit-font-smoothing: antialiased;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--duration-normal) var(--ease-in-out);
 }
 
 .emptyCol {

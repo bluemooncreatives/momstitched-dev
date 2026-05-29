@@ -69,13 +69,10 @@ const ResetPassword = () => {
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-transparent to-black/60" />
 
                 {/* Left panel */}
-                <div className="relative hidden overflow-hidden bg-[#3E000D] p-8 text-sidebar-foreground md:block md:w-1/2 md:p-12">
+                <div className="relative hidden overflow-hidden bg-[var(--brand-primary)] p-8 text-sidebar-foreground md:block md:w-1/2 md:p-12">
                     <div
                         className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[64%]"
-                        style={{
-                            backgroundImage:
-                                "radial-gradient(66% 112% at 6% 100%, color-mix(in srgb, #8E1616 88%, transparent), transparent 78%), radial-gradient(56% 102% at 22% 100%, color-mix(in srgb, #a01c1c 84%, transparent), transparent 80%), radial-gradient(48% 96% at 42% 100%, color-mix(in srgb, #8E1616 82%, transparent), transparent 82%), radial-gradient(44% 92% at 64% 100%, color-mix(in srgb, #6b1010 76%, transparent), transparent 84%), radial-gradient(42% 88% at 86% 100%, color-mix(in srgb, #3E000D 68%, transparent), transparent 86%), linear-gradient(0deg, rgb(255 255 255 / 0.08), transparent 62%)",
-                        }}
+                        style={{ backgroundImage: "var(--auth-panel-gradient)" }}
                     />
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[56%] bg-[linear-gradient(0deg,rgba(255,255,255,0.18),transparent_74%)] blur-2xl" />
                     <div className="relative z-20 flex h-full flex-col justify-between">

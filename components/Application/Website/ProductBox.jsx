@@ -14,7 +14,7 @@ const ProductBox = ({ product }) => {
     return (
         <div className='group relative overflow-hidden rounded-[var(--admin-shell-radius)] border border-border/60 bg-white transition duration-300 hover:-translate-y-0.5 hover:border-foreground/35 hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)]'>
             <div className="flex h-full flex-col">
-                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#f4f4f3]">
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[var(--product-card-bg)]">
                     <span className={`absolute right-4 top-4 z-10 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${hasDiscount ? 'border-[var(--dark-red)] bg-[var(--secondary)] text-[var(--dark-red)]' : 'border-border/60 bg-white/90 text-foreground/70'}`}>
                         {hasDiscount ? `Sale ${discount}%` : 'Hot'}
                     </span>
