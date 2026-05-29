@@ -69,7 +69,7 @@ const ProductBox = ({ product }) => {
                             {product?.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                         </span>
                         {hasDiscount && (
-                            <span className='text-[11px] text-foreground/45 line-through'>
+                            <span className='text-[11px] text-stone-500 line-through'>
                                 {product?.mrp.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                             </span>
                         )}

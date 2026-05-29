@@ -1,5 +1,5 @@
 'use client'
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useId, useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import ButtonLoading from '../ButtonLoading'
@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Minus, Plus } from 'lucide-react'
 const Filter = ({ filters }) => {
+    const instanceId = useId()
     const searchParams = useSearchParams()
 
     const [priceFilter, setPriceFilter] = useState({ minPrice: 0, maxPrice: 3000 })
@@ -144,7 +145,7 @@ const Filter = ({ filters }) => {
                                 <li className="px-2 py-1.5 text-[12px] text-muted-foreground">No categories available.</li>
                             )}
                             {categoriesReady && categories.map((category) => {
-                                const categoryId = `category-${category._id}`
+                                const categoryId = `${instanceId}-category-${category._id}`
                                 const active = selectedCategory.includes(category.slug)
                                 return (
                                     <li key={category._id}>
@@ -184,7 +185,7 @@ const Filter = ({ filters }) => {
                             )}
                             {colorsReady && colors.map((color) => {
                                 const safeColor = String(color).replace(/\s+/g, '-').toLowerCase()
-                                const colorId = `color-${safeColor}`
+                                const colorId = `${instanceId}-color-${safeColor}`
                                 const active = selectedColor.includes(color)
                                 return (
                                     <li key={color}>
@@ -229,7 +230,7 @@ const Filter = ({ filters }) => {
                             )}
                             {sizesReady && sizes.map((size) => {
                                 const safeSize = String(size).replace(/\s+/g, '-').toLowerCase()
-                                const sizeId = `size-${safeSize}`
+                                const sizeId = `${instanceId}-size-${safeSize}`
                                 const active = selectedSize.includes(size)
                                 return (
                                     <li key={size}>

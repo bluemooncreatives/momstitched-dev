@@ -22,11 +22,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <head>
-        {/* Preload the two most-used PP Neue Montreal weights and the display font
-            so they join the critical path instead of loading after CSS parse. */}
-        <link rel="preload" href="/assets/font/PPNeueMontreal-Book.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
+        {/* Preload only fonts on the LCP critical path.
+            Medium (weight 600) is used by the LCP "Shop" heading.
+            Book (weight 400) is the primary body font — preloaded so it's
+            ready before below-the-fold content renders. */}
         <link rel="preload" href="/assets/font/PPNeueMontreal-Medium.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
-        <link rel="preload" href="/assets/font/Felixti.TTF" as="font" type="font/truetype" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/font/PPNeueMontreal-Book.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
       </head>
       <body
         className={`${assistantFont.className} antialiased`}

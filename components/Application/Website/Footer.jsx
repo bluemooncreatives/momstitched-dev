@@ -12,11 +12,11 @@ const Footer = () => {
                 <div className='lg:col-span-1 md:col-span-2 col-span-1'>
                     <Image
                         src={logo}
-                        width={383}
-                        height={146}
-                        alt='logo'
+                        width={144}
+                        height={55}
+                        alt='MomStitched logo'
                         className='w-36 mb-2'
-                        unoptimized
+                        sizes="144px"
                     />
                     <p className='text-gray-500 text-sm'>
                        MomStitched is your trusted destination for quality and convenience. From fashion to essentials, we bring everything you need right to your doorstep. Shop smart, live better — only at MomStitched.
@@ -108,19 +108,19 @@ const Footer = () => {
 
                     <div className='flex gap-5 mt-5'>
 
-                        <Link href="">
+                        <Link href="https://www.youtube.com/@momstitched" target="_blank" rel="noopener noreferrer" aria-label="MomStitched on YouTube">
                             <Youtube className='text-primary size-6' />
                         </Link>
-                        <Link href="">
+                        <Link href="https://www.instagram.com/mom.stitched/" target="_blank" rel="noopener noreferrer" aria-label="MomStitched on Instagram">
                             <Instagram className='text-primary size-6' />
                         </Link>
-                        <Link href="">
+                        <Link href="https://wa.me/918569874589" target="_blank" rel="noopener noreferrer" aria-label="Contact MomStitched on WhatsApp">
                             <MessageCircle className='text-primary size-6' />
                         </Link>
-                        <Link href="">
+                        <Link href="https://www.facebook.com/people/momstitched/100087738263074/" target="_blank" rel="noopener noreferrer" aria-label="MomStitched on Facebook">
                             <Facebook className='text-primary size-6' />
                         </Link>
-                        <Link href="">
+                        <Link href="https://twitter.com/momstitched" target="_blank" rel="noopener noreferrer" aria-label="MomStitched on X (Twitter)">
                             <Twitter className='text-primary size-6' />
                         </Link>
 

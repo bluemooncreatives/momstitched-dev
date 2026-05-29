@@ -27,7 +27,7 @@ const Sorting = ({ sorting, setSorting, mobileFilterOpen, setMobileFilterOpen, r
 
             <div className="flex flex-wrap items-center gap-2.5">
                 <Select value={sorting} onValueChange={(value) => setSorting(value)}>
-                    <SelectTrigger className="h-9 w-full rounded-md border-border/70 bg-background text-base font-semibold text-[var(--brand-primary)] md:w-[230px]">
+                    <SelectTrigger aria-label="Sort products" className="h-9 w-full rounded-md border-border/70 bg-background text-base font-semibold text-[var(--brand-primary)] md:w-[230px]">
                         <SelectValue placeholder="Default Sorting" />
                     </SelectTrigger>
                     <SelectContent
