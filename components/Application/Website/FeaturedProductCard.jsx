@@ -103,7 +103,7 @@ const FeaturedProductCard = ({ product, size = 'medium' }) => {
                                 e.preventDefault();
                                 setIsWishlisted(!isWishlisted);
                             }}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white rounded-full p-2 hover:bg-gray-100"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-background rounded-full p-2 hover:bg-muted"
                         >
                             <Heart 
                                 size={20} 
@@ -114,7 +114,7 @@ const FeaturedProductCard = ({ product, size = 'medium' }) => {
                 </div>
 
                 {/* Product Info */}
-                <div className="p-4 border-t bg-white">
+                <div className="p-4 border-t bg-background">
                     <h3 className="font-semibold text-sm sm:text-base text-gray-800 line-clamp-2 group-hover:text-gray-900 transition-colors">
                         {product?.name}
                     </h3>

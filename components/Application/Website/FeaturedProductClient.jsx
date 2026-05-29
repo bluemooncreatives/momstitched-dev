@@ -107,7 +107,7 @@ const FeaturedProductClient = ({ products = [] }) => {
 
     if (!products.length) {
         return (
-            <section className="fp-section bg-white">
+            <section className="fp-section bg-background">
                 <div className="fp-container">
                     <div className="text-center py-12 text-gray-400">
                         No featured products available
@@ -118,7 +118,7 @@ const FeaturedProductClient = ({ products = [] }) => {
     }
 
     return (
-        <section className="fp-section bg-white" ref={containerRef}>
+        <section className="fp-section bg-background" ref={containerRef}>
             <div className="fp-container">
                 {renderProductRows()}
                 <div className="fp-actions">

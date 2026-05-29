@@ -49,7 +49,7 @@ const Cart = () => {
                 <ShoppingCart className="h-5 w-5 text-foreground" strokeWidth={1.75} />
                 <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[10px] font-semibold text-white">{cart.count}</span>
             </SheetTrigger>
-            <SheetContent className="w-full border-l border-border/70 bg-white p-0 sm:max-w-[460px]">
+            <SheetContent className="w-full border-l border-border/70 bg-background p-0 sm:max-w-[460px]">
                 <SheetHeader className='border-b border-border/60 px-5 py-4'>
                     <SheetTitle className="font-neue text-2xl font-semibold tracking-[0.01em]">My Cart</SheetTitle>
                     <SheetDescription></SheetDescription>
@@ -90,7 +90,7 @@ const Cart = () => {
                             </div>
                         ))}
                     </div>
-                    <div className="border-t border-border/60 bg-white px-5 py-4">
+                    <div className="border-t border-border/60 bg-background px-5 py-4">
                         <div className="space-y-1.5">
                             <h2 className="flex items-center justify-between text-lg font-semibold"><span>Subtotal</span> <span>{subtotal?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></h2>
                             <h2 className="flex items-center justify-between text-sm font-medium text-muted-foreground"><span>Discount</span> <span>{discount?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></h2>

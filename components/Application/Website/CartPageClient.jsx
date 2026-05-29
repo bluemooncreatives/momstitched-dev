@@ -54,7 +54,7 @@ const CartPageClient = () => {
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-36 bg-gradient-to-b from-transparent via-white/50 to-white" />
             </section>
 
-            <section className="website-gutter bg-white py-10 lg:py-14">
+            <section className="website-gutter bg-background py-10 lg:py-14">
                 <div className="grid w-full gap-6 lg:grid-cols-[290px_1fr] lg:gap-8">
                     {isEmpty ? (
                         <div className="lg:col-span-2">
@@ -114,7 +114,7 @@ const CartPageClient = () => {
                             </aside>
 
                             <div className="w-full">
-                                <div className="rounded-lg border border-border/60 bg-white shadow-sm">
+                                <div className="rounded-lg border border-border/60 bg-background shadow-sm">
                                     <Table>
                                         <TableHeader className="hidden bg-muted/40 md:table-header-group">
                                             <TableRow>
@@ -158,7 +158,7 @@ const CartPageClient = () => {
                                                     <TableCell className="flex justify-between px-3 pb-3 md:table-cell md:py-4">
                                                         <span className="font-medium md:hidden">Quantity</span>
                                                         <div className="flex justify-center">
-                                                            <div className="flex items-center justify-center rounded-full border border-border/60 bg-white">
+                                                            <div className="flex items-center justify-center rounded-full border border-border/60 bg-background">
                                                                 <Button
                                                                     type="button"
                                                                     variant="ghost"

@@ -171,7 +171,7 @@ const Testimonial = () => {
     const item = testimonials[active]
 
     return (
-        <section ref={sectionRef} className="relative overflow-hidden bg-white website-gutter pt-20 lg:pt-28 pb-6 lg:pb-10">
+        <section ref={sectionRef} className="relative overflow-hidden bg-background website-gutter pt-20 lg:pt-28 pb-6 lg:pb-10">
 
             {/* decorative large quote */}
             <div

@@ -24,7 +24,7 @@ const SizeGuideTable = ({ columns, rows, className = "" }) => {
     const columnKeys = safeColumns.map((column) => toColumnKey(column))
 
     return (
-        <div className={cn("rounded-md border border-border/60 bg-white shadow-sm", className)}>
+        <div className={cn("rounded-md border border-border/60 bg-background shadow-sm", className)}>
             <Table className="w-full table-fixed">
                 <TableHeader>
                     <TableRow>

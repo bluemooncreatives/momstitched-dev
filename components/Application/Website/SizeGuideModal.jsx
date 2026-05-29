@@ -11,7 +11,7 @@ const SizeGuideModal = ({ open, onOpenChange, sizeGuide }) => {
 
     const content = (
         <div className="space-y-4">
-                <div className="rounded-md border border-border/60 bg-white">
+                <div className="rounded-md border border-border/60 bg-background">
                 {isLoading ? (
                     <div className="rounded-md border border-dashed border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground">
                         Loading size guide...
@@ -32,7 +32,7 @@ const SizeGuideModal = ({ open, onOpenChange, sizeGuide }) => {
     if (isMobile) {
         return (
             <Sheet open={open} onOpenChange={onOpenChange}>
-                <SheetContent side="bottom" className="rounded-t-2xl border-border/60 bg-white p-0">
+                <SheetContent side="bottom" className="rounded-t-2xl border-border/60 bg-background p-0">
                     <SheetHeader className="border-b border-border/60 px-5 py-4">
                         <SheetTitle className="text-lg font-semibold uppercase tracking-[0.08em]">Size Guide</SheetTitle>
                         <SheetDescription className="text-sm text-muted-foreground">
@@ -49,7 +49,7 @@ const SizeGuideModal = ({ open, onOpenChange, sizeGuide }) => {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="w-[min(92vw,980px)] max-w-5xl rounded-2xl border-border/60 bg-white p-0">
+                <DialogContent className="w-[min(92vw,980px)] max-w-5xl rounded-2xl border-border/60 bg-background p-0">
                 <DialogHeader className="border-b border-border/60 px-6 py-4">
                     <DialogTitle className="text-lg font-semibold uppercase tracking-[0.08em]">Size Guide</DialogTitle>
                     <DialogDescription className="text-sm text-muted-foreground">

@@ -14,7 +14,7 @@ const Search = ({ isShow }) => {
     }
     return (
         <div
-            className={`absolute border-t transition-all left-0 py-5 md:px-32 px-5 z-10 bg-white w-full ${isShow ? "top-18" : "-top-full "
+            className={`absolute border-t transition-all left-0 py-5 md:px-32 px-5 z-10 bg-background w-full ${isShow ? "top-18" : "-top-full "
                 }`}
         >
             <div className="flex justify-between items-center relative">

@@ -128,7 +128,7 @@ const Filter = ({ filters }) => {
                 className="space-y-4"
             >
                 <AccordionItem value="category" className="border-b border-border/60">
-                    <AccordionTrigger className="group flex w-full items-center justify-between py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-foreground hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
+                    <AccordionTrigger className="group flex w-full items-center justify-between py-2 text-base font-semibold text-[var(--brand-primary)] hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
                         <span>Categories</span>
                         <span className="relative flex size-4 items-center justify-center">
                             <Plus className="absolute size-4 transition-all duration-200 group-data-[state=open]:rotate-90 group-data-[state=open]:opacity-0" />
@@ -150,7 +150,7 @@ const Filter = ({ filters }) => {
                                     <li key={category._id}>
                                         <label
                                             htmlFor={categoryId}
-                                            className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                            className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--dark-red)]' : 'text-foreground/60 hover:text-foreground'}`}
                                         >
                                             <Checkbox
                                                 id={categoryId}
@@ -167,7 +167,7 @@ const Filter = ({ filters }) => {
                 </AccordionItem>
 
                 <AccordionItem value="color" className="border-b border-border/60">
-                    <AccordionTrigger className="group flex w-full items-center justify-between py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-foreground hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
+                    <AccordionTrigger className="group flex w-full items-center justify-between py-2 text-base font-semibold text-[var(--brand-primary)] hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
                         <span>Color</span>
                         <span className="relative flex size-4 items-center justify-center">
                             <Plus className="absolute size-4 transition-all duration-200 group-data-[state=open]:rotate-90 group-data-[state=open]:opacity-0" />
@@ -190,7 +190,7 @@ const Filter = ({ filters }) => {
                                     <li key={color}>
                                         <label
                                             htmlFor={colorId}
-                                            className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                            className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--dark-red)]' : 'text-foreground/60 hover:text-foreground'}`}
                                         >
                                             <Checkbox
                                                 id={colorId}
@@ -212,7 +212,7 @@ const Filter = ({ filters }) => {
                 </AccordionItem>
 
                 <AccordionItem value="size" className="border-b border-border/60">
-                    <AccordionTrigger className="group flex w-full items-center justify-between py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-foreground hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
+                    <AccordionTrigger className="group flex w-full items-center justify-between py-2 text-base font-semibold text-[var(--brand-primary)] hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
                         <span>Size</span>
                         <span className="relative flex size-4 items-center justify-center">
                             <Plus className="absolute size-4 transition-all duration-200 group-data-[state=open]:rotate-90 group-data-[state=open]:opacity-0" />
@@ -235,7 +235,7 @@ const Filter = ({ filters }) => {
                                     <li key={size}>
                                         <label
                                             htmlFor={sizeId}
-                                            className={`flex cursor-pointer items-center gap-2 px-1 py-1.5 text-[13px] transition ${active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                            className={`flex cursor-pointer items-center gap-2 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--dark-red)]' : 'text-foreground/60 hover:text-foreground'}`}
                                         >
                                             <Checkbox
                                                 id={sizeId}
@@ -252,26 +252,26 @@ const Filter = ({ filters }) => {
                 </AccordionItem>
 
                 <AccordionItem value="price" className="border-b border-border/60">
-                    <AccordionTrigger className="group flex w-full items-center justify-between py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-foreground hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
+                    <AccordionTrigger className="group flex w-full items-center justify-between py-2 text-base font-semibold text-[var(--brand-primary)] hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
                         <span>Price</span>
                         <span className="relative flex size-4 items-center justify-center">
                             <Plus className="absolute size-4 transition-all duration-200 group-data-[state=open]:rotate-90 group-data-[state=open]:opacity-0" />
                             <Minus className="absolute size-4 opacity-0 transition-all duration-200 group-data-[state=open]:opacity-100" />
                         </span>
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-4 pb-4">
+                    <AccordionContent className="space-y-4 px-[10px] pb-4">
                         <Slider
-                            className="mt-1"
+                            className="mt-0"
                             value={[priceFilter.minPrice, priceFilter.maxPrice]}
                             max={3000}
                             step={1}
                             onValueChange={handlePriceChange}
                         />
-                        <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
-                            <div className="border border-border/60 px-2 py-2 text-center">
+                        <div className="grid grid-cols-2 gap-2 font-neue text-[11px] text-foreground/60">
+                            <div className="border border-border/60 px-2 py-2 text-center tracking-[0.04em]">
                                 {priceFilter.minPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                             </div>
-                            <div className="border border-border/60 px-2 py-2 text-center">
+                            <div className="border border-border/60 px-2 py-2 text-center tracking-[0.04em]">
                                 {priceFilter.maxPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                             </div>
                         </div>

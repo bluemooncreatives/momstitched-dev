@@ -22,7 +22,7 @@ const buttonVariants = cva(
         brand:
           "rounded-md bg-[var(--dark-red)] text-white hover:bg-[var(--dark-red-2)] focus-visible:ring-[var(--dark-red)]/40",
         "brand-outline":
-          "rounded-sm border border-[var(--dark-red)] bg-transparent text-[var(--dark-red)] hover:bg-[var(--dark-red)] hover:text-white focus-visible:ring-[var(--dark-red)]/40",
+          "rounded-md border border-[var(--dark-red)] bg-transparent text-[var(--dark-red)] hover:bg-[var(--dark-red)] hover:text-white focus-visible:ring-[var(--dark-red)]/40",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

@@ -97,7 +97,7 @@ const EditorialCardsSection = () => {
     }
 
     return (
-        <section ref={sectionRef} className="website-gutter bg-white pb-16 lg:pb-24">
+        <section ref={sectionRef} className="website-gutter bg-background pb-16 lg:pb-24">
 
             {/* section header */}
             <div ref={headerRef} className="mb-4 flex items-end justify-between lg:mb-6">

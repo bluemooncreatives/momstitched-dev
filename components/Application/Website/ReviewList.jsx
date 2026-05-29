@@ -7,7 +7,7 @@ import { Star } from 'lucide-react'
 dayjs.extend(relativeTime);
 const ReviewList = ({ review }) => {
     return (
-        <div className='flex gap-4 rounded-md border border-border/60 bg-white p-4'>
+        <div className='flex gap-4 rounded-md border border-border/60 bg-background p-4'>
             <div className='w-[55px] shrink-0'>
                 <Image
                     src={review?.avatar?.url || usericon.src}

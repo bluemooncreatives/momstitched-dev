@@ -21,7 +21,7 @@ import Link from 'next/link'
 const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilters, initialSearchParamsString = '' }) => {
     const searchParams = useSearchParams()
     const searchParamString = searchParams.toString()
-    const [limit, setLimit] = useState(9)
+    const limit = 9
     const [sorting, setSorting] = useState('default_sorting')
     const [isMobileFilter, setIsMobileFilter] = useState(false)
     const [isDesktop, setIsDesktop] = useState(false)
@@ -54,10 +54,9 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
             throw new Error(getProduct.message || 'Failed to load products.')
         }
         return getProduct.data
-    }, [limit, sorting, searchParamString])
+    }, [sorting, searchParamString])
 
     const isInitialQuery = searchParamString === initialSearchParamsString
-        && limit === 9
         && sorting === 'default_sorting'
 
     const initialData = useMemo(() => {
@@ -69,7 +68,7 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
     }, [initialProducts, initialNextPage, isInitialQuery])
 
     const { error, data, isFetching, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
-        queryKey: ['products', limit, sorting, searchParamString],
+        queryKey: ['products', sorting, searchParamString],
         queryFn: ({ pageParam }) => fetchProduct(pageParam),
         initialPageParam: 0,
         initialData,
@@ -106,10 +105,10 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                         Shop
                     </div>
                 </div>
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-36 bg-gradient-to-b from-transparent via-white/50 to-white" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-36 bg-gradient-to-b from-transparent via-background/50 to-background" />
             </section>
 
-            <section className='website-gutter bg-white py-10 lg:py-14'>
+            <section className='website-gutter bg-background py-10 lg:py-14'>
                 <div className="grid w-full gap-6 lg:grid-cols-[290px_1fr] lg:gap-8">
                     {isDesktop ? (
                         <aside className='w-full'>
@@ -119,7 +118,7 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                         </aside>
                     ) : (
                         <Sheet open={isMobileFilter} onOpenChange={setIsMobileFilter}>
-                            <SheetContent side='left' className="block bg-white">
+                            <SheetContent side='left' className="block bg-background">
                                 <SheetHeader className="border-b px-5">
                                     <SheetTitle>Filter</SheetTitle>
                                     <SheetDescription>Refine your results quickly.</SheetDescription>
@@ -134,8 +133,6 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                     <div className='w-full'>
                         <div>
                             <Sorting
-                                limit={limit}
-                                setLimit={setLimit}
                                 sorting={sorting}
                                 setSorting={setSorting}
                                 mobileFilterOpen={isMobileFilter}
@@ -148,7 +145,7 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                         {error && <div className='font-neue py-6 text-center text-sm text-destructive'>Failed to load products. Please try again.</div>}
 
                         {showEmptyState ? (
-                            <div className="mt-8 rounded-lg border border-border/60 bg-white p-10 text-center shadow-sm">
+                            <div className="mt-8 rounded-lg border border-border/60 bg-background p-10 text-center shadow-sm">
                                 <h3 className="font-neue text-xl font-semibold">No products found</h3>
                                 <p className="font-neue mt-2 text-sm text-muted-foreground">
                                     Try adjusting your filters or start a fresh search.

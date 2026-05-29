@@ -128,7 +128,7 @@ const ProductReveiw = ({ productId }) => {
 
 
     return (
-        <div className="mb-20 rounded-[var(--admin-shell-radius)] border border-border/60 bg-white shadow-sm">
+        <div className="mb-20 rounded-[var(--admin-shell-radius)] border border-border/60 bg-background shadow-sm">
             <div className="border-b border-border/60 px-5 py-4">
                 <h2 className="text-xl font-semibold uppercase tracking-[0.04em]">Rating & Reviews</h2>
             </div>
