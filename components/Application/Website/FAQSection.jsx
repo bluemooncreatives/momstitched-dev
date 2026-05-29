@@ -10,28 +10,56 @@ gsap.registerPlugin(ScrollTrigger)
 
 const FAQS = [
     {
-        q: 'What is your return policy?',
-        a: 'We offer hassle-free returns within 7 days of delivery. Items must be unworn, unwashed, and in their original packaging with all tags attached. Reach out to our support team and we\'ll take it from there.',
+        q: 'How long does it take to process an order?',
+        a: 'Since every piece is made-to-order, it typically takes 7–14 days to carefully stitch and dispatch your outfit. This ensures each garment receives the time and attention it deserves.',
     },
     {
-        q: 'How long does shipping take?',
-        a: 'Standard shipping typically takes 3–5 business days. Express shipping (1–2 business days) is available at checkout. Free standard shipping applies to all orders — no minimum required.',
+        q: 'Can I wear these outfits for daily use or only occasions?',
+        a: 'Our designs are crafted to be truly versatile — refined enough for small festive gatherings yet comfortable enough for everyday elegance. One wardrobe, many moments.',
     },
     {
-        q: 'Can I exchange for a different size?',
-        a: 'Absolutely. If the fit isn\'t right, contact our support team within 7 days and we\'ll arrange a size exchange at no additional cost, subject to stock availability.',
+        q: 'What if the outfit doesn\'t fit well?',
+        a: 'We put great care into getting the fit right, but if something feels off, simply reach out to us. We\'ll guide you through possible alterations or find the best solution for you.',
     },
     {
-        q: 'How do member discounts work?',
-        a: 'Create a free account to unlock exclusive member pricing, early access to new arrivals, and seasonal promotions. Discounts are applied automatically at checkout — no codes needed.',
+        q: 'How should I care for my outfit?',
+        a: 'To preserve the fabric quality and stitching, we recommend a gentle hand wash or dry clean. Treating each piece with care ensures it stays beautiful for years to come.',
     },
     {
-        q: 'What payment methods do you accept?',
-        a: 'We accept all major credit and debit cards, UPI, net banking, and popular digital wallets. Every transaction is secured with industry-standard encryption.',
+        q: 'Do you accept returns or exchanges?',
+        a: 'As most pieces are made-to-order, we offer limited exchange options. Please review our return policy for full details, or reach out to us — we\'re happy to help find a resolution.',
     },
     {
-        q: 'How do I track my order?',
-        a: 'Once your order is dispatched, you\'ll receive a confirmation email with a tracking link. You can also track it anytime from the Orders section inside your account dashboard.',
+        q: 'What fabrics do you use?',
+        a: 'We carefully source fabrics that are breathable, comfortable, and suited for Indian weather — without compromising on the elegant ethnic aesthetic that defines MomStitched.',
+    },
+    {
+        q: 'Do you offer customization?',
+        a: 'Yes, we welcome minor customizations such as sleeve length, neckline adjustments, and fit preferences. Simply mention your requirements while placing the order and we\'ll do our best.',
+    },
+    {
+        q: 'How do I choose the right size?',
+        a: 'We provide a detailed size guide to help you find your fit. If you\'re unsure, feel free to share your measurements with us — we\'ll personally assist you in selecting the perfect size.',
+    },
+    {
+        q: 'Are all outfits made to order?',
+        a: 'Yes, every MomStitched piece is made-to-order with close attention to detail. This approach ensures a better fit, superior finish, and a quality that truly stands apart.',
+    },
+    {
+        q: 'Can I place a bulk or group order?',
+        a: 'Absolutely. We happily take bulk orders for small functions or coordinated group outfits. Reach out to us with your requirements and we\'ll take care of the rest.',
+    },
+    {
+        q: 'Can I make changes after placing the order?',
+        a: 'If your order hasn\'t entered production yet, we\'ll do our best to accommodate your request. Please contact us as early as possible so we can act in time.',
+    },
+    {
+        q: 'Are your outfits suitable for all age groups?',
+        a: 'Yes — our designs are timeless, comfortable, and thoughtfully crafted to be worn and loved across different age groups, from young adults to elders.',
+    },
+    {
+        q: 'Do you restock designs?',
+        a: 'Since most pieces are made-to-order, traditional restocks aren\'t our usual practice. However, you\'re welcome to reach out and we\'ll let you know what\'s possible.',
     },
 ]
 
