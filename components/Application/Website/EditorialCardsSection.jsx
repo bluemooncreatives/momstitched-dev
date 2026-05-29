@@ -18,7 +18,7 @@ const CARDS = [
         description: "Crafted with a mother's love — each piece carries the warmth, care, and attention that defines who we are.",
         cta: 'Discover More',
         href: '/about-us',
-        image: '/assets/images/hero/03.jpg',
+        image: '/assets/images/hero/03.png',
         overlay: 'bg-gradient-to-t from-black/80 via-black/30 to-black/10',
     },
     {
@@ -27,7 +27,7 @@ const CARDS = [
         description: 'From everyday essentials to statement pieces — explore our full range of thoughtfully designed clothing.',
         cta: 'Shop Collection',
         href: WEBSITE_SHOP,
-        image: '/assets/images/hero/01.jpg',
+        image: '/assets/images/hero/01.png',
         overlay: 'bg-gradient-to-t from-[var(--dark-red)]/90 via-[var(--dark-red)]/25 to-transparent',
     },
     {
@@ -36,7 +36,7 @@ const CARDS = [
         description: "Have a question or need help finding the right fit? We're always here to help you.",
         cta: 'Get In Touch',
         href: '/contact',
-        image: '/assets/images/hero/04.jpg',
+        image: '/assets/images/hero/04.png',
         overlay: 'bg-gradient-to-t from-black/85 via-black/35 to-black/10',
     },
 ]
@@ -97,7 +97,7 @@ const EditorialCardsSection = () => {
     }
 
     return (
-        <section ref={sectionRef} className="website-gutter bg-background pb-16 lg:pb-24">
+        <section ref={sectionRef} className="website-gutter bg-background pt-[clamp(1.25rem,2.5vw,2rem)] pb-[clamp(2rem,4vw,3.5rem)]">
 
             {/* section header */}
             <div ref={headerRef} className="mb-4 flex items-end justify-between lg:mb-6">
@@ -135,6 +135,7 @@ const EditorialCardsSection = () => {
                             src={card.image}
                             alt={card.heading}
                             fill
+                            quality={90}
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                             className="object-cover will-change-transform"
                         />

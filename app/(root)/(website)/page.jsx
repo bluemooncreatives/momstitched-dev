@@ -12,6 +12,7 @@ const AboutUsSection = dynamic(() => import('@/components/Application/Website/Ab
 const Testimonial = dynamic(() => import('@/components/Application/Website/Testimonial'))
 const EditorialCardsSection = dynamic(() => import('@/components/Application/Website/EditorialCardsSection'))
 const BenefitsSection = dynamic(() => import('@/components/Application/Website/BenefitsSection'))
+const FAQSection = dynamic(() => import('@/components/Application/Website/FAQSection'))
 
 const Home = () => {
     return (
@@ -36,6 +37,8 @@ const Home = () => {
             <EditorialCardsSection />
 
             <BenefitsSection />
+
+            <FAQSection />
         </>
     )
 }
