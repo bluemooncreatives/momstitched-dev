@@ -118,14 +118,14 @@ const FAQSection = () => {
             {/* section header */}
             <div ref={headerRef} className="mb-4 flex items-end justify-between lg:mb-6">
                 <div>
-                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.28em] text-[var(--dark-red)]/60">
+                    <p className="text-[1rem] font-semibold uppercase text-[var(--dark-red)]/60">
                         Got Questions?
                     </p>
                     <h2 className="mt-1.5 font-neue text-[clamp(1.8rem,4.8vw,3.8rem)] font-medium uppercase text-[var(--dark-red-2)]">
                         Frequently Asked
                     </h2>
                 </div>
-                <span className="hidden text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground sm:block">
+                <span className="hidden text-[0.68rem] font-semibold uppercase text-muted-foreground sm:block">
                     Returns · Shipping · Orders
                 </span>
             </div>
