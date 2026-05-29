@@ -82,14 +82,14 @@ const Testimonial = () => {
     useGSAP(() => {
         gsap.fromTo(
             [headerRef.current, bigQuoteRef.current],
-            { autoAlpha: 0, y: 28 },
+            { autoAlpha: 0, y: 40 },
             {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.85,
-                ease: 'power3.out',
-                stagger: 0.08,
-                scrollTrigger: { trigger: sectionRef.current, start: 'top 75%', once: true },
+                duration: 0.9,
+                ease: 'power4.out',
+                stagger: 0.1,
+                scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
             }
         )
         gsap.fromTo(
@@ -97,9 +97,10 @@ const Testimonial = () => {
             { scaleX: 0, transformOrigin: 'left center' },
             {
                 scaleX: 1,
-                duration: 1.1,
-                ease: 'power3.inOut',
-                scrollTrigger: { trigger: sectionRef.current, start: 'top 75%', once: true },
+                duration: 1.2,
+                ease: 'expo.inOut',
+                delay: 0.12,
+                scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
             }
         )
     }, { scope: sectionRef })

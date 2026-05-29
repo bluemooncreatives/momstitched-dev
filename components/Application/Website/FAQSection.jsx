@@ -77,13 +77,13 @@ const FAQSection = () => {
     useGSAP(() => {
         gsap.fromTo(
             headerRef.current,
-            { autoAlpha: 0, y: 24 },
+            { autoAlpha: 0, y: 40 },
             {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.85,
-                ease: 'power3.out',
-                scrollTrigger: { trigger: sectionRef.current, start: 'top 82%', once: true },
+                duration: 0.9,
+                ease: 'power4.out',
+                scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
             }
         )
 
@@ -92,21 +92,23 @@ const FAQSection = () => {
             { scaleX: 0, transformOrigin: 'left center' },
             {
                 scaleX: 1,
-                duration: 1.1,
-                ease: 'power3.inOut',
-                scrollTrigger: { trigger: sectionRef.current, start: 'top 82%', once: true },
+                duration: 1.2,
+                ease: 'expo.inOut',
+                delay: 0.12,
+                scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
             }
         )
 
         gsap.fromTo(
             itemRefs.current,
-            { autoAlpha: 0, y: 32 },
+            { autoAlpha: 0, y: 50, scale: 0.97 },
             {
                 autoAlpha: 1,
                 y: 0,
-                duration: 0.8,
-                ease: 'power3.out',
-                stagger: 0.08,
+                scale: 1,
+                duration: 0.95,
+                ease: 'power4.out',
+                stagger: 0.1,
                 scrollTrigger: { trigger: sectionRef.current, start: 'top 72%', once: true },
             }
         )
