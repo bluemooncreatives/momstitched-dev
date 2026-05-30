@@ -29,22 +29,32 @@ export default function LenisProvider({ children }) {
       return
     }
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smooth: true,
-      smoothTouch: false,
+    // Defer Lenis init until the browser is idle so it doesn't run
+    // in the same task as React hydration, keeping TBT low.
+    const requestIdle = window.requestIdleCallback?.bind(window)
+      || ((cb) => setTimeout(cb, 200))
+    const cancelIdle = window.cancelIdleCallback?.bind(window)
+      || ((id) => clearTimeout(id))
+
+    const idleId = requestIdle(() => {
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smooth: true,
+        smoothTouch: false,
+      })
+
+      lenisRef.current = lenis
+
+      const onRaf = (time) => {
+        lenis.raf(time)
+        rafRef.current = requestAnimationFrame(onRaf)
+      }
+      rafRef.current = requestAnimationFrame(onRaf)
     })
 
-    lenisRef.current = lenis
-
-    const onRaf = (time) => {
-      lenis.raf(time)
-      rafRef.current = requestAnimationFrame(onRaf)
-    }
-    rafRef.current = requestAnimationFrame(onRaf)
-
     return () => {
+      cancelIdle(idleId)
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current)
         rafRef.current = null

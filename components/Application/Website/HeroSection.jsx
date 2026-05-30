@@ -100,6 +100,13 @@ const HeroSection = () => {
   const progressBarsRef = useRef([]);
   const [loaderComplete, setLoaderComplete] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
+  // Chars are split client-side only so the server renders ~150 fewer DOM nodes,
+  // cutting hydration time. The loader covers the hero during the transition.
+  const [textSplit, setTextSplit] = useState(false);
+
+  useEffect(() => {
+    setTextSplit(true);
+  }, []);
 
   useEffect(() => {
     try {
@@ -496,7 +503,7 @@ const HeroSection = () => {
             {SLIDES.map((slide) => (
               <div key={slide.id} className="flex h-40 flex-col items-center justify-center">
                 <p className="text-center text-[38px] font-medium leading-tight text-white">
-                  {splitToChars(slide.title)}
+                  {textSplit ? splitToChars(slide.title) : slide.title}
                 </p>
               </div>
             ))}
@@ -511,7 +518,7 @@ const HeroSection = () => {
                 key={slide.id}
                 className="flex h-[172px] items-end pb-2 text-[clamp(4.5rem,10vw,8.5rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-white"
               >
-                {splitToChars(slide.headline)}
+                {textSplit ? splitToChars(slide.headline) : slide.headline}
               </h2>
             ))}
           </div>
