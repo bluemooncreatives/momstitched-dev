@@ -1,6 +1,10 @@
 'use client'
-import Filter from '@/components/Application/Website/Filter'
+import dynamic from 'next/dynamic'
 import Sorting from '@/components/Application/Website/Sorting'
+
+// Filter is never server-rendered (isDesktop starts false; mobile Sheet starts closed)
+// so ssr:false defers its Accordion/Checkbox/Slider/radix-ui chunk entirely.
+const Filter = dynamic(() => import('@/components/Application/Website/Filter'), { ssr: false })
 import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
@@ -158,8 +162,8 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                             </div>
                         ) : (
                             <div className='grid grid-cols-2 gap-4 pt-7 md:grid-cols-3 md:gap-5 lg:gap-6'>
-                                {allProducts.map((product) => (
-                                    <ProductBox key={product._id} product={product} />
+                                {allProducts.map((product, index) => (
+                                    <ProductBox key={product._id} product={product} priority={index < 3} />
                                 ))}
                             </div>
                         )}

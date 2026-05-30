@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     experimental: {
-        optimizePackageImports: ['lucide-react', 'gsap', '@gsap/react', 'react-icons'],
+        optimizePackageImports: ['lucide-react', 'gsap', '@gsap/react', 'react-icons', 'radix-ui'],
     },
     async headers() {
         return [

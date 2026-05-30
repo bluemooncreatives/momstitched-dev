@@ -5,7 +5,6 @@ import gsap from "gsap"
 import CustomEase from "gsap/CustomEase"
 
 gsap.registerPlugin(CustomEase)
-CustomEase.create("hop", "0.9, 0, 0.1, 1")
 
 const PageLoader = ({ onReady, onComplete }) => {
     const loaderRef = useRef(null)
@@ -66,6 +65,9 @@ const PageLoader = ({ onReady, onComplete }) => {
         const currentCount = countRef.current
         const remainingProgress = 100 - currentCount
         const duration = Math.max(0.3, remainingProgress / 100) // Min 0.3s to finish
+
+        // Create the ease right before the timeline that uses it
+        CustomEase.create("hop", "0.9, 0, 0.1, 1")
 
         const completeTl = gsap.timeline({
             defaults: { ease: "hop" }

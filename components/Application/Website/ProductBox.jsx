@@ -6,7 +6,7 @@ import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
 import { Eye, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const ProductBox = ({ product }) => {
+const ProductBox = ({ product, priority = false }) => {
     const hasDiscount = product?.mrp > product?.sellingPrice
     const discount = hasDiscount ? Math.round(((product.mrp - product.sellingPrice) / product.mrp) * 100) : 0
     const rating = Number(product?.ratingAvg || 0)
@@ -30,6 +30,7 @@ const ProductBox = ({ product }) => {
                             alt={product?.media[0]?.alt || product?.name}
                             title={product?.media[0]?.title || product?.name}
                             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                            priority={priority}
                             className='h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105'
                         />
                     </Link>
