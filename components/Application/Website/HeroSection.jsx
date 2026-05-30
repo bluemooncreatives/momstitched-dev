@@ -65,7 +65,7 @@ const splitToChars = (text) =>
         {word.split("").map((char, charIndex) => (
           <span
             key={`${wordIndex}-${charIndex}`}
-            className="char inline-block will-change-transform"
+            className="char inline-block"
             style={{ transformOrigin: "50% 100%" }}
           >
             {char}
@@ -78,7 +78,7 @@ const splitToChars = (text) =>
         wordGroup,
         <span
           key={`sp-${wordIndex}`}
-          className="char inline-block will-change-transform"
+          className="char inline-block"
           style={{ transformOrigin: "50% 100%" }}
         >
           {"\u00A0"}
@@ -564,7 +564,7 @@ const HeroSection = () => {
                 src={slide.src}
                 alt={slide.alt}
                 fill
-                priority={index === 0}
+                priority
                 sizes="(max-width: 1024px) 24vw, 12vw"
                 className="h-full w-full object-cover"
               />

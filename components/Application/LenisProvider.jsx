@@ -14,7 +14,8 @@ export default function LenisProvider({ children }) {
     const isWebsiteRoute = !pathname?.startsWith('/admin') && !pathname?.startsWith('/auth')
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
     const isLowEndConnection = connection?.saveData || ['slow-2g', '2g'].includes(connection?.effectiveType)
-    const shouldEnable = isWebsiteRoute && !isLowEndConnection
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const shouldEnable = isWebsiteRoute && !isLowEndConnection && !prefersReducedMotion
 
     if (!shouldEnable) {
       if (rafRef.current) {
