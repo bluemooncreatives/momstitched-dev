@@ -2,72 +2,105 @@
 import UserPanelLayout from '@/components/Application/Website/UserPanelLayout'
 import WebsiteBreadcrumb from '@/components/Application/Website/WebsiteBreadcrumb'
 import useFetch from '@/hooks/useFetch'
-import { WEBSITE_ORDER_DETAILS } from '@/routes/WebsiteRoute'
+import { WEBSITE_ORDER_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import Link from 'next/link'
+import { Package } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
 const breadCrumbData = {
     title: 'Orders',
     links: [{ label: 'Orders' }]
 }
+
 const Orders = () => {
     const { data: orderData, loading } = useFetch("/api/user-order")
+    const orders = orderData?.data ?? []
 
     return (
         <div>
             <WebsiteBreadcrumb props={breadCrumbData} />
             <UserPanelLayout>
+                <div className="rounded-[var(--radius)] border border-border/60 bg-background">
 
-                <div className='shadow rounded'>
-                    <div className='p-5 text-xl font-semibold border-b'>
-                        Orders
+                    {/* Section header */}
+                    <div className="flex items-center gap-2 border-b border-border/60 px-5 py-4">
+                        <Package className="size-3.5 text-[var(--brand-primary)]" />
+                        <h2 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
+                            My Orders
+                        </h2>
                     </div>
-                    <div className='p-5'>
-                        {loading ? (
-                            <div className='py-10 text-center text-sm text-gray-400'>Loading...</div>
-                        ) : !orderData?.data?.length ? (
-                            <div className='flex flex-col items-center gap-3 py-16 text-center'>
-                                <p className='text-lg font-semibold text-[var(--dark-red-2)]'>No orders yet</p>
-                                <p className='max-w-xs text-sm text-gray-400'>
-                                    You haven&apos;t placed any orders. Explore our collections and find something you love.
-                                </p>
-                                <Link
-                                    href='/shop'
-                                    className='mt-2 bg-[var(--dark-red)] px-6 py-2.5 text-sm font-medium uppercase tracking-widest text-white transition-colors hover:bg-[var(--dark-red-2)]'
-                                >
-                                    Shop Now
-                                </Link>
-                            </div>
-                        ) : (
-                            <div className='overflow-auto'>
-                                <table className='w-full'>
-                                    <thead>
-                                        <tr>
-                                            <th className='text-start p-2 text-sm border-b text-nowrap text-gray-500'>Sr.No.</th>
-                                            <th className='text-start p-2 text-sm border-b text-nowrap text-gray-500'>Order id</th>
-                                            <th className='text-start p-2 text-sm border-b text-nowrap text-gray-500'>Total Item</th>
-                                            <th className='text-start p-2 text-sm border-b text-nowrap text-gray-500'>Amount</th>
+
+                    {/* Table */}
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="border-b border-border/60 bg-[var(--brand-warm-bg)]/40">
+                                    <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                        #
+                                    </th>
+                                    <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground text-nowrap">
+                                        Order ID
+                                    </th>
+                                    <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground text-nowrap">
+                                        Items
+                                    </th>
+                                    <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                        Amount
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loading ? (
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <tr key={i} className="border-b border-border/60">
+                                            {Array.from({ length: 4 }).map((__, j) => (
+                                                <td key={j} className="px-5 py-3.5">
+                                                    <span className="inline-block h-3.5 w-24 animate-pulse rounded bg-border/60" />
+                                                </td>
+                                            ))}
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {orderData.data.map((order, i) => (
-                                            <tr key={order._id}>
-                                                <td className='text-start text-sm text-gray-500 p-2 font-bold'>{i + 1}</td>
-                                                <td className='text-start text-sm text-gray-500 p-2'>
-                                                    <Link className='underline hover:text-blue-500 underline-offset-2' href={WEBSITE_ORDER_DETAILS(order.order_id)}>
-                                                        {order.order_id}
-                                                    </Link>
-                                                </td>
-                                                <td className='text-start text-sm text-gray-500 p-2'>{order.products.length}</td>
-                                                <td className='text-start text-sm text-gray-500 p-2'>
-                                                    {order.totalAmount.toLocaleString('en-In', { style: 'currency', currency: 'INR' })}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-
+                                    ))
+                                ) : orders.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={4} className="px-5 py-16 text-center">
+                                            <p className="font-neue text-[13px] font-semibold text-[var(--brand-primary)]">
+                                                No orders yet
+                                            </p>
+                                            <p className="mt-1.5 font-neue text-[11px] text-muted-foreground max-w-xs mx-auto">
+                                                You haven&apos;t placed any orders. Explore our collections and find something you love.
+                                            </p>
+                                            <Button asChild variant="brand" className="mt-5 h-9 px-6 text-[11px] font-semibold uppercase tracking-[0.24em]">
+                                                <Link href={WEBSITE_SHOP}>Shop Now</Link>
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    orders.map((order, i) => (
+                                        <tr key={order._id} className="border-b border-border/60 transition-colors hover:bg-[var(--brand-warm-bg)]/30 last:border-0">
+                                            <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-muted-foreground">
+                                                {i + 1}
+                                            </td>
+                                            <td className="px-5 py-3.5">
+                                                <Link
+                                                    href={WEBSITE_ORDER_DETAILS(order.order_id)}
+                                                    className="font-neue text-[13px] font-semibold text-[var(--dark-red)] underline underline-offset-2 transition hover:text-[var(--dark-red-2)]"
+                                                >
+                                                    {order.order_id}
+                                                </Link>
+                                            </td>
+                                            <td className="px-5 py-3.5 font-neue text-[13px] text-muted-foreground">
+                                                {order.products.length}
+                                            </td>
+                                            <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-foreground">
+                                                {order.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
                     </div>
+
                 </div>
             </UserPanelLayout>
         </div>

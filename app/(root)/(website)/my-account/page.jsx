@@ -2,81 +2,160 @@
 import UserPanelLayout from '@/components/Application/Website/UserPanelLayout'
 import WebsiteBreadcrumb from '@/components/Application/Website/WebsiteBreadcrumb'
 import useFetch from '@/hooks/useFetch';
-import { WEBSITE_ORDER_DETAILS } from '@/routes/WebsiteRoute';
+import { WEBSITE_ORDER_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute';
 import Link from 'next/link';
-import { ShoppingBag, ShoppingCart } from 'lucide-react'
+import { ShoppingBag, ShoppingCart, Package, ArrowRight } from 'lucide-react'
 import { useSelector } from 'react-redux';
+import { Button } from '@/components/ui/button'
 
 const breadCrumbData = {
     title: 'Dashboard',
     links: [{ label: 'Dashboard' }]
 }
+
+const StatCard = ({ icon: Icon, label, value, loading }) => (
+    <div className="group flex items-center justify-between gap-4 rounded-[var(--radius)] border border-border/60 bg-background p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-card-hover)]">
+        <div>
+            <p className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                {label}
+            </p>
+            <p className="mt-2 font-neue text-3xl font-semibold text-[var(--brand-primary)]">
+                {loading ? (
+                    <span className="inline-block h-8 w-12 animate-pulse rounded bg-border/60" />
+                ) : (
+                    value ?? 0
+                )}
+            </p>
+        </div>
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[var(--dark-red)] shadow-[var(--shadow-brand)]">
+            <Icon className="size-5 text-white" />
+        </div>
+    </div>
+)
+
 const MyAccount = () => {
-    const { data: dashboardData } = useFetch('/api/dashboard/user')
+    const { data: dashboardData, loading } = useFetch('/api/dashboard/user')
     const cartStore = useSelector(store => store.cartStore)
+    const recentOrders = dashboardData?.data?.recentOrders ?? []
 
     return (
         <div>
             <WebsiteBreadcrumb props={breadCrumbData} />
             <UserPanelLayout>
-                <div className='shadow rounded'>
-                    <div className='p-5 text-xl font-semibold border'>
-                        Dashboard
+                <div className="space-y-8">
+
+                    {/* Page heading */}
+                    <div>
+                        <h2 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
+                            Overview
+                        </h2>
+                        <p className="mt-1 font-neue text-[13px] text-muted-foreground">
+                            A quick look at your account activity.
+                        </p>
                     </div>
-                    <div className='p-5'>
-                        <div className='grid lg:grid-cols-2 grid-cols-1 gap-10'>
-                            <div className='flex items-center justify-between gap-5 border rounded p-3'>
-                                <div>
-                                    <h4 className='font-semibold text-lg mb-1'>Total Orders</h4>
-                                    <span className='font-semibold text-gray-500'>{dashboardData?.data?.totalOrder || 0}</span>
-                                </div>
-                                <div className='w-16 h-16 bg-primary rounded-full flex justify-center items-center'>
-                                    <ShoppingBag className='text-white size-6' />
-                                </div>
+
+                    {/* Stat cards */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <StatCard
+                            icon={ShoppingBag}
+                            label="Total Orders"
+                            value={dashboardData?.data?.totalOrder}
+                            loading={loading}
+                        />
+                        <StatCard
+                            icon={ShoppingCart}
+                            label="Items in Cart"
+                            value={cartStore?.count}
+                            loading={false}
+                        />
+                    </div>
+
+                    {/* Recent Orders */}
+                    <div className="rounded-[var(--radius)] border border-border/60 bg-background">
+                        {/* Section header */}
+                        <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
+                            <div className="flex items-center gap-2">
+                                <Package className="size-3.5 text-[var(--brand-primary)]" />
+                                <h3 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
+                                    Recent Orders
+                                </h3>
                             </div>
-                            <div className='flex items-center justify-between gap-5 border rounded p-3'>
-                                <div>
-                                    <h4 className='font-semibold text-lg mb-1'>Items In Cart</h4>
-                                    <span className='font-semibold text-gray-500'>{cartStore?.count}</span>
-                                </div>
-                                <div className='w-16 h-16 bg-primary rounded-full flex justify-center items-center'>
-                                    <ShoppingCart className='text-white size-6' />
-                                </div>
-                            </div>
+                            <Button asChild variant="link" className="h-auto p-0 font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground hover:text-[var(--brand-primary)]">
+                                <Link href="/orders" className="flex items-center gap-1">
+                                    View all <ArrowRight className="size-3" />
+                                </Link>
+                            </Button>
                         </div>
 
-                        <div className='mt-5'>
-                            <h4 className='text-lg font-semibold mb-3'>Recent Orders</h4>
-                            <div className='overflow-auto'>
-                                <table className='w-full'>
-                                    <thead>
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b border-border/60 bg-[var(--brand-warm-bg)]/40">
+                                        <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                            #
+                                        </th>
+                                        <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground text-nowrap">
+                                            Order ID
+                                        </th>
+                                        <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground text-nowrap">
+                                            Items
+                                        </th>
+                                        <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                            Amount
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loading ? (
+                                        Array.from({ length: 3 }).map((_, i) => (
+                                            <tr key={i} className="border-b border-border/60">
+                                                {Array.from({ length: 4 }).map((__, j) => (
+                                                    <td key={j} className="px-5 py-3.5">
+                                                        <span className="inline-block h-3.5 w-20 animate-pulse rounded bg-border/60" />
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))
+                                    ) : recentOrders.length === 0 ? (
                                         <tr>
-                                            <th className='text-start p-2 text-sm border-b text-nowrap text-gray-500'>Sr.No.</th>
-                                            <th className='text-start p-2 text-sm border-b text-nowrap text-gray-500'>Order id</th>
-                                            <th className='text-start p-2 text-sm border-b text-nowrap text-gray-500'>Total Item</th>
-                                            <th className='text-start p-2 text-sm border-b text-nowrap text-gray-500'>Amount</th>
+                                            <td colSpan={4} className="px-5 py-12 text-center">
+                                                <p className="font-neue text-[13px] font-semibold text-[var(--brand-primary)]">No orders yet</p>
+                                                <p className="mt-1 font-neue text-[11px] text-muted-foreground">
+                                                    Start shopping and your orders will appear here.
+                                                </p>
+                                                <Button asChild variant="brand" className="mt-4 h-9 px-6 text-[11px] font-semibold uppercase tracking-[0.24em]">
+                                                    <Link href={WEBSITE_SHOP}>Shop Now</Link>
+                                                </Button>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {dashboardData && dashboardData?.data?.recentOrders?.map((order, i) => (
-                                            <tr key={order._id}>
-                                                <td className='text-start text-sm text-gray-500 p-2 font-bold'>{i + 1}</td>
-                                                <td className='text-start text-sm text-gray-500 p-2'><Link className='underline hover:text-blue-500 underline-offset-2' href={WEBSITE_ORDER_DETAILS(order.order_id)}>{order.order_id}</Link></td>
-                                                <td className='text-start text-sm text-gray-500 p-2 '>
+                                    ) : (
+                                        recentOrders.map((order, i) => (
+                                            <tr key={order._id} className="border-b border-border/60 transition-colors hover:bg-[var(--brand-warm-bg)]/30 last:border-0">
+                                                <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-muted-foreground">
+                                                    {i + 1}
+                                                </td>
+                                                <td className="px-5 py-3.5">
+                                                    <Link
+                                                        href={WEBSITE_ORDER_DETAILS(order.order_id)}
+                                                        className="font-neue text-[13px] font-semibold text-[var(--dark-red)] underline underline-offset-2 transition hover:text-[var(--dark-red-2)]"
+                                                    >
+                                                        {order.order_id}
+                                                    </Link>
+                                                </td>
+                                                <td className="px-5 py-3.5 font-neue text-[13px] text-muted-foreground">
                                                     {order.products.length}
                                                 </td>
-                                                <td className='text-start text-sm text-gray-500 p-2 '>
-                                                    {order.totalAmount.toLocaleString('en-In', { style: 'currency', currency: 'INR' })}
+                                                <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-foreground">
+                                                    {order.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                                 </td>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-
-                            </div>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-
                     </div>
+
                 </div>
             </UserPanelLayout>
         </div>
@@ -84,3 +163,4 @@ const MyAccount = () => {
 }
 
 export default MyAccount
+

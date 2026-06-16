@@ -2,14 +2,18 @@ import UserPanelNavigation from './UserPanelNavigation'
 
 const UserPanelLayout = ({ children }) => {
     return (
-        <div className='flex lg:flex-nowrap flex-wrap gap-10 lg:px-32 px-5 my-20'>
-            <div className='lg:w-64 w-full lg:mb-0 mb-5'>
-                <UserPanelNavigation />
+        <section className="website-gutter bg-background py-10 lg:py-14">
+            <div className="grid w-full gap-6 lg:grid-cols-[260px_1fr] lg:gap-8">
+                <aside className="w-full">
+                    <div className="sticky top-6">
+                        <UserPanelNavigation />
+                    </div>
+                </aside>
+                <div className="w-full min-w-0">
+                    {children}
+                </div>
             </div>
-            <div className='lg:w-[calc(100%-16rem)] w-full'>
-                {children}
-            </div>
-        </div>
+        </section>
     )
 }
 

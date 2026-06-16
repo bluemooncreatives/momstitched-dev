@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form'
 import Dropzone from 'react-dropzone'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import userIcon from '@/public/assets/images/user.png'
-import { Camera } from 'lucide-react'
+import { Camera, User } from 'lucide-react'
 import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
@@ -23,6 +23,7 @@ const breadCrumbData = {
     title: 'Profile',
     links: [{ label: 'Profile' }]
 }
+
 const Profile = () => {
     const dispatch = useDispatch()
     const { data: user } = useFetch('/api/profile/get')
@@ -100,13 +101,20 @@ const Profile = () => {
         <div>
             <WebsiteBreadcrumb props={breadCrumbData} />
             <UserPanelLayout>
-                <div className='shadow rounded'>
-                    <div className='p-5 text-xl font-semibold border-b'>
-                        Profile
+                <div className="rounded-[var(--radius)] border border-border/60 bg-background">
+
+                    {/* Section header */}
+                    <div className="flex items-center gap-2 border-b border-border/60 px-5 py-4">
+                        <User className="size-3.5 text-[var(--brand-primary)]" />
+                        <h2 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
+                            My Profile
+                        </h2>
                     </div>
-                    <div className='p-5'>
+
+                    <div className="p-5 sm:p-6">
                         <Form {...form}>
-                            <form className='grid md:grid-cols-2 grid-cols-1 gap-5' onSubmit={form.handleSubmit(updateProfile)} >
+                            <form className='grid md:grid-cols-2 grid-cols-1 gap-5' onSubmit={form.handleSubmit(updateProfile)}>
+                                {/* Avatar */}
                                 <div className='md:col-span-2 col-span-1 flex justify-center items-center'>
                                     <div className="flex flex-col items-center gap-2">
                                         <Dropzone
@@ -117,28 +125,27 @@ const Profile = () => {
                                             {({ getRootProps, getInputProps }) => (
                                                 <div {...getRootProps()}>
                                                     <input {...getInputProps()} />
-                                                    <Avatar className="w-28 h-28 relative group border border-gray-100">
+                                                    <Avatar className="w-28 h-28 relative group border-2 border-border/60 transition-all duration-200 hover:border-[var(--dark-red)]">
                                                         <AvatarImage src={preview ? preview : userIcon.src} />
-                                                        <div className='absolute z-50 w-full h-full top-1/2
-                                                         left-1/2 -translate-x-1/2 -translate-y-1/2
-                                                          justify-center items-center border-2 border-violet-500 rounded-full group-hover:flex hidden cursor-pointer bg-black/20'>
-                                                            <Camera className='size-4 text-violet-500' />
+                                                        <div className='absolute z-50 w-full h-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 justify-center items-center border-2 border-[var(--dark-red)] rounded-full group-hover:flex hidden cursor-pointer bg-black/20'>
+                                                            <Camera className='size-4 text-white' />
                                                         </div>
                                                     </Avatar>
                                                 </div>
-
                                             )}
                                         </Dropzone>
-                                        <p className="text-xs text-muted-foreground">Max image size: 5 MB.</p>
+                                        <p className="font-neue text-[11px] text-muted-foreground">Max image size: 5 MB.</p>
                                     </div>
                                 </div>
+
+                                {/* Name */}
                                 <div className='mb-3'>
                                     <FormField
                                         control={form.control}
                                         name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Name</FormLabel>
+                                                <FormLabel className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Name</FormLabel>
                                                 <FormControl>
                                                     <Input type="text" placeholder="Enter your name" {...field} />
                                                 </FormControl>
@@ -147,13 +154,15 @@ const Profile = () => {
                                         )}
                                     />
                                 </div>
+
+                                {/* Phone */}
                                 <div className='mb-3'>
                                     <FormField
                                         control={form.control}
                                         name="phone"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Phone</FormLabel>
+                                                <FormLabel className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Phone</FormLabel>
                                                 <FormControl>
                                                     <Input type="number" placeholder="Enter your phone number" {...field} />
                                                 </FormControl>
@@ -162,13 +171,15 @@ const Profile = () => {
                                         )}
                                     />
                                 </div>
+
+                                {/* Address */}
                                 <div className='mb-3 md:col-span-2 col-span-1'>
                                     <FormField
                                         control={form.control}
                                         name="address"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Address</FormLabel>
+                                                <FormLabel className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Address</FormLabel>
                                                 <FormControl>
                                                     <Textarea placeholder="Enter your address" {...field} />
                                                 </FormControl>
@@ -178,14 +189,20 @@ const Profile = () => {
                                     />
                                 </div>
 
+                                {/* Submit */}
                                 <div className='mb-3 md:col-span-2 col-span-1'>
-                                    <ButtonLoading loading={loading} type="submit" text="Save Changes" className="cursor-pointer" />
+                                    <ButtonLoading
+                                        loading={loading}
+                                        type="submit"
+                                        text="Save Changes"
+                                        variant="brand"
+                                        className="h-9 px-8 text-[11px] font-semibold uppercase tracking-[0.24em] cursor-pointer"
+                                    />
                                 </div>
-
                             </form>
                         </Form>
-
                     </div>
+
                 </div>
             </UserPanelLayout>
         </div>
@@ -193,3 +210,4 @@ const Profile = () => {
 }
 
 export default Profile
+
