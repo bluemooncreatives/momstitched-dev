@@ -106,7 +106,7 @@ const Profile = () => {
                     {/* Section header */}
                     <div className="flex items-center gap-2 border-b border-[var(--dark-red)]/20 px-5 py-4">
                         <User className="size-3.5 text-[var(--brand-primary)]" />
-                        <h2 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
+                        <h2 className="text-base font-semibold text-[var(--brand-primary)]">
                             My Profile
                         </h2>
                     </div>
@@ -134,7 +134,7 @@ const Profile = () => {
                                                 </div>
                                             )}
                                         </Dropzone>
-                                        <p className="font-neue text-[11px] text-muted-foreground">Max image size: 5 MB.</p>
+                                        <p className="text-[13px] text-foreground/60">Max image size: 5 MB.</p>
                                     </div>
                                 </div>
 
@@ -145,7 +145,7 @@ const Profile = () => {
                                         name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Name</FormLabel>
+                                                <FormLabel className="text-[13px] text-foreground/60">Name</FormLabel>
                                                 <FormControl>
                                                     <Input type="text" placeholder="Enter your name" {...field} />
                                                 </FormControl>
@@ -162,7 +162,7 @@ const Profile = () => {
                                         name="phone"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Phone</FormLabel>
+                                                <FormLabel className="text-[13px] text-foreground/60">Phone</FormLabel>
                                                 <FormControl>
                                                     <Input type="number" placeholder="Enter your phone number" {...field} />
                                                 </FormControl>
@@ -179,7 +179,7 @@ const Profile = () => {
                                         name="address"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Address</FormLabel>
+                                                <FormLabel className="text-[13px] text-foreground/60">Address</FormLabel>
                                                 <FormControl>
                                                     <Textarea placeholder="Enter your address" {...field} />
                                                 </FormControl>
@@ -196,7 +196,7 @@ const Profile = () => {
                                         type="submit"
                                         text="Save Changes"
                                         variant="brand"
-                                        className="h-9 px-8 text-[11px] font-semibold uppercase tracking-[0.24em] cursor-pointer"
+                                        className="h-9 px-8 text-[13px] font-semibold cursor-pointer"
                                     />
                                 </div>
                             </form>

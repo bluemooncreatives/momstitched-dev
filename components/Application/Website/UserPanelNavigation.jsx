@@ -92,7 +92,7 @@ const UserPanelNavigation = () => {
             </nav>
 
             {/* Logout */}
-            <div className="border-t border-[var(--dark-red)]/40 p-2">
+            <div className="border-t border-[var(--dark-red)]/20 p-2">
                 <button
                     type="button"
                     onClick={handleLogout}

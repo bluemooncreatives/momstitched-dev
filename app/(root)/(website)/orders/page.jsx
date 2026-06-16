@@ -25,7 +25,7 @@ const Orders = () => {
                     {/* Section header */}
                     <div className="flex items-center gap-2 border-b border-[var(--dark-red)]/20 px-5 py-4">
                         <Package className="size-3.5 text-[var(--brand-primary)]" />
-                        <h2 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
+                        <h2 className="text-base font-semibold text-[var(--brand-primary)]">
                             My Orders
                         </h2>
                     </div>
@@ -63,13 +63,13 @@ const Orders = () => {
                                 ) : orders.length === 0 ? (
                                     <tr>
                                         <td colSpan={4} className="px-5 py-16 text-center">
-                                            <p className="font-neue text-[13px] font-semibold text-[var(--brand-primary)]">
+                                            <p className="text-base font-semibold text-[var(--brand-primary)]">
                                                 No orders yet
                                             </p>
-                                            <p className="mt-1.5 font-neue text-[11px] text-muted-foreground max-w-xs mx-auto">
+                                            <p className="mt-1.5 text-[13px] text-foreground/60 max-w-xs mx-auto">
                                                 You haven&apos;t placed any orders. Explore our collections and find something you love.
                                             </p>
-                                            <Button asChild variant="brand" className="mt-5 h-9 px-6 text-[11px] font-semibold uppercase tracking-[0.24em]">
+                                            <Button asChild variant="brand" className="mt-5 h-9 px-6 text-[13px] font-semibold">
                                                 <Link href={WEBSITE_SHOP}>Shop Now</Link>
                                             </Button>
                                         </td>
