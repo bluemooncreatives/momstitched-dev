@@ -10,6 +10,7 @@ import { signOut } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { LayoutDashboard, User, ShoppingBag, LogOut } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const navLinks = [
     { label: 'Dashboard', href: USER_DASHBOARD, icon: LayoutDashboard },
@@ -20,7 +21,7 @@ const navLinks = [
 const UserPanelNavigation = () => {
     const pathname = usePathname()
     const dispatch = useDispatch()
-    const user = useSelector((store) => store.authStore?.user)
+    const user = useSelector((store) => store.authStore?.auth)
 
     const handleLogout = async () => {
         try {
@@ -52,9 +53,12 @@ const UserPanelNavigation = () => {
             {/* User greeting */}
             <div className="border-b border-[var(--dark-red)]/20 px-5 py-4">
                 <div className="flex items-center gap-3">
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--dark-red)] font-neue text-[11px] font-semibold uppercase tracking-[0.04em] text-white">
-                        {user?.name ? user.name.charAt(0) : 'U'}
-                    </div>
+                    <Avatar className="size-9 border border-[var(--dark-red)]/10">
+                        <AvatarImage src={user?.avatar?.url} alt={user?.name || 'User'} className="object-cover" />
+                        <AvatarFallback className="bg-[var(--dark-red)] font-neue text-[11px] font-semibold uppercase tracking-[0.04em] text-white">
+                            {user?.name ? user.name.charAt(0) : 'U'}
+                        </AvatarFallback>
+                    </Avatar>
                     <div className="min-w-0">
                         <p className="text-[13px] text-foreground/60">
                             Welcome back
