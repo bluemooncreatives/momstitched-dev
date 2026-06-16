@@ -24,8 +24,8 @@ const Orders = () => {
 
                     {/* Section header */}
                     <div className="flex items-center gap-2 border-b border-[var(--dark-red)]/20 px-5 py-4">
-                        <Package className="size-3.5 text-[var(--brand-primary)]" />
-                        <h2 className="text-base font-semibold text-[var(--brand-primary)]">
+                        <Package className="size-4 text-[var(--brand-primary)]" />
+                        <h2 className="text-lg font-semibold text-[var(--brand-primary)]">
                             My Orders
                         </h2>
                     </div>
@@ -35,16 +35,16 @@ const Orders = () => {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b border-[var(--dark-red)]/20 bg-[var(--brand-warm-bg)]/40">
-                                    <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                    <th className="px-5 py-3 text-left font-neue text-sm font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                                         #
                                     </th>
-                                    <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground text-nowrap">
+                                    <th className="px-5 py-3 text-left font-neue text-sm font-semibold uppercase tracking-[0.05em] text-muted-foreground text-nowrap">
                                         Order ID
                                     </th>
-                                    <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground text-nowrap">
+                                    <th className="px-5 py-3 text-left font-neue text-sm font-semibold uppercase tracking-[0.05em] text-muted-foreground text-nowrap">
                                         Items
                                     </th>
-                                    <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                    <th className="px-5 py-3 text-left font-neue text-sm font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                                         Amount
                                     </th>
                                 </tr>
@@ -63,13 +63,13 @@ const Orders = () => {
                                 ) : orders.length === 0 ? (
                                     <tr>
                                         <td colSpan={4} className="px-5 py-16 text-center">
-                                            <p className="text-base font-semibold text-[var(--brand-primary)]">
+                                            <p className="text-lg font-semibold text-[var(--brand-primary)]">
                                                 No orders yet
                                             </p>
-                                            <p className="mt-1.5 text-[13px] text-foreground/60 max-w-xs mx-auto">
+                                            <p className="mt-2 text-sm text-foreground/60 max-w-xs mx-auto">
                                                 You haven&apos;t placed any orders. Explore our collections and find something you love.
                                             </p>
-                                            <Button asChild variant="brand" className="mt-5 h-9 px-6 text-[13px] font-semibold">
+                                            <Button asChild variant="brand" className="mt-6 h-11 px-8 text-base font-semibold">
                                                 <Link href={WEBSITE_SHOP}>Shop Now</Link>
                                             </Button>
                                         </td>
@@ -77,21 +77,21 @@ const Orders = () => {
                                 ) : (
                                     orders.map((order, i) => (
                                         <tr key={order._id} className="border-b border-[var(--dark-red)]/20 transition-colors hover:bg-[var(--brand-warm-bg)]/30 last:border-0">
-                                            <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-muted-foreground">
+                                            <td className="px-5 py-3.5 font-neue text-sm font-medium text-muted-foreground">
                                                 {i + 1}
                                             </td>
                                             <td className="px-5 py-3.5">
                                                 <Link
                                                     href={WEBSITE_ORDER_DETAILS(order.order_id)}
-                                                    className="font-neue text-[13px] font-semibold text-[var(--dark-red)] underline underline-offset-2 transition hover:text-[var(--dark-red-2)]"
+                                                    className="font-neue text-sm font-medium text-[var(--dark-red)] underline underline-offset-2 transition hover:text-[var(--dark-red-2)]"
                                                 >
                                                     {order.order_id}
                                                 </Link>
                                             </td>
-                                            <td className="px-5 py-3.5 font-neue text-[13px] text-muted-foreground">
+                                            <td className="px-5 py-3.5 font-neue text-sm text-muted-foreground">
                                                 {order.products.length}
                                             </td>
-                                            <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-foreground">
+                                            <td className="px-5 py-3.5 font-neue text-sm font-semibold text-foreground">
                                                 {order.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                             </td>
                                         </tr>

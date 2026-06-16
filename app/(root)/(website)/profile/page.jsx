@@ -105,8 +105,8 @@ const Profile = () => {
 
                     {/* Section header */}
                     <div className="flex items-center gap-2 border-b border-[var(--dark-red)]/20 px-5 py-4">
-                        <User className="size-3.5 text-[var(--brand-primary)]" />
-                        <h2 className="text-base font-semibold text-[var(--brand-primary)]">
+                        <User className="size-4 text-[var(--brand-primary)]" />
+                        <h2 className="text-lg font-semibold text-[var(--brand-primary)]">
                             My Profile
                         </h2>
                     </div>
@@ -134,7 +134,7 @@ const Profile = () => {
                                                 </div>
                                             )}
                                         </Dropzone>
-                                        <p className="text-[13px] text-foreground/60">Max image size: 5 MB.</p>
+                                        <p className="text-sm text-foreground/60">Max image size: 5 MB.</p>
                                     </div>
                                 </div>
 
@@ -145,9 +145,9 @@ const Profile = () => {
                                         name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[13px] text-foreground/60">Name</FormLabel>
+                                                <FormLabel className="text-sm font-semibold text-foreground/60">Name</FormLabel>
                                                 <FormControl>
-                                                    <Input type="text" placeholder="Enter your name" {...field} />
+                                                    <Input type="text" placeholder="Enter your name" className="h-11 text-base" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -162,9 +162,9 @@ const Profile = () => {
                                         name="phone"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[13px] text-foreground/60">Phone</FormLabel>
+                                                <FormLabel className="text-sm font-semibold text-foreground/60">Phone</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="Enter your phone number" {...field} />
+                                                    <Input type="number" placeholder="Enter your phone number" className="h-11 text-base" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -179,9 +179,9 @@ const Profile = () => {
                                         name="address"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[13px] text-foreground/60">Address</FormLabel>
+                                                <FormLabel className="text-sm font-semibold text-foreground/60">Address</FormLabel>
                                                 <FormControl>
-                                                    <Textarea placeholder="Enter your address" {...field} />
+                                                    <Textarea placeholder="Enter your address" className="min-h-[120px] text-base resize-y" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -196,7 +196,7 @@ const Profile = () => {
                                         type="submit"
                                         text="Save Changes"
                                         variant="brand"
-                                        className="h-9 px-8 text-[13px] font-semibold cursor-pointer"
+                                        className="h-11 px-8 text-base font-semibold cursor-pointer"
                                     />
                                 </div>
                             </form>
