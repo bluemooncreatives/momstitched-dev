@@ -14,12 +14,12 @@ const breadCrumbData = {
 }
 
 const StatCard = ({ icon: Icon, label, value, loading }) => (
-    <div className="group flex items-center justify-between gap-4 rounded-[var(--radius)] border border-border/60 bg-background p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-card-hover)]">
+    <div className="group flex items-center justify-between gap-4 rounded-[var(--radius)] border border-[var(--dark-red)]/20 bg-background p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)]">
         <div>
-            <p className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+            <p className="text-[13px] text-foreground/60">
                 {label}
             </p>
-            <p className="mt-2 font-neue text-3xl font-semibold text-[var(--brand-primary)]">
+            <p className="mt-2 text-3xl font-semibold text-[var(--brand-primary)]">
                 {loading ? (
                     <span className="inline-block h-8 w-12 animate-pulse rounded bg-border/60" />
                 ) : (
@@ -46,10 +46,10 @@ const MyAccount = () => {
 
                     {/* Page heading */}
                     <div>
-                        <h2 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
+                        <h2 className="text-base font-semibold text-[var(--brand-primary)]">
                             Overview
                         </h2>
-                        <p className="mt-1 font-neue text-[13px] text-muted-foreground">
+                        <p className="mt-1 text-[13px] text-foreground/60">
                             A quick look at your account activity.
                         </p>
                     </div>
@@ -71,16 +71,16 @@ const MyAccount = () => {
                     </div>
 
                     {/* Recent Orders */}
-                    <div className="rounded-[var(--radius)] border border-border/60 bg-background">
+                    <div className="rounded-[var(--radius)] border border-[var(--dark-red)]/20 bg-background">
                         {/* Section header */}
-                        <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
+                        <div className="flex items-center justify-between border-b border-[var(--dark-red)]/20 px-5 py-4">
                             <div className="flex items-center gap-2">
                                 <Package className="size-3.5 text-[var(--brand-primary)]" />
-                                <h3 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
+                                <h3 className="text-base font-semibold text-[var(--brand-primary)]">
                                     Recent Orders
                                 </h3>
                             </div>
-                            <Button asChild variant="link" className="h-auto p-0 font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground hover:text-[var(--brand-primary)]">
+                            <Button asChild variant="link" className="h-auto p-0 text-[13px] text-foreground/60 hover:text-[var(--brand-primary)] hover:no-underline">
                                 <Link href="/orders" className="flex items-center gap-1">
                                     View all <ArrowRight className="size-3" />
                                 </Link>
@@ -90,17 +90,17 @@ const MyAccount = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="border-b border-border/60 bg-[var(--brand-warm-bg)]/40">
-                                        <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                    <tr className="border-b border-[var(--dark-red)]/20 bg-[var(--brand-warm-bg)]/40">
+                                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-foreground/60">
                                             #
                                         </th>
-                                        <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground text-nowrap">
+                                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-foreground/60 text-nowrap">
                                             Order ID
                                         </th>
-                                        <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground text-nowrap">
+                                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-foreground/60 text-nowrap">
                                             Items
                                         </th>
-                                        <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-foreground/60">
                                             Amount
                                         </th>
                                     </tr>
@@ -108,7 +108,7 @@ const MyAccount = () => {
                                 <tbody>
                                     {loading ? (
                                         Array.from({ length: 3 }).map((_, i) => (
-                                            <tr key={i} className="border-b border-border/60">
+                                            <tr key={i} className="border-b border-[var(--dark-red)]/20">
                                                 {Array.from({ length: 4 }).map((__, j) => (
                                                     <td key={j} className="px-5 py-3.5">
                                                         <span className="inline-block h-3.5 w-20 animate-pulse rounded bg-border/60" />
@@ -119,11 +119,11 @@ const MyAccount = () => {
                                     ) : recentOrders.length === 0 ? (
                                         <tr>
                                             <td colSpan={4} className="px-5 py-12 text-center">
-                                                <p className="font-neue text-[13px] font-semibold text-[var(--brand-primary)]">No orders yet</p>
-                                                <p className="mt-1 font-neue text-[11px] text-muted-foreground">
+                                                <p className="text-base font-semibold text-[var(--brand-primary)]">No orders yet</p>
+                                                <p className="mt-1 text-[13px] text-foreground/60">
                                                     Start shopping and your orders will appear here.
                                                 </p>
-                                                <Button asChild variant="brand" className="mt-4 h-9 px-6 text-[11px] font-semibold uppercase tracking-[0.24em]">
+                                                <Button asChild variant="brand" className="mt-4 h-9 px-6 text-[13px] font-semibold">
                                                     <Link href={WEBSITE_SHOP}>Shop Now</Link>
                                                 </Button>
                                             </td>
@@ -131,21 +131,21 @@ const MyAccount = () => {
                                     ) : (
                                         recentOrders.map((order, i) => (
                                             <tr key={order._id} className="border-b border-border/60 transition-colors hover:bg-[var(--brand-warm-bg)]/30 last:border-0">
-                                                <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-muted-foreground">
+                                                <td className="px-5 py-3.5 text-[13px] text-foreground/60">
                                                     {i + 1}
                                                 </td>
                                                 <td className="px-5 py-3.5">
                                                     <Link
                                                         href={WEBSITE_ORDER_DETAILS(order.order_id)}
-                                                        className="font-neue text-[13px] font-semibold text-[var(--dark-red)] underline underline-offset-2 transition hover:text-[var(--dark-red-2)]"
+                                                        className="text-[13px] font-medium text-[var(--dark-red)] underline underline-offset-2 transition hover:text-[var(--dark-red-2)]"
                                                     >
                                                         {order.order_id}
                                                     </Link>
                                                 </td>
-                                                <td className="px-5 py-3.5 font-neue text-[13px] text-muted-foreground">
+                                                <td className="px-5 py-3.5 text-[13px] text-foreground/60">
                                                     {order.products.length}
                                                 </td>
-                                                <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-foreground">
+                                                <td className="px-5 py-3.5 text-[13px] font-semibold text-[var(--brand-primary)]">
                                                     {order.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                                 </td>
                                             </tr>

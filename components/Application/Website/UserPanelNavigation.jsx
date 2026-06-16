@@ -48,18 +48,18 @@ const UserPanelNavigation = () => {
     }
 
     return (
-        <div className="overflow-hidden rounded-[var(--radius)] border border-border/60 bg-background">
+        <div className="overflow-hidden rounded-[var(--radius)] border border-[var(--dark-red)]/20 bg-background font-neue">
             {/* User greeting */}
-            <div className="border-b border-border/60 px-5 py-4">
+            <div className="border-b border-[var(--dark-red)]/20 px-5 py-4">
                 <div className="flex items-center gap-3">
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--dark-red)] text-[11px] font-semibold uppercase text-white">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--dark-red)] font-neue text-[11px] font-semibold uppercase tracking-[0.04em] text-white">
                         {user?.name ? user.name.charAt(0) : 'U'}
                     </div>
                     <div className="min-w-0">
-                        <p className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                        <p className="text-[13px] text-foreground/60">
                             Welcome back
                         </p>
-                        <p className="truncate font-neue text-[13px] font-semibold text-[var(--brand-primary)]">
+                        <p className="truncate text-base font-semibold text-[var(--brand-primary)]">
                             {user?.name || 'User'}
                         </p>
                     </div>
@@ -67,22 +67,21 @@ const UserPanelNavigation = () => {
             </div>
 
             {/* Navigation links */}
-            <nav className="p-3">
-                <ul className="space-y-1">
+            <nav className="p-2">
+                <ul className="space-y-0.5">
                     {navLinks.map(({ label, href, icon: Icon }) => {
                         const isActive = pathname.startsWith(href)
                         return (
                             <li key={href}>
                                 <Link
                                     href={href}
-                                    className={`group flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 transition-all duration-200 ${
-                                        isActive
-                                            ? 'bg-[var(--dark-red)] text-white shadow-[var(--shadow-sm)]'
-                                            : 'text-foreground/60 hover:bg-[var(--brand-warm-bg)] hover:text-[var(--brand-primary)]'
-                                    }`}
+                                    className={`group flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 transition-all duration-200 ${isActive
+                                        ? 'bg-[var(--dark-red)] text-white'
+                                        : 'text-foreground/60 hover:bg-[var(--brand-warm-bg)] hover:text-[var(--brand-primary)]'
+                                        }`}
                                 >
-                                    <Icon className={`size-3.5 shrink-0 ${isActive ? 'text-white' : 'text-foreground/40 group-hover:text-[var(--brand-primary)]'}`} />
-                                    <span className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em]">
+                                    <Icon className={`size-3.5 shrink-0 ${isActive ? 'text-white/90' : 'text-foreground/40 group-hover:text-[var(--brand-primary)]'}`} />
+                                    <span className={`text-base font-semibold ${isActive ? 'text-white' : 'text-[var(--brand-primary)]'}`}>
                                         {label}
                                     </span>
                                 </Link>
@@ -93,14 +92,14 @@ const UserPanelNavigation = () => {
             </nav>
 
             {/* Logout */}
-            <div className="border-t border-border/60 p-3">
+            <div className="border-t border-[var(--dark-red)]/40 p-2">
                 <button
                     type="button"
                     onClick={handleLogout}
-                    className="group flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-left transition-all duration-200 hover:bg-red-50 hover:text-red-700"
+                    className="group flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-left transition-all duration-200 hover:bg-red-50"
                 >
-                    <LogOut className="size-3.5 shrink-0 text-foreground/40 group-hover:text-red-600" />
-                    <span className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/60 group-hover:text-red-700">
+                    <LogOut className="size-3.5 shrink-0 text-foreground/40 group-hover:text-red-500" />
+                    <span className="text-base font-semibold text-foreground/60 group-hover:text-red-600">
                         Logout
                     </span>
                 </button>
@@ -109,4 +108,4 @@ const UserPanelNavigation = () => {
     )
 }
 
-export default UserPanelNavigation
+export default UserPanelNavigation

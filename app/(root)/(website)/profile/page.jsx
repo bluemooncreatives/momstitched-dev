@@ -101,10 +101,10 @@ const Profile = () => {
         <div>
             <WebsiteBreadcrumb props={breadCrumbData} />
             <UserPanelLayout>
-                <div className="rounded-[var(--radius)] border border-border/60 bg-background">
+                <div className="rounded-[var(--radius)] border border-[var(--dark-red)]/20 bg-background">
 
                     {/* Section header */}
-                    <div className="flex items-center gap-2 border-b border-border/60 px-5 py-4">
+                    <div className="flex items-center gap-2 border-b border-[var(--dark-red)]/20 px-5 py-4">
                         <User className="size-3.5 text-[var(--brand-primary)]" />
                         <h2 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
                             My Profile
@@ -125,7 +125,7 @@ const Profile = () => {
                                             {({ getRootProps, getInputProps }) => (
                                                 <div {...getRootProps()}>
                                                     <input {...getInputProps()} />
-                                                    <Avatar className="w-28 h-28 relative group border-2 border-border/60 transition-all duration-200 hover:border-[var(--dark-red)]">
+                                                    <Avatar className="w-28 h-28 relative group border-2 border-[var(--dark-red)]/40 transition-all duration-200 hover:border-[var(--dark-red)]">
                                                         <AvatarImage src={preview ? preview : userIcon.src} />
                                                         <div className='absolute z-50 w-full h-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 justify-center items-center border-2 border-[var(--dark-red)] rounded-full group-hover:flex hidden cursor-pointer bg-black/20'>
                                                             <Camera className='size-4 text-white' />

@@ -20,10 +20,10 @@ const Orders = () => {
         <div>
             <WebsiteBreadcrumb props={breadCrumbData} />
             <UserPanelLayout>
-                <div className="rounded-[var(--radius)] border border-border/60 bg-background">
+                <div className="rounded-[var(--radius)] border border-[var(--dark-red)]/20 bg-background">
 
                     {/* Section header */}
-                    <div className="flex items-center gap-2 border-b border-border/60 px-5 py-4">
+                    <div className="flex items-center gap-2 border-b border-[var(--dark-red)]/20 px-5 py-4">
                         <Package className="size-3.5 text-[var(--brand-primary)]" />
                         <h2 className="font-neue text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--brand-primary)]">
                             My Orders
@@ -34,7 +34,7 @@ const Orders = () => {
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b border-border/60 bg-[var(--brand-warm-bg)]/40">
+                                <tr className="border-b border-[var(--dark-red)]/20 bg-[var(--brand-warm-bg)]/40">
                                     <th className="px-5 py-3 text-left font-neue text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                                         #
                                     </th>
@@ -52,7 +52,7 @@ const Orders = () => {
                             <tbody>
                                 {loading ? (
                                     Array.from({ length: 5 }).map((_, i) => (
-                                        <tr key={i} className="border-b border-border/60">
+                                        <tr key={i} className="border-b border-[var(--dark-red)]/20">
                                             {Array.from({ length: 4 }).map((__, j) => (
                                                 <td key={j} className="px-5 py-3.5">
                                                     <span className="inline-block h-3.5 w-24 animate-pulse rounded bg-border/60" />
@@ -76,7 +76,7 @@ const Orders = () => {
                                     </tr>
                                 ) : (
                                     orders.map((order, i) => (
-                                        <tr key={order._id} className="border-b border-border/60 transition-colors hover:bg-[var(--brand-warm-bg)]/30 last:border-0">
+                                        <tr key={order._id} className="border-b border-[var(--dark-red)]/20 transition-colors hover:bg-[var(--brand-warm-bg)]/30 last:border-0">
                                             <td className="px-5 py-3.5 font-neue text-[13px] font-semibold text-muted-foreground">
                                                 {i + 1}
                                             </td>
