@@ -198,14 +198,12 @@ const OrderDetails = ({ params }) => {
                                                     <td className="font-medium py-2">Subtotal</td>
                                                     <td className="text-end py-2">{orderData?.subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                                                 </tr>
-                                                <tr>
-                                                    <td className="font-medium py-2">Discount</td>
-                                                    <td className="text-end py-2">{orderData?.discount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="font-medium py-2">Coupon Discount</td>
-                                                    <td className="text-end py-2">{orderData?.couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
-                                                </tr>
+                                                {orderData?.couponDiscountAmount > 0 && (
+                                                    <tr>
+                                                        <td className="font-medium py-2">Coupon Discount</td>
+                                                        <td className="text-end py-2">- {orderData?.couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+                                                    </tr>
+                                                )}
                                                 <tr>
                                                     <td className="font-medium py-2">Total</td>
                                                     <td className="text-end py-2">{orderData?.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>

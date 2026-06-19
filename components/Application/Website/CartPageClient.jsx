@@ -17,17 +17,13 @@ const CartPageClient = () => {
     const cart = useSelector((store) => store.cartStore)
 
     const [subtotal, setSubTotal] = useState(0)
-    const [discount, setDiscount] = useState(0)
 
     useEffect(() => {
         const cartProducts = cart.products
 
         const totalAmount = cartProducts.reduce((sum, product) => sum + (product.sellingPrice * product.qty), 0)
 
-        const discountAmount = cartProducts.reduce((sum, product) => sum + ((product.mrp - product.sellingPrice) * product.qty), 0)
-
         setSubTotal(totalAmount)
-        setDiscount(discountAmount)
     }, [cart])
 
     const isEmpty = cart.count === 0
@@ -88,18 +84,15 @@ const CartPageClient = () => {
                                                     {subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground">Discount</span>
-                                                <span className="font-medium text-emerald-600">
-                                                    -{discount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                                </span>
-                                            </div>
                                             <div className="flex items-center justify-between text-base font-semibold">
                                                 <span>Total</span>
                                                 <span>
                                                     {subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                                 </span>
                                             </div>
+                                            <p className="text-xs text-muted-foreground">
+                                                Coupon discounts can be applied at checkout.
+                                            </p>
                                         </CardContent>
                                         <CardFooter className="flex flex-col gap-3">
                                             <Button type="button" asChild variant="brand" className="h-11 w-full text-[11px] font-semibold uppercase tracking-[0.2em]">

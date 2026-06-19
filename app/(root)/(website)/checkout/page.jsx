@@ -42,7 +42,7 @@ const Checkout = () => {
 
     const [isCouponApplied, setIsCouponApplied] = useState(false)
     const [subtotal, setSubTotal] = useState(0)
-    const [discount, setDiscount] = useState(0)
+    const [couponDiscountPercentage, setCouponDiscountPercentage] = useState(0)
     const [couponDiscountAmount, setCouponDiscountAmount] = useState(0)
     const [totalAmount, setTotalAmount] = useState(0)
     const [couponLoading, setCouponLoading] = useState(false)
@@ -71,15 +71,17 @@ const Checkout = () => {
 
         const subTotalAmount = cartProducts.reduce((sum, product) => sum + (product.sellingPrice * product.qty), 0)
 
-        const discount = cartProducts.reduce((sum, product) => sum + ((product.mrp - product.sellingPrice) * product.qty), 0)
+        // Coupon is the only discount. Always derive it from the live subtotal so it
+        // stays correct if the cart changes after a coupon has been applied.
+        const newCouponDiscount = Math.round((subTotalAmount * couponDiscountPercentage) / 100)
 
         setSubTotal(subTotalAmount)
-        setDiscount(discount)
-        setTotalAmount(subTotalAmount)
+        setCouponDiscountAmount(newCouponDiscount)
+        setTotalAmount(subTotalAmount - newCouponDiscount)
 
         couponForm.setValue('minShoppingAmount', subTotalAmount)
 
-    }, [cart])
+    }, [cart, couponDiscountPercentage])
 
     useEffect(() => {
         if (paymentMethod === 'cod') {
@@ -117,9 +119,8 @@ const Checkout = () => {
             }
 
             const discountPercentage = response.data.discountPercentage
-            // get coupon discount amount 
-            setCouponDiscountAmount((subtotal * discountPercentage) / 100)
-            setTotalAmount(subtotal - ((subtotal * discountPercentage) / 100))
+            // Store the percentage; the cart effect derives the discount amount + total.
+            setCouponDiscountPercentage(discountPercentage)
             showToast('success', response.message)
             setCouponCode(couponForm.getValues('code'))
             setIsCouponApplied(true)
@@ -135,8 +136,7 @@ const Checkout = () => {
     const removeCoupon = () => {
         setIsCouponApplied(false)
         setCouponCode('')
-        setCouponDiscountAmount(0)
-        setTotalAmount(subtotal)
+        setCouponDiscountPercentage(0)
     }
 
 
@@ -224,7 +224,6 @@ const Checkout = () => {
                     ...formData,
                     products,
                     subtotal,
-                    discount,
                     couponDiscountAmount,
                     totalAmount,
                     paymentMethod: 'cod',
@@ -270,7 +269,6 @@ const Checkout = () => {
                         ...response,
                         products,
                         subtotal,
-                        discount,
                         couponDiscountAmount,
                         totalAmount,
                         paymentMethod: 'full',
@@ -600,18 +598,14 @@ const Checkout = () => {
                                                 {subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td className='font-medium py-2'>Discount</td>
-                                            <td className='text-end py-2'>
-                                                - {discount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className='font-medium py-2'>Coupon Discount</td>
-                                            <td className='text-end py-2'>
-                                                -  {couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                            </td>
-                                        </tr>
+                                        {couponDiscountAmount > 0 && (
+                                            <tr>
+                                                <td className='font-medium py-2 text-emerald-600'>Coupon Discount</td>
+                                                <td className='text-end py-2 text-emerald-600'>
+                                                    - {couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                                                </td>
+                                            </tr>
+                                        )}
                                         <tr>
                                             <td className='font-medium py-2 text-xl'>Total</td>
                                             <td className='text-end py-2'>

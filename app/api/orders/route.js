@@ -45,8 +45,6 @@ export async function GET(request) {
                 { state: { $regex: globalFilter, $options: 'i' } },
                 { city: { $regex: globalFilter, $options: 'i' } },
                 { pincode: { $regex: globalFilter, $options: 'i' } },
-                { discount: { $regex: globalFilter, $options: 'i' } },
-                { couponDiscount: { $regex: globalFilter, $options: 'i' } },
                 { totalAmount: { $regex: globalFilter, $options: 'i' } },
                 { status: { $regex: globalFilter, $options: 'i' } },
             ]

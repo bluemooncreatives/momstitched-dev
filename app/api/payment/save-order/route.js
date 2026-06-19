@@ -32,7 +32,6 @@ export async function POST(request) {
             razorpay_signature: z.string().optional(),
             order_id: z.string().optional(),
             subtotal: z.number().nonnegative(),
-            discount: z.number().nonnegative(),
             couponDiscountAmount: z.number().nonnegative(),
             totalAmount: z.number().nonnegative(),
             products: z.array(productSchema).min(1, 'Products are required.'),
@@ -61,7 +60,20 @@ export async function POST(request) {
         if (!paymentMethod) {
             return response(false, 400, 'Payment method is required.')
         }
-        const totalAmount = roundToTwo(validatedData.totalAmount)
+
+        // Server is authoritative on money. Recompute the subtotal from the line items so
+        // the client cannot tamper with it. Coupon is the ONLY discount and is bounded to
+        // the subtotal, so the total can never go negative or below zero.
+        const subtotal = roundToTwo(
+            validatedData.products.reduce((sum, item) => sum + (item.sellingPrice * item.qty), 0)
+        )
+        const couponDiscountAmount = Math.min(roundToTwo(validatedData.couponDiscountAmount), subtotal)
+        const totalAmount = roundToTwo(subtotal - couponDiscountAmount)
+
+        // Reject if the client's submitted total disagrees with the server's computation.
+        if (Math.abs(roundToTwo(validatedData.totalAmount) - totalAmount) > 0.01) {
+            return response(false, 400, 'Order total mismatch. Please refresh your cart and try again.')
+        }
 
         let partialPaymentPercentage = paymentMethod === 'partial'
             ? Number(validatedData.partialPaymentPercentage || 0)
@@ -143,10 +155,9 @@ export async function POST(request) {
             landmark: validatedData.landmark,
             ordernote: validatedData.ordernote,
             products: validatedData.products,
-            discount: validatedData.discount,
-            couponDiscountAmount: validatedData.couponDiscountAmount,
+            couponDiscountAmount,
             totalAmount,
-            subtotal: validatedData.subtotal,
+            subtotal,
             paymentMethod,
             partialPaymentPercentage,
             paidAmount,

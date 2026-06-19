@@ -1,5 +1,5 @@
 'use client'
-import { ShoppingCart, ShoppingCartIcon, Tag } from 'lucide-react'
+import { ShoppingCart, ShoppingCartIcon } from 'lucide-react'
 import {
     Sheet,
     SheetContent,
@@ -23,7 +23,6 @@ const fmt = (n) => n?.toLocaleString('en-IN', { style: 'currency', currency: 'IN
 const Cart = () => {
     const [open, setOpen] = useState(false)
     const [subtotal, setSubTotal] = useState(0)
-    const [discount, setDiscount] = useState(0)
     const [mounted, setMounted] = useState(false)
     useEffect(() => setMounted(true), [])
 
@@ -34,7 +33,6 @@ const Cart = () => {
     useEffect(() => {
         const cartProducts = cart.products
         setSubTotal(cartProducts.reduce((s, p) => s + p.sellingPrice * p.qty, 0))
-        setDiscount(cartProducts.reduce((s, p) => s + (p.mrp - p.sellingPrice) * p.qty, 0))
     }, [cart])
 
     return (
@@ -140,29 +138,17 @@ const Cart = () => {
                                     <span className="text-[13px] font-medium text-foreground">{fmt(subtotal)}</span>
                                 </div>
 
-                                {discount > 0 && (
-                                    <div className="flex items-center justify-between">
-                                        <span className="flex items-center gap-1.5 text-[13px] text-emerald-600">
-                                            <Tag className="h-3 w-3" />
-                                            Discount
-                                        </span>
-                                        <span className="text-[13px] font-medium text-emerald-600">− {fmt(discount)}</span>
-                                    </div>
-                                )}
-
                                 <div className="my-1 border-t border-border/40" />
 
                                 <div className="flex items-center justify-between">
                                     <span className="font-neue text-[15px] font-semibold text-foreground">Total</span>
-                                    <span className="font-neue text-[15px] font-semibold text-foreground">{fmt(subtotal - discount)}</span>
+                                    <span className="font-neue text-[15px] font-semibold text-foreground">{fmt(subtotal)}</span>
                                 </div>
                             </div>
 
-                            {discount > 0 && (
-                                <p className="mt-2.5 rounded-lg bg-emerald-50 px-3 py-2 text-center text-[11.5px] font-medium text-emerald-700">
-                                    You&apos;re saving {fmt(discount)} on this order
-                                </p>
-                            )}
+                            <p className="mt-2.5 rounded-lg bg-muted/40 px-3 py-2 text-center text-[11.5px] font-medium text-muted-foreground">
+                                Have a coupon? Apply it at checkout.
+                            </p>
                         </>
                     ) : (
                         <div className="space-y-1.5">

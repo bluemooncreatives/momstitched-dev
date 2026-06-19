@@ -1,20 +1,24 @@
 // Content-Security-Policy scoped to the third parties this app actually uses:
-// Razorpay checkout (script/frame/connect) and Cloudinary (images). 'unsafe-inline'
-// is required for Next.js' inline bootstrap/hydration scripts and inline style
-// attributes; tightening to a nonce-based strict-dynamic CSP is a future step.
+// Razorpay checkout (script/frame/connect), Cloudinary images (res.cloudinary.com)
+// and the Cloudinary Upload Widget used in the admin Media section. The widget
+// injects a script from and renders inside an iframe on upload-widget.cloudinary.com,
+// and uploads go to api.cloudinary.com — all three must be whitelisted or the
+// "Upload Media" button does nothing. 'unsafe-inline' is required for Next.js'
+// inline bootstrap/hydration scripts and inline style attributes; tightening to a
+// nonce-based strict-dynamic CSP is a future step.
 const contentSecurityPolicy = [
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
     "frame-ancestors 'self'",
     "form-action 'self'",
-    "img-src 'self' data: blob: https://res.cloudinary.com https://*.razorpay.com",
+    "img-src 'self' data: blob: https://res.cloudinary.com https://upload-widget.cloudinary.com https://*.razorpay.com",
     "media-src 'self' https://res.cloudinary.com",
     "font-src 'self'",
     "style-src 'self' 'unsafe-inline'",
-    "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://*.razorpay.com",
-    "connect-src 'self' https://*.razorpay.com https://lumberjack.razorpay.com",
-    "frame-src 'self' https://*.razorpay.com https://api.razorpay.com",
+    "script-src 'self' 'unsafe-inline' https://upload-widget.cloudinary.com https://checkout.razorpay.com https://*.razorpay.com",
+    "connect-src 'self' https://api.cloudinary.com https://upload-widget.cloudinary.com https://*.razorpay.com https://lumberjack.razorpay.com",
+    "frame-src 'self' https://upload-widget.cloudinary.com https://*.razorpay.com https://api.razorpay.com",
     "upgrade-insecure-requests",
 ].join('; ')
 
