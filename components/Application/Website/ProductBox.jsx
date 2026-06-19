@@ -60,7 +60,7 @@ const ProductBox = ({ product, priority = false }) => {
                         variant="brand-outline"
                         className="mt-1 h-8 min-w-[150px] rounded-md px-4 text-[10px] font-semibold uppercase tracking-[0.28em]"
                     >
-                        <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)}>
+                        <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} aria-label={`Buy Product: ${product?.name}`}>
                             Buy Product
                         </Link>
                     </Button>

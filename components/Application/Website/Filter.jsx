@@ -183,12 +183,13 @@ const Filter = ({ filters }) => {
                             {colorsReady && colors.length === 0 && (
                                 <li className="px-2 py-1.5 text-[12px] text-muted-foreground">No colors available.</li>
                             )}
-                            {colorsReady && colors.map((color) => {
-                                const safeColor = String(color).replace(/\s+/g, '-').toLowerCase()
-                                const colorId = `${instanceId}-color-${safeColor}`
+                            {colorsReady && colors.map((color, index) => {
+                                // Index keeps the id unique even when colors differ only by case
+                                // (e.g. "Purple" vs "purple"), which would otherwise collide.
+                                const colorId = `${instanceId}-color-${index}`
                                 const active = selectedColor.includes(color)
                                 return (
-                                    <li key={color}>
+                                    <li key={`${color}-${index}`}>
                                         <label
                                             htmlFor={colorId}
                                             className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--dark-red)]' : 'text-foreground/60 hover:text-foreground'}`}
@@ -228,12 +229,11 @@ const Filter = ({ filters }) => {
                             {sizesReady && sizes.length === 0 && (
                                 <li className="col-span-2 px-2 py-1.5 text-[12px] text-muted-foreground">No sizes available.</li>
                             )}
-                            {sizesReady && sizes.map((size) => {
-                                const safeSize = String(size).replace(/\s+/g, '-').toLowerCase()
-                                const sizeId = `${instanceId}-size-${safeSize}`
+                            {sizesReady && sizes.map((size, index) => {
+                                const sizeId = `${instanceId}-size-${index}`
                                 const active = selectedSize.includes(size)
                                 return (
-                                    <li key={size}>
+                                    <li key={`${size}-${index}`}>
                                         <label
                                             htmlFor={sizeId}
                                             className={`flex cursor-pointer items-center gap-2 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--dark-red)]' : 'text-foreground/60 hover:text-foreground'}`}

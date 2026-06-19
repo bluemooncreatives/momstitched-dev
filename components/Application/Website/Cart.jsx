@@ -22,9 +22,18 @@ const Cart = () => {
     const [subtotal, setSubTotal] = useState(0)
     const [discount, setDiscount] = useState(0)
 
+    // The cart store is rehydrated from localStorage by redux-persist on the
+    // client. Until this component has mounted we mirror the server-rendered
+    // initial state (count 0) so the first client render matches the SSR HTML
+    // and we don't trigger a hydration mismatch (React #418) for returning
+    // visitors who already have items in their cart.
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => setMounted(true), [])
 
     const cart = useSelector(store => store.cartStore)
     const dispatch = useDispatch()
+
+    const cartCount = mounted ? cart.count : 0
 
 
     useEffect(() => {
@@ -47,7 +56,7 @@ const Cart = () => {
         <Sheet open={open} onOpenChange={setOpen} >
             <SheetTrigger className="relative flex items-center justify-center rounded-md px-2.5 py-2 transition hover:bg-muted/40">
                 <ShoppingCart className="h-5 w-5 text-foreground" strokeWidth={1.75} />
-                <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[10px] font-semibold text-white">{cart.count}</span>
+                <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[10px] font-semibold text-white">{cartCount}</span>
             </SheetTrigger>
             <SheetContent className="w-full border-l border-border/70 bg-background p-0 sm:max-w-[460px]">
                 <SheetHeader className='border-b border-border/60 px-5 py-4'>

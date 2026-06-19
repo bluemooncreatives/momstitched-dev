@@ -26,8 +26,8 @@ export default function RootLayout({ children }) {
             Medium (weight 600) is used by the LCP "Shop" heading.
             Book (weight 400) is the primary body font — preloaded so it's
             ready before below-the-fold content renders. */}
-        <link rel="preload" href="/assets/font/PPNeueMontreal-Medium.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
-        <link rel="preload" href="/assets/font/PPNeueMontreal-Book.ttf" as="font" type="font/truetype" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/font/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/font/PPNeueMontreal-Book.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
       <body
         className={`${assistantFont.className} antialiased`}
