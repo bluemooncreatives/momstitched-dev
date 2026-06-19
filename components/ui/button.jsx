@@ -20,9 +20,9 @@ const buttonVariants = cva(
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         pill: "rounded-full border-current bg-transparent font-semibold uppercase tracking-[0em]",
         brand:
-          "rounded-md bg-[var(--dark-red)] text-white hover:bg-[var(--dark-red-2)] focus-visible:ring-[var(--dark-red)]/40",
+          "rounded-sm bg-[var(--dark-red)] text-white hover:bg-[var(--dark-red-2)] focus-visible:ring-[var(--dark-red)]/40",
         "brand-outline":
-          "rounded-md border border-[var(--dark-red)] bg-transparent text-[var(--dark-red)] hover:bg-[var(--dark-red)] hover:text-white focus-visible:ring-[var(--dark-red)]/40",
+          "rounded-sm border border-[var(--dark-red)] bg-transparent text-[var(--dark-red)] hover:bg-[var(--dark-red)] hover:text-white focus-visible:ring-[var(--dark-red)]/40",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

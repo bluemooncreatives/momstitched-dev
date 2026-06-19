@@ -1,5 +1,5 @@
 'use client'
-import { ShoppingCart, ShoppingCartIcon } from 'lucide-react'
+import { ShoppingCart, ShoppingCartIcon, Tag } from 'lucide-react'
 import {
     Sheet,
     SheetContent,
@@ -8,124 +8,202 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet"
-import { useDispatch, useSelector } from "react-redux";
-import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux"
+import Image from "next/image"
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
-import { removeFromCart } from "@/store/reducer/cartReducer";
-import Link from "next/link";
-import { WEBSITE_CART, WEBSITE_CHECKOUT } from "@/routes/WebsiteRoute";
-import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { showToast } from "@/lib/showToast";
+import { removeFromCart } from "@/store/reducer/cartReducer"
+import Link from "next/link"
+import { WEBSITE_CART, WEBSITE_CHECKOUT } from "@/routes/WebsiteRoute"
+import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+import { showToast } from "@/lib/showToast"
+
+const fmt = (n) => n?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
+
 const Cart = () => {
     const [open, setOpen] = useState(false)
     const [subtotal, setSubTotal] = useState(0)
     const [discount, setDiscount] = useState(0)
-
-    // The cart store is rehydrated from localStorage by redux-persist on the
-    // client. Until this component has mounted we mirror the server-rendered
-    // initial state (count 0) so the first client render matches the SSR HTML
-    // and we don't trigger a hydration mismatch (React #418) for returning
-    // visitors who already have items in their cart.
     const [mounted, setMounted] = useState(false)
     useEffect(() => setMounted(true), [])
 
     const cart = useSelector(store => store.cartStore)
     const dispatch = useDispatch()
-
     const cartCount = mounted ? cart.count : 0
-
 
     useEffect(() => {
         const cartProducts = cart.products
-
-        const totalAmount = cartProducts.reduce((sum, product) => sum + (product.sellingPrice * product.qty), 0)
-
-        const discount = cartProducts.reduce((sum, product) => sum + ((product.mrp - product.sellingPrice) * product.qty), 0)
-
-
-        setSubTotal(totalAmount)
-        setDiscount(discount)
-
-
-
+        setSubTotal(cartProducts.reduce((s, p) => s + p.sellingPrice * p.qty, 0))
+        setDiscount(cartProducts.reduce((s, p) => s + (p.mrp - p.sellingPrice) * p.qty, 0))
     }, [cart])
 
-
     return (
-        <Sheet open={open} onOpenChange={setOpen} >
+        <Sheet open={open} onOpenChange={setOpen}>
+            {/* ── Trigger ── */}
             <SheetTrigger className="relative flex items-center justify-center rounded-md px-2.5 py-2 transition hover:bg-muted/40">
                 <ShoppingCart className="h-5 w-5 text-foreground" strokeWidth={1.75} />
-                <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[10px] font-semibold text-white">{cartCount}</span>
+                {cartCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[10px] font-semibold text-white tabular-nums">
+                        {cartCount}
+                    </span>
+                )}
             </SheetTrigger>
-            <SheetContent className="w-full border-l border-border/70 bg-background p-0 sm:max-w-[460px]">
-                <SheetHeader className='border-b border-border/60 px-5 py-4'>
-                    <SheetTitle className="font-neue text-2xl font-semibold tracking-[0.01em]">My Cart</SheetTitle>
-                    <SheetDescription></SheetDescription>
+
+            {/* ── Drawer ── */}
+            <SheetContent className="w-full gap-0 border-l border-border/40 bg-background p-0 shadow-xl sm:max-w-[440px]">
+
+                {/* Header */}
+                <SheetHeader className="flex-shrink-0 border-b border-border/50 px-6 py-5">
+                    <div className="flex items-center justify-between pr-8">
+                        <SheetTitle className="font-neue text-xl font-semibold tracking-[0.01em]">
+                            My Cart
+                        </SheetTitle>
+                        {cartCount > 0 && (
+                            <span className="rounded-full bg-muted/60 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                                {cartCount} {cartCount === 1 ? 'item' : 'items'}
+                            </span>
+                        )}
+                    </div>
+                    <SheetDescription className="sr-only">Your selected items</SheetDescription>
                 </SheetHeader>
 
-                <div className="flex h-[calc(100dvh-80px)] flex-col">
-                    <div className="flex-1 overflow-auto px-5 py-4">
-                        {cart.count === 0 && <div className="flex h-full flex-col items-center justify-center rounded-md border border-dashed border-border/70 bg-muted/20 px-6 text-center">
-                            <ShoppingCartIcon className="font-neue text-3xl leading-none"/>
-                            <p className="mt-3 font-neue text-2xl font-semibold">Your cart is empty</p>
-                            <p className="mt-2 max-w-[280px] text-sm text-muted-foreground">Add pieces you love to see them here with pricing and quick checkout.</p>
-                        </div>}
-
-                        {cart.products?.map(product => (
-                            <div key={product.variantId} className="mb-4 flex items-center justify-between gap-4 rounded-md border border-border/70 p-3">
-                                <div className="flex items-center gap-3.5">
-                                    <Image src={product?.media || imgPlaceholder.src} height={100} width={100} alt={product.name} className="h-20 w-20 rounded-md border border-border/60 object-cover" />
-
-                                    <div >
-                                        <h4 className="line-clamp-1 font-neue text-[15px] font-semibold">{product.name}</h4>
-                                        <p className="mt-0.5 text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                                            {product.size}/{product.color}
-                                        </p>
-                                        <p className="mt-2 text-sm font-semibold text-foreground">
-                                            {product.qty} x {product.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                        </p>
+                {/* Scrollable product list */}
+                <div className="no-scrollbar flex-1 overflow-y-auto px-5 py-5">
+                    {cart.count === 0 ? (
+                        <div className="flex min-h-[360px] flex-col items-center justify-center gap-5 rounded-2xl border border-dashed border-border/60 bg-muted/10 px-6 text-center">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted/50">
+                                <ShoppingCartIcon className="h-7 w-7 text-muted-foreground/70" strokeWidth={1.5} />
+                            </div>
+                            <div className="space-y-1.5">
+                                <p className="font-neue text-[1.05rem] font-semibold tracking-tight text-foreground">Your cart is empty</p>
+                                <p className="max-w-[220px] text-[13px] leading-relaxed text-muted-foreground">
+                                    Add pieces you love to see them here with pricing and quick checkout.
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {cart.products?.map(product => (
+                                <div
+                                    key={product.variantId}
+                                    className="group relative flex items-stretch gap-3 rounded-xs border border-border/40 bg-background p-3 transition-all duration-200 hover:border-border/70 hover:shadow-[0_4px_16px_rgba(0,0,0,0.07)]"
+                                >
+                                    {/* Thumbnail */}
+                                    <div className="relative w-[80px] flex-shrink-0 overflow-hidden rounded-xs border border-border/30">
+                                        <Image
+                                            src={product?.media || imgPlaceholder.src}
+                                            fill
+                                            sizes="80px"
+                                            alt={product.name}
+                                            className="object-cover object-center transition-transform duration-300 group-hover:scale-[1.06]"
+                                        />
                                     </div>
 
+                                    {/* Details */}
+                                    <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
+                                        <h4 className="line-clamp-2 font-neue text-[13px] font-semibold leading-snug text-foreground">
+                                            {product.name}
+                                        </h4>
+                                        <span className="w-fit rounded-full bg-muted/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                                            {product.size} / {product.color}
+                                        </span>
+                                        <div className="flex items-center justify-between">
+                                            <span className="rounded-xs bg-[var(--dark-red)]/10 px-1.5 py-0.5 font-neue text-[10px] font-semibold text-[var(--dark-red)]">
+                                                ×{product.qty}
+                                            </span>
+                                            <span className="font-neue text-[14px] font-semibold text-foreground">
+                                                {fmt(product.sellingPrice)}
+                                            </span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => dispatch(removeFromCart({ productId: product.productId, variantId: product.variantId }))}
+                                            className="w-fit cursor-pointer text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground/50 transition-colors hover:text-[var(--dark-red)]"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="flex-shrink-0 border-t border-border/50 bg-background px-6 pb-6 pt-5">
+                    {cart.count > 0 ? (
+                        <>
+                            {/* Price summary */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[13px] text-muted-foreground">Subtotal</span>
+                                    <span className="text-[13px] font-medium text-foreground">{fmt(subtotal)}</span>
                                 </div>
 
-                                <div className="flex items-end">
-                                    <button type="button" className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--dark-red)] underline underline-offset-4 cursor-pointer"
-                                        onClick={() => dispatch(removeFromCart({ productId: product.productId, variantId: product.variantId }))}
-                                    >
-                                        Remove
-                                    </button>
+                                {discount > 0 && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="flex items-center gap-1.5 text-[13px] text-emerald-600">
+                                            <Tag className="h-3 w-3" />
+                                            Discount
+                                        </span>
+                                        <span className="text-[13px] font-medium text-emerald-600">− {fmt(discount)}</span>
+                                    </div>
+                                )}
+
+                                <div className="my-1 border-t border-border/40" />
+
+                                <div className="flex items-center justify-between">
+                                    <span className="font-neue text-[15px] font-semibold text-foreground">Total</span>
+                                    <span className="font-neue text-[15px] font-semibold text-foreground">{fmt(subtotal - discount)}</span>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                    <div className="border-t border-border/60 bg-background px-5 py-4">
-                        <div className="space-y-1.5">
-                            <h2 className="flex items-center justify-between text-lg font-semibold"><span>Subtotal</span> <span>{subtotal?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></h2>
-                            <h2 className="flex items-center justify-between text-sm font-medium text-muted-foreground"><span>Discount</span> <span>{discount?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></h2>
-                        </div>
 
-                        <div className="mt-4 grid grid-cols-2 gap-3">
-                            <Button type="button" asChild variant="outline" className="h-11 rounded-md border-border/70 font-semibold" onClick={() => setOpen(false)}>
-                                <Link href={WEBSITE_CART}>View Cart</Link>
-                            </Button>
-                            <Button type="button" asChild variant="brand" className="h-11 font-semibold" onClick={() => setOpen(false)}>
-                                {cart.count ?
-                                    <Link href={WEBSITE_CHECKOUT}>Checkout</Link>
-                                    :
-                                    <span onClick={(event) => {
-                                        event.preventDefault()
-                                        showToast('error', 'Your cart is empty!')
-                                    }}>Checkout</span>
-                                }
-                            </Button>
+                            {discount > 0 && (
+                                <p className="mt-2.5 rounded-lg bg-emerald-50 px-3 py-2 text-center text-[11.5px] font-medium text-emerald-700">
+                                    You&apos;re saving {fmt(discount)} on this order
+                                </p>
+                            )}
+                        </>
+                    ) : (
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                                <span className="font-neue text-[15px] font-semibold text-foreground">Total</span>
+                                <span className="font-neue text-[15px] font-semibold text-foreground">{fmt(0)}</span>
+                            </div>
                         </div>
+                    )}
+
+                    {/* Action buttons */}
+                    <div className="mt-4 grid grid-cols-2 gap-2.5">
+                        <Button
+                            type="button"
+                            asChild
+                            variant="brand-outline"
+                            className="h-9 w-full rounded-xs text-base font-semibold uppercase"
+                            onClick={() => setOpen(false)}
+                        >
+                            <Link href={WEBSITE_CART}>View Cart</Link>
+                        </Button>
+                        <Button
+                            type="button"
+                            asChild
+                            variant="brand"
+                            className="h-9 w-full rounded-xs text-base font-semibold uppercase"
+                            onClick={() => setOpen(false)}
+                        >
+                            {cart.count ? (
+                                <Link href={WEBSITE_CHECKOUT}>Checkout</Link>
+                            ) : (
+                                <span onClick={(e) => { e.preventDefault(); showToast('error', 'Your cart is empty!') }}>
+                                    Checkout
+                                </span>
+                            )}
+                        </Button>
                     </div>
                 </div>
 
             </SheetContent>
         </Sheet>
-
     )
 }
 
