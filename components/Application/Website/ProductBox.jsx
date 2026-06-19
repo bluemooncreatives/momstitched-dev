@@ -1,80 +1,188 @@
+'use client'
+
 import Image from 'next/image'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import Link from 'next/link'
-import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
-import { Eye, Star } from 'lucide-react'
+import { useDispatch, useSelector } from 'react-redux'
+import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
+import { ChevronLeft, ChevronRight, Eye, ShoppingBag, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { addIntoCart } from '@/store/reducer/cartReducer'
+import { showToast } from '@/lib/showToast'
 
 const ProductBox = ({ product, priority = false }) => {
+    const dispatch = useDispatch()
+    const cartProducts = useSelector((store) => store.cartStore.products)
+
     const hasDiscount = product?.mrp > product?.sellingPrice
     const discount = hasDiscount ? Math.round(((product.mrp - product.sellingPrice) / product.mrp) * 100) : 0
     const rating = Number(product?.ratingAvg || 0)
     const filledStars = Math.round(rating)
+    const ratingCount = Number(product?.ratingCount || 0)
+
+    const variant = product?.defaultVariant
+    const isInCart = variant
+        ? cartProducts.some((item) => item.productId === product._id && item.variantId === variant._id)
+        : false
+
+    const [isAdding, setIsAdding] = useState(false)
+
+    const images = product?.media?.length > 0
+        ? product.media
+        : [{ secure_url: imgPlaceholder.src, alt: product?.name }]
+    const showArrows = images.length > 1
+    const [imgIndex, setImgIndex] = useState(0)
+    const activeImage = images[imgIndex]
+
+    const slideImage = (e, dir) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setImgIndex((prev) => (prev + dir + images.length) % images.length)
+    }
+
+    const handleAddToCart = () => {
+        if (!variant) return
+
+        setIsAdding(true)
+        dispatch(addIntoCart({
+            productId: product._id,
+            variantId: variant._id,
+            name: product.name,
+            url: product.slug,
+            size: variant.size,
+            color: variant.color,
+            mrp: variant.mrp ?? product.mrp,
+            sellingPrice: variant.sellingPrice ?? product.sellingPrice,
+            media: product?.media?.[0]?.secure_url || imgPlaceholder.src,
+            qty: 1,
+        }))
+        showToast('success', 'Product added into cart.')
+        setIsAdding(false)
+    }
 
     return (
-        <div className='group relative overflow-hidden rounded-[var(--radius)] border border-border/60 bg-background transition duration-300 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-[var(--shadow-card-hover)]'>
-            <div className="flex h-full flex-col">
-                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[var(--product-card-bg)]">
-                    <span className={`absolute right-3 top-3 z-10 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${hasDiscount ? 'border-[var(--dark-red)] bg-background text-[var(--dark-red)]' : 'border-border/60 bg-background/90 text-foreground/60'}`}>
-                        {hasDiscount ? `Sale ${discount}%` : 'Hot'}
-                    </span>
-                    <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/30 bg-background/70 px-6 py-6 text-foreground/60 opacity-0 shadow-sm backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
-                        <Eye className="size-5" />
-                    </div>
-                    <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} className="block h-full w-full">
-                        <Image
-                            src={product?.media[0]?.secure_url || imgPlaceholder.src}
-                            width={600}
-                            height={750}
-                            alt={product?.media[0]?.alt || product?.name}
-                            title={product?.media[0]?.title || product?.name}
-                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                            priority={priority}
-                            className='h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105'
-                        />
-                    </Link>
-                </div>
+        <div className='group relative flex flex-col overflow-hidden rounded-[var(--radius)] border border-border/60 bg-background transition duration-300 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-[var(--shadow-card-hover)]'>
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-[var(--product-card-bg)]">
+                <span className={`absolute right-3 top-3 z-20 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] shadow-sm ${hasDiscount ? 'bg-[var(--dark-red)] text-white' : 'bg-background/90 text-foreground/70'}`}>
+                    {hasDiscount ? `Sale ${discount}%` : 'Hot'}
+                </span>
 
-                <div className="flex flex-1 flex-col items-center justify-center gap-2 border-t border-border/60 px-4 py-5 text-center font-neue">
-                    <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} className="block">
-                        <h4 className="line-clamp-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-foreground">
-                            {product?.name}
-                        </h4>
-                    </Link>
+                <Link
+                    href={WEBSITE_PRODUCT_DETAILS(product.slug)}
+                    aria-label={`View ${product?.name}`}
+                    className="absolute left-3 top-3 z-20 flex size-9 items-center justify-center rounded-xs border border-border/40 bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground group-hover:opacity-100"
+                >
+                    <Eye className="size-4" />
+                </Link>
 
-                    <div className="flex items-center gap-0.5">
-                        {Array.from({ length: 5 }).map((_, index) => {
-                            const isFilled = index < filledStars
-                            return (
+                <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} className="block h-full w-full">
+                    <Image
+                        src={activeImage?.secure_url || imgPlaceholder.src}
+                        width={600}
+                        height={750}
+                        alt={activeImage?.alt || product?.name}
+                        title={activeImage?.title || product?.name}
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                        priority={priority}
+                        className='h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105'
+                    />
+                </Link>
+
+                {showArrows && (
+                    <>
+                        <button
+                            type="button"
+                            aria-label="Previous image"
+                            onClick={(e) => slideImage(e, -1)}
+                            className="absolute left-2 top-1/2 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/40 bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground group-hover:opacity-100"
+                        >
+                            <ChevronLeft className="size-4" />
+                        </button>
+                        <button
+                            type="button"
+                            aria-label="Next image"
+                            onClick={(e) => slideImage(e, 1)}
+                            className="absolute right-2 top-1/2 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/40 bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground group-hover:opacity-100"
+                        >
+                            <ChevronRight className="size-4" />
+                        </button>
+
+                        <div className="absolute inset-x-0 bottom-2 z-20 flex justify-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                            {images.map((_, index) => (
+                                <span
+                                    key={index}
+                                    className={`size-1.5 rounded-full transition-colors ${index === imgIndex ? 'bg-[var(--dark-red)]' : 'bg-background/70'}`}
+                                />
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
+
+            <div className="flex flex-1 flex-col items-center gap-2 border-t border-border/60 px-4 py-5 text-center font-neue">
+                <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} className="block w-full">
+                    <h4 title={product?.name} className="w-full truncate text-left text-base font-semibold leading-[1.2] text-foreground transition-colors group-hover:text-[var(--dark-red)]">
+                        {product?.name}
+                    </h4>
+                </Link>
+
+                <div className='flex w-full items-center justify-between gap-2'>
+                    <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-0.5">
+                            {Array.from({ length: 5 }).map((_, index) => (
                                 <Star
                                     key={index}
-                                    className={`size-3 ${isFilled ? 'fill-[var(--dark-red)] text-[var(--dark-red)]' : 'text-foreground/20'}`}
+                                    className={`size-3 ${index < filledStars ? 'fill-[var(--dark-red)] text-[var(--dark-red)]' : 'text-foreground/20'}`}
                                 />
-                            )
-                        })}
+                            ))}
+                        </div>
+                        <span className='text-[11px] text-muted-foreground'>({ratingCount})</span>
                     </div>
+
+                    <div className='flex items-center gap-2'>
+                        <span className='text-[18px] font-semibold text-foreground'>
+                            {product?.sellingPrice?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                        </span>
+                        {hasDiscount && (
+                            <span className='text-[12px] text-stone-700 line-through'>
+                                {product?.mrp?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="grid w-full grid-cols-2 gap-2">
+                    {isInCart ? (
+                        <Button
+                            asChild
+                            variant="brand-outline"
+                            className="h-9 w-full rounded-xs text-base font-semibold uppercase"
+                        >
+                            <Link href={WEBSITE_CART}>Go To Cart</Link>
+                        </Button>
+                    ) : (
+                        <Button
+                            type="button"
+                            variant="brand-outline"
+                            disabled={!variant || isAdding}
+                            onClick={handleAddToCart}
+                            className="h-9 w-full rounded-xs text-base font-semibold uppercase"
+                        >
+                            <ShoppingBag className="size-3.5" />
+                            Add To Cart
+                        </Button>
+                    )}
 
                     <Button
                         asChild
-                        variant="brand-outline"
-                        className="mt-1 h-8 min-w-[150px] rounded-md px-4 text-[10px] font-semibold uppercase tracking-[0.28em]"
+                        variant="brand"
+                        className="h-9 w-full rounded-xs text-base font-semibold uppercase"
                     >
                         <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} aria-label={`Buy Product: ${product?.name}`}>
                             Buy Product
                         </Link>
                     </Button>
-
-                    <div className='mt-1 flex items-center gap-2'>
-                        <span className='text-[15px] font-semibold text-foreground'>
-                            {product?.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                        </span>
-                        {hasDiscount && (
-                            <span className='text-[11px] text-stone-500 line-through'>
-                                {product?.mrp.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                            </span>
-                        )}
-                    </div>
                 </div>
             </div>
         </div>
