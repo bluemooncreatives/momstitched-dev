@@ -9,6 +9,7 @@ const contentSecurityPolicy = [
     "frame-ancestors 'self'",
     "form-action 'self'",
     "img-src 'self' data: blob: https://res.cloudinary.com https://*.razorpay.com",
+    "media-src 'self' https://res.cloudinary.com",
     "font-src 'self'",
     "style-src 'self' 'unsafe-inline'",
     "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://*.razorpay.com",

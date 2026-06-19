@@ -235,17 +235,22 @@ const Testimonial = () => {
 
             {/* bottom nav */}
             <div className="mt-5 flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center">
                     {testimonials.map((_, i) => (
                         <button
                             key={i}
                             type="button"
                             aria-label={`Go to review ${i + 1}`}
+                            aria-current={i === active}
                             onClick={() => goTo(i)}
-                            className={`h-1.5 rounded-full transition-all duration-300 ${
-                                i === active ? 'w-6 bg-[var(--dark-red)]' : 'w-1.5 bg-[var(--dark-red)]/25 hover:bg-[var(--dark-red)]/45'
-                            }`}
-                        />
+                            className="group flex h-6 min-w-6 items-center justify-center px-0.5"
+                        >
+                            <span
+                                className={`h-1.5 rounded-full transition-all duration-300 ${
+                                    i === active ? 'w-6 bg-[var(--dark-red)]' : 'w-1.5 bg-[var(--dark-red)]/25 group-hover:bg-[var(--dark-red)]/45'
+                                }`}
+                            />
+                        </button>
                     ))}
                 </div>
 

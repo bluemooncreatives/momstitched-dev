@@ -25,7 +25,7 @@ const Footer = () => {
 
 
                 <div>
-                    <h4 className='text-xl font-bold uppercase mb-5'>Categories</h4>
+                    <h3 className='text-xl font-bold uppercase mb-5'>Categories</h3>
                     <ul>
                         <li className='mb-2 text-gray-500'>
                             <Link href={`${WEBSITE_SHOP}?category=t-shirts`}>T-shirt</Link>
@@ -45,7 +45,7 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div>
-                    <h4 className='text-xl font-bold uppercase mb-5'>Userfull Links</h4>
+                    <h3 className='text-xl font-bold uppercase mb-5'>Userfull Links</h3>
                     <ul>
                         <li className='mb-2 text-gray-500'>
                             <Link href={WEBSITE_HOME}>Home</Link>
@@ -66,7 +66,7 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div>
-                    <h4 className='text-xl font-bold uppercase mb-5'>Help Center</h4>
+                    <h3 className='text-xl font-bold uppercase mb-5'>Help Center</h3>
                     <ul>
                         <li className='mb-2 text-gray-500'>
                             <Link href={WEBSITE_REGISTER}>Register</Link>
@@ -88,7 +88,7 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div>
-                    <h4 className='text-xl font-bold uppercase mb-5'>Contact Us </h4>
+                    <h3 className='text-xl font-bold uppercase mb-5'>Contact Us </h3>
                     <ul>
                         <li className='mb-2 text-gray-500 flex gap-2'>
                             <MapPin className='size-5' />
