@@ -343,7 +343,7 @@ const CategoryArchiveSection = () => {
             <div className={styles.archivePage}>
                 <div className={styles.archive}>
                     <div className={styles.copyBlock}>
-                        <h1 className={styles.title}>Categories</h1>
+                        <h2 className={styles.title}>Categories</h2>
                         <p className={styles.writeup}>
                             Discover signature silhouettes, everyday essentials, and statement pieces curated for every
                             wardrobe. Each category brings together styles designed for comfort, movement, and everyday

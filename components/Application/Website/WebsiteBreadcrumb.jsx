@@ -11,8 +11,7 @@ const WebsiteBreadcrumb = ({ props }) => {
                 <div
                     className="pointer-events-none select-none font-neue font-semibold uppercase tracking-[0.02em] text-white/90"
                     style={{
-                        fontSize: 'clamp(3rem, 16vw, 14rem)',
-                        lineHeight: 0.78,
+                        fontSize: 'clamp(3rem, 16vw, 8rem)',
                         WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 38%, rgba(0,0,0,0) 100%)',
                         maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 38%, rgba(0,0,0,0) 100%)',
                         textShadow: '0 12px 32px rgba(0,0,0,0.18)',

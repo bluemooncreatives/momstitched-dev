@@ -53,9 +53,9 @@ const InstagramReelsMarquee = () => {
     return (
         <section className="relative overflow-hidden bg-background pt-[clamp(1.25rem,2.5vw,2rem)] pb-[clamp(2rem,4vw,3.5rem)]">
             <div className="website-gutter relative z-20 mb-6 flex items-center justify-between gap-6">
-                <h1 className="text-left text-[clamp(1.8rem,4.8vw,3.8rem)] font-medium uppercase text-[var(--dark-red-2)] z-50">
+                <h2 className="text-left text-[clamp(1.8rem,4.8vw,3.8rem)] font-medium uppercase text-[var(--dark-red-2)] z-50">
                     Gallery
-                </h1>
+                </h2>
                 <div className="flex shrink-0 items-center gap-4 text-[var(--dark-red-2)]">
                     <Link
                         href="https://www.instagram.com/mom.stitched/"
