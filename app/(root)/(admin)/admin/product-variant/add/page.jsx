@@ -8,7 +8,7 @@ import ButtonLoading from '@/components/Application/ButtonLoading'
 import { zSchema } from '@/lib/zodSchema'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 import useFetch from '@/hooks/useFetch'
@@ -399,4 +399,12 @@ const AddProduct = () => {
   )
 }
 
-export default AddProduct
+const AddProductPage = () => {
+  return (
+    <Suspense fallback={null}>
+      <AddProduct />
+    </Suspense>
+  )
+}
+
+export default AddProductPage

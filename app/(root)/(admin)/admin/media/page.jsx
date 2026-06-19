@@ -21,7 +21,9 @@ const breadcrumbData = [
     { href: '', label: 'Media' },
 ]
 
-const MediaPage = () => {
+import { Suspense } from 'react'
+
+const MediaContent = () => {
     const queryClient = useQueryClient()
     const [deleteType, setDeleteType] = useState('SD')
     const [selectedMedia, setSelectedMedia] = useState([])
@@ -209,6 +211,14 @@ const MediaPage = () => {
                 )}
             </div>
         </div>
+    )
+}
+
+const MediaPage = () => {
+    return (
+        <Suspense fallback={null}>
+            <MediaContent />
+        </Suspense>
     )
 }
 

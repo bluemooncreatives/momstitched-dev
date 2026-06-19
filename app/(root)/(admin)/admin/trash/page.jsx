@@ -77,7 +77,9 @@ const TRASH_CONFIG = {
 
 }
 
-const Trash = () => {
+import { Suspense } from "react"
+
+const TrashContent = () => {
 
     const searchParams = useSearchParams()
     const trashOf = searchParams.get('trashof')
@@ -128,6 +130,14 @@ const Trash = () => {
                 />
             </div>
         </div>
+    )
+}
+
+const Trash = () => {
+    return (
+        <Suspense fallback={null}>
+            <TrashContent />
+        </Suspense>
     )
 }
 

@@ -1,6 +1,6 @@
 'use client'
 import { Card, CardContent } from '@/components/ui/card'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import Logo from '@/public/assets/images/logo-white.png'
 import Image from 'next/image'
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -214,4 +214,12 @@ const LoginPage = () => {
     )
 }
 
-export default LoginPage
+const Login = () => {
+    return (
+        <Suspense fallback={null}>
+            <LoginPage />
+        </Suspense>
+    )
+}
+
+export default Login
