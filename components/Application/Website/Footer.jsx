@@ -1,7 +1,16 @@
+'use client'
+
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import { useRef } from 'react'
 import Link from 'next/link'
 import { MapPin, Phone, Mail, Instagram, MessageCircle, Facebook, Twitter, Globe, ArrowRight } from 'lucide-react'
 
 import { USER_DASHBOARD, WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
+import FooterWordmark from '@/components/Application/Website/FooterWordmark'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const CONTACT_EMAIL = 'momstitched.official@gmail.com'
 
@@ -37,7 +46,7 @@ const socialLinks = [
 ]
 
 const LinkColumn = ({ title, links }) => (
-    <div>
+    <div className='footer-col'>
         <h3 className='text-2xl font-semibold text-white mb-6'>{title}</h3>
         <ul className='space-y-2'>
             {links.map(({ label, href }) => (
@@ -52,20 +61,49 @@ const LinkColumn = ({ title, links }) => (
 )
 
 const Footer = () => {
+    const rootRef = useRef(null)
+
+    useGSAP(() => {
+        const reveal = (selector, vars = {}) =>
+            gsap.from(selector, {
+                autoAlpha: 0,
+                y: 40,
+                duration: 0.9,
+                ease: 'power4.out',
+                scrollTrigger: { trigger: selector, start: 'top 90%', once: true },
+                ...vars,
+            })
+
+        // Top row — caption, big email, CTA card
+        reveal('.footer-caption')
+        reveal('.footer-email', { y: 60, duration: 1 })
+        reveal('.footer-cta', { x: 60, y: 0, duration: 1, ease: 'power3.out' })
+
+        // Middle row — link columns / office reveal with a stagger
+        gsap.from('.footer-col', {
+            autoAlpha: 0,
+            y: 50,
+            duration: 0.8,
+            ease: 'power3.out',
+            stagger: 0.12,
+            scrollTrigger: { trigger: '.footer-cols', start: 'top 85%', once: true },
+        })
+    }, { scope: rootRef })
+
     return (
-        <footer className='sticky z-0 bottom-0 left-0 w-full bg-[var(--brand-primary)] text-white overflow-hidden'>
+        <footer ref={rootRef} className='sticky z-0 bottom-0 left-0 w-full bg-[var(--brand-primary)] text-white overflow-hidden'>
             <div className='website-gutter pt-14 pb-8'>
 
                 {/* ───── Top row: caption + big email + CTA card ───── */}
                 <div className='flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10'>
                     <div className='min-w-0'>
-                        <p className='text-md text-white/60 leading-snug mb-5 max-w-md'>
+                        <p className='footer-caption text-md text-white/60 leading-snug mb-5 max-w-md'>
                             Every stitch carries a story of care, craft, and grace. Discover handcrafted garments made to celebrate femininity and
                             culture Reach <span className='font-semibold text-white'>MomStitched</span> at
                         </p>
                         <Link
                             href={`mailto:${CONTACT_EMAIL}`}
-                            className='inline-block border-b border-white/30 pb-3 font-semibold tracking-tight text-[clamp(1.25rem,4.8vw,2.6rem)] leading-none hover:text-[var(--brand-cream)] transition-colors break-all'
+                            className='footer-email inline-block border-b border-white/30 pb-3 font-semibold tracking-tight text-[clamp(1.25rem,4.8vw,2.6rem)] leading-none hover:text-[var(--brand-cream)] transition-colors break-all'
                         >
                             {CONTACT_EMAIL}
                         </Link>
@@ -73,7 +111,7 @@ const Footer = () => {
 
                     {/* Get Started CTA card */}
                     <div className='shrink-0'>
-                        <div className='bg-[var(--brand-cream)] rounded-3xl p-5 w-56'>
+                        <div className='footer-cta bg-[var(--brand-cream)] rounded-3xl p-5 w-56'>
                             <p className='text-[var(--brand-ink)] text-xl font-semibold mb-10'>Get Started</p>
                             <Link
                                 href={WEBSITE_SHOP}
@@ -87,13 +125,13 @@ const Footer = () => {
                 </div>
 
                 {/* ───── Middle row: link columns + contact / office ───── */}
-                <div className='grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 mt-14'>
+                <div className='footer-cols grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 mt-14'>
                     <LinkColumn title='Categories' links={categoryLinks} />
                     <LinkColumn title='Useful Links' links={usefulLinks} />
                     <LinkColumn title='Help Center' links={helpLinks} />
 
                     {/* Office / Contact */}
-                    <div className='lg:text-right'>
+                    <div className='footer-col lg:text-right'>
                         <h3 className='text-2xl font-semibold text-white mb-6'>Office</h3>
                         <ul className='space-y-2 text-white/70'>
                             <li className='flex lg:justify-end items-center gap-2'>
@@ -119,16 +157,12 @@ const Footer = () => {
                     </div>
                 </div>
 
-                {/* ───── Giant wordmark ───── */}
-                <div className='mt-14'>
-                    <h2 className='font-bold tracking-tighter leading-[0.8] text-[clamp(3.5rem,18vw,13rem)] text-white whitespace-nowrap'>
-                        MOMSTITCHED
-                    </h2>
-                </div>
+                {/* ───── Giant wordmark (scroll-stretch GSAP effect) ───── */}
+                <FooterWordmark />
             </div>
 
             {/* ───── Bottom bar (purple) ───── */}
-            <div className='bg-[var(--brand-primary)] text-[var(--brand-cream)]/80'>
+            <div className='bg-[var(--brand-ink-soft)] text-[var(--brand-cream)]'>
                 <div className='website-gutter py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm'>
                     <p>Copyright © {new Date().getFullYear()} MomStitched. All Rights Reserved.</p>
                     <div className='flex items-center flex-wrap justify-center gap-x-8 gap-y-2'>
