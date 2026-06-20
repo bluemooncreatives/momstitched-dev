@@ -17,7 +17,7 @@ const buildSearchParamString = (searchParams) => {
 const Shop = async ({ searchParams }) => {
     const resolvedSearchParams = (await searchParams) ?? {}
     const initialSearchParamsString = buildSearchParamString(resolvedSearchParams)
-    const [filters, { products, nextPage }] = await Promise.all([
+    const [filters, { products, total, totalPages }] = await Promise.all([
         getShopFilters(),
         getShopProducts({
             size: resolvedSearchParams?.size,
@@ -36,7 +36,8 @@ const Shop = async ({ searchParams }) => {
         <ShopClient
             initialFilters={filters}
             initialProducts={products}
-            initialNextPage={nextPage}
+            initialTotal={total}
+            initialTotalPages={totalPages}
             initialSearchParamsString={initialSearchParamsString}
         />
     )

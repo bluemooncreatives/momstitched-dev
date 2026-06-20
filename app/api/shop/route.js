@@ -9,7 +9,7 @@ export async function GET(request) {
     try {
         const searchParams = request.nextUrl.searchParams
 
-        const { products, nextPage } = await getShopProducts({
+        const result = await getShopProducts({
             size: searchParams.get('size'),
             color: searchParams.get('color'),
             minPrice: searchParams.get('minPrice'),
@@ -21,7 +21,7 @@ export async function GET(request) {
             page: searchParams.get('page'),
         })
 
-        return response(true, 200, 'Product data found.', { products, nextPage }, { headers: CACHE_HEADERS })
+        return response(true, 200, 'Product data found.', result, { headers: CACHE_HEADERS })
 
     } catch (error) {
         return catchError(error)

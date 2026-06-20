@@ -6,7 +6,7 @@ import Sorting from '@/components/Application/Website/Sorting'
 // so ssr:false defers its Accordion/Checkbox/Slider/radix-ui chunk entirely.
 const Filter = dynamic(() => import('@/components/Application/Website/Filter'), { ssr: false })
 import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
     Sheet,
     SheetContent,
@@ -16,20 +16,24 @@ import {
 } from "@/components/ui/sheet"
 import axios from 'axios'
 import { useSearchParams } from 'next/navigation'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import ProductBox from '@/components/Application/Website/ProductBox'
-import ButtonLoading from '@/components/Application/ButtonLoading'
+import ProductBoxSkeleton from '@/components/Application/Website/ProductBoxSkeleton'
+import ShopPagination from '@/components/Application/Website/ShopPagination'
 import { BrandButton } from '@/components/Application/Website/BrandButton'
 import Link from 'next/link'
 import { PackageSearch, RotateCcw, Store } from 'lucide-react'
 
-const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilters, initialSearchParamsString = '' }) => {
+const LIMIT = 9
+
+const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages = 0, initialFilters, initialSearchParamsString = '' }) => {
     const searchParams = useSearchParams()
     const searchParamString = searchParams.toString()
-    const limit = 9
     const [sorting, setSorting] = useState('default_sorting')
+    const [page, setPage] = useState(0)
     const [isMobileFilter, setIsMobileFilter] = useState(false)
     const [isDesktop, setIsDesktop] = useState(false)
+    const gridTopRef = useRef(null)
 
     useEffect(() => {
         const mediaQuery = window.matchMedia('(min-width: 1025px)')
@@ -46,11 +50,17 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
         }
     }, [])
 
+    // Filters or sort changed → always restart at the first page, otherwise the
+    // user could be stranded on a page index that no longer exists.
+    useEffect(() => {
+        setPage(0)
+    }, [searchParamString, sorting])
+
     const fetchProduct = useCallback(async (pageParam) => {
         const { data: getProduct } = await axios.get('/api/shop', {
             params: {
                 page: pageParam,
-                limit,
+                limit: LIMIT,
                 sort: sorting,
                 ...(searchParamString ? Object.fromEntries(new URLSearchParams(searchParamString)) : {}),
             }
@@ -64,32 +74,44 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
     const isInitialQuery = searchParamString === initialSearchParamsString
         && sorting === 'default_sorting'
 
-    const initialData = useMemo(() => {
-        if (!isInitialQuery) return undefined
-        return {
-            pages: [{ products: initialProducts, nextPage: initialNextPage }],
-            pageParams: [0],
-        }
-    }, [initialProducts, initialNextPage, isInitialQuery])
-
-    const { error, data, isFetching, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
-        queryKey: ['products', sorting, searchParamString],
-        queryFn: ({ pageParam }) => fetchProduct(pageParam),
-        initialPageParam: 0,
-        initialData,
+    const { error, data, isFetching, isPending, refetch } = useQuery({
+        queryKey: ['products', sorting, searchParamString, page],
+        queryFn: () => fetchProduct(page),
+        // Reuse the server-rendered first page so the initial paint needs no refetch.
+        initialData: (page === 0 && isInitialQuery)
+            ? { products: initialProducts, total: initialTotal, totalPages: initialTotalPages, page: 0 }
+            : undefined,
         staleTime: 60 * 1000,
         gcTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         retry: 1,
-        getNextPageParam: (lastPage) => {
-            return lastPage?.nextPage ?? undefined
-        }
     })
 
-    const allProducts = useMemo(() => data?.pages?.flatMap((page) => page.products) || [], [data?.pages])
-    const showEmptyState = !isFetching && !error && allProducts.length === 0
-    const resultCount = !isFetching && !error ? allProducts.length : null
+    const products = data?.products ?? []
+    const total = data?.total ?? 0
+    const totalPages = data?.totalPages ?? 0
+
+    // If the result set shrank below the current page (e.g. tighter filter),
+    // fall back to the last valid page.
+    const pageOutOfRange = !isFetching && totalPages > 0 && page > totalPages - 1
+    useEffect(() => {
+        if (pageOutOfRange) {
+            setPage(totalPages - 1)
+        }
+    }, [pageOutOfRange, totalPages])
+
+    // No cached data for this page yet, or we're about to clamp → show skeletons.
+    const showSkeleton = isPending || pageOutOfRange
+    const showEmptyState = !isFetching && !error && total === 0
+    const resultCount = error ? null : total
+
+    const handlePageChange = (nextPageIndex) => {
+        setPage(nextPageIndex)
+        requestAnimationFrame(() => {
+            gridTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        })
+    }
 
     return (
         <div>
@@ -146,10 +168,28 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                             />
                         </div>
 
-                        {(isLoading || isFetching) && <div className='font-neue py-6 text-center text-sm text-muted-foreground'>Loading products...</div>}
-                        {error && <div className='font-neue py-6 text-center text-sm text-destructive'>Failed to load products. Please try again.</div>}
+                        {/* Scroll anchor — page changes bring this back into view. */}
+                        <div ref={gridTopRef} className="scroll-mt-24" />
 
-                        {showEmptyState ? (
+                        {error ? (
+                            <div className="mt-8 flex flex-col items-center rounded-lg border border-border/60 bg-background px-6 py-14 text-center shadow-sm">
+                                <h3 className="font-neue text-xl font-semibold text-destructive">Something went wrong</h3>
+                                <p className="font-neue mt-2 max-w-sm text-sm text-muted-foreground">
+                                    We couldn&apos;t load products right now. Please try again.
+                                </p>
+                                <div className="mt-6 w-full max-w-xs">
+                                    <BrandButton type="button" onClick={() => refetch()}>
+                                        <RotateCcw className="mr-2 size-4" />Retry
+                                    </BrandButton>
+                                </div>
+                            </div>
+                        ) : showSkeleton ? (
+                            <div className='grid grid-cols-2 gap-4 pt-7 md:grid-cols-3 md:gap-5 lg:gap-6'>
+                                {Array.from({ length: LIMIT }).map((_, index) => (
+                                    <ProductBoxSkeleton key={index} />
+                                ))}
+                            </div>
+                        ) : showEmptyState ? (
                             <div className="mt-8 flex flex-col items-center rounded-lg border border-border/60 bg-background px-6 py-14 text-center shadow-sm">
                                 <div className="flex size-16 items-center justify-center rounded-full bg-[var(--brand-cream)]/50 text-[var(--brand-primary)]">
                                     <PackageSearch className="size-8" strokeWidth={1.5} />
@@ -174,31 +214,27 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                             </div>
                         ) : (
                             <div className='grid grid-cols-2 gap-4 pt-7 md:grid-cols-3 md:gap-5 lg:gap-6'>
-                                {allProducts.map((product, index) => (
+                                {products.map((product, index) => (
                                     <ProductBox key={product._id} product={product} priority={index < 3} />
                                 ))}
                             </div>
                         )}
 
-                        <div className='mt-9 flex flex-col items-center gap-4'>
-                            {hasNextPage ? (
-                                <ButtonLoading
-                                    type="button"
-                                    loading={isFetching}
-                                    text="Load More"
-                                    onClick={fetchNextPage}
-                                    variant="brand"
-                                    className="h-10 px-7 text-[11px] font-semibold uppercase tracking-[0.24em]"
+                        {!error && !showEmptyState && (
+                            <div className='mt-10 flex flex-col items-center gap-4'>
+                                <ShopPagination
+                                    page={page}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    disabled={isFetching}
                                 />
-                            ) : (
-                                !isFetching && !showEmptyState && <span className="text-sm text-muted-foreground">No more data to load.</span>
-                            )}
-                            {!showEmptyState && (
-                                <p className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                                    Showing {allProducts.length} results
-                                </p>
-                            )}
-                        </div>
+                                {total > 0 && (
+                                    <p className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                                        Page {Math.min(page + 1, totalPages)} of {totalPages} · {total} {total === 1 ? 'item' : 'items'}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
