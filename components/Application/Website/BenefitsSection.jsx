@@ -96,7 +96,7 @@ const BenefitsSection = () => {
     }, { scope: sectionRef })
 
     return (
-        <section ref={sectionRef} className="website-gutter bg-background py-16 lg:py-24">
+        <section ref={sectionRef} className="website-gutter bg-background py-16 lg:py-14">
 
             {/* box */}
             <div className="relative overflow-hidden rounded-3xl bg-[var(--dark-red)] p-8 lg:p-16">

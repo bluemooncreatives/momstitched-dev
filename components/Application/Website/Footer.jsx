@@ -111,11 +111,11 @@ const Footer = () => {
 
                     {/* Get Started CTA card */}
                     <div className='shrink-0'>
-                        <div className='footer-cta bg-[var(--brand-cream)] rounded-3xl p-5 w-56'>
+                        <div className='footer-cta bg-[var(--brand-cream)] rounded-sm p-5 w-56'>
                             <p className='text-[var(--brand-ink)] text-xl font-semibold mb-10'>Get Started</p>
                             <Link
                                 href={WEBSITE_SHOP}
-                                className='flex items-center justify-between bg-[var(--brand-primary)] text-white rounded-full pl-5 pr-4 py-3 hover:bg-[var(--brand-primary-hover)] transition-colors'
+                                className='flex items-center justify-between bg-[var(--brand-primary)] text-white rounded-sm pl-5 pr-4 py-3 hover:bg-[var(--brand-primary-hover)] transition-colors'
                             >
                                 <span className='text-sm'>Go</span>
                                 <ArrowRight className='size-4' />
