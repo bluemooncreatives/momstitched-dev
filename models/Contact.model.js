@@ -14,6 +14,18 @@ const contactSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    phone: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 20,
+    },
+    address: {
+      type: String,
+      trim: true,
+      maxlength: 300,
+      default: '',
+    },
     subject: {
       type: String,
       trim: true,

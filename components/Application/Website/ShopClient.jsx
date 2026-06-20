@@ -19,8 +19,9 @@ import { useSearchParams } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import ProductBox from '@/components/Application/Website/ProductBox'
 import ButtonLoading from '@/components/Application/ButtonLoading'
-import { Button } from '@/components/ui/button'
+import { BrandButton } from '@/components/Application/Website/BrandButton'
 import Link from 'next/link'
+import { PackageSearch, RotateCcw, Store } from 'lucide-react'
 
 const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilters, initialSearchParamsString = '' }) => {
     const searchParams = useSearchParams()
@@ -149,16 +150,27 @@ const ShopClient = ({ initialProducts = [], initialNextPage = null, initialFilte
                         {error && <div className='font-neue py-6 text-center text-sm text-destructive'>Failed to load products. Please try again.</div>}
 
                         {showEmptyState ? (
-                            <div className="mt-8 rounded-lg border border-border/60 bg-background p-10 text-center shadow-sm">
-                                <h3 className="font-neue text-xl font-semibold">No products found</h3>
-                                <p className="font-neue mt-2 text-sm text-muted-foreground">
-                                    Try adjusting your filters or start a fresh search.
+                            <div className="mt-8 flex flex-col items-center rounded-lg border border-border/60 bg-background px-6 py-14 text-center shadow-sm">
+                                <div className="flex size-16 items-center justify-center rounded-full bg-[var(--brand-cream)]/50 text-[var(--brand-primary)]">
+                                    <PackageSearch className="size-8" strokeWidth={1.5} />
+                                </div>
+                                <h3 className="font-neue mt-5 text-xl font-semibold">No Products Found</h3>
+                                <p className="font-neue mt-2 max-w-sm text-sm text-muted-foreground">
+                                    {searchParams.size > 0
+                                        ? 'No products match your current filters. Try clearing them or browse the full collection.'
+                                        : 'There are no products to show right now. Please check back soon.'}
                                 </p>
-                                {searchParams.size > 0 && (
-                                    <Button asChild variant="brand" className="mt-4">
-                                        <Link href={WEBSITE_SHOP}>Clear Filters</Link>
-                                    </Button>
-                                )}
+                                <div className="mt-6 w-full max-w-xs">
+                                    <BrandButton asChild>
+                                        <Link href={WEBSITE_SHOP}>
+                                            {searchParams.size > 0 ? (
+                                                <><RotateCcw className="mr-2 size-4" />Clear Filters</>
+                                            ) : (
+                                                <><Store className="mr-2 size-4" />Browse Shop</>
+                                            )}
+                                        </Link>
+                                    </BrandButton>
+                                </div>
                             </div>
                         ) : (
                             <div className='grid grid-cols-2 gap-4 pt-7 md:grid-cols-3 md:gap-5 lg:gap-6'>

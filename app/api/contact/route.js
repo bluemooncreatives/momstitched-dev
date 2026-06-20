@@ -10,7 +10,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, email, subject, message } = body
+    const { name, email, phone, address, subject, message } = body
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return response(false, 400, 'Name is required.')
@@ -18,16 +18,24 @@ export async function POST(request) {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return response(false, 400, 'A valid email is required.')
     }
+    if (!phone || !/^[+\d][\d\s()-]{6,19}$/.test(phone.trim())) {
+      return response(false, 400, 'A valid mobile number is required.')
+    }
     if (!message || typeof message !== 'string' || message.trim().length < 10) {
       return response(false, 400, 'Message must be at least 10 characters.')
     }
     if (name.trim().length > 100 || message.trim().length > 2000) {
       return response(false, 400, 'Input exceeds maximum allowed length.')
     }
+    if (address && address.trim().length > 300) {
+      return response(false, 400, 'Address exceeds maximum allowed length.')
+    }
 
     const payload = {
       name: name.trim(),
       email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      address: address?.trim() || '',
       subject: subject?.trim() || '',
       message: message.trim(),
     }
@@ -76,6 +84,8 @@ export async function GET(request) {
       matchQuery['$or'] = [
         { name: { $regex: globalFilter, $options: 'i' } },
         { email: { $regex: globalFilter, $options: 'i' } },
+        { phone: { $regex: globalFilter, $options: 'i' } },
+        { address: { $regex: globalFilter, $options: 'i' } },
         { subject: { $regex: globalFilter, $options: 'i' } },
         { message: { $regex: globalFilter, $options: 'i' } },
       ]

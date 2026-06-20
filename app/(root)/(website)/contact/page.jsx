@@ -8,7 +8,7 @@ import styles from "./contact.module.css";
 
 const ContactPage = () => {
   const container = useRef();
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", subject: "", message: "" });
   const [loading, setLoading] = useState(false);
 
   useGSAP(
@@ -56,7 +56,7 @@ const ContactPage = () => {
       const data = await res.json();
       if (data.success) {
         toast.success("Message sent! We'll get back to you soon.");
-        setForm({ name: "", email: "", subject: "", message: "" });
+        setForm({ name: "", email: "", phone: "", address: "", subject: "", message: "" });
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }
@@ -117,6 +117,38 @@ const ContactPage = () => {
                   autoComplete="email"
                   placeholder="your@email.com"
                   value={form.email}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="phone" className={styles.label}>Mobile Number</label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  required
+                  autoComplete="tel"
+                  placeholder="+91 98765 43210"
+                  value={form.phone}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="address" className={styles.label}>
+                  Address <span className={styles.optional}>(optional)</span>
+                </label>
+                <input
+                  id="address"
+                  name="address"
+                  type="text"
+                  autoComplete="street-address"
+                  placeholder="City, State"
+                  value={form.address}
                   onChange={handleChange}
                   className={styles.input}
                 />

@@ -1,4 +1,4 @@
-export const contactNotification = ({ name, email, subject, message }) => {
+export const contactNotification = ({ name, email, phone, address, subject, message }) => {
   const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -53,6 +53,18 @@ export const contactNotification = ({ name, email, subject, message }) => {
                     <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#aaaaaa;">From</p>
                     <p style="margin:0;font-size:16px;color:#111111;font-weight:600;">${name}</p>
                     <p style="margin:4px 0 0;font-size:14px;color:#555555;">${email}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom:20px;">
+                    <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#aaaaaa;">Mobile</p>
+                    <p style="margin:0;font-size:16px;color:#111111;">${phone || '—'}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom:20px;">
+                    <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#aaaaaa;">Address</p>
+                    <p style="margin:0;font-size:16px;color:#111111;">${address || '(Not provided)'}</p>
                   </td>
                 </tr>
                 <tr>

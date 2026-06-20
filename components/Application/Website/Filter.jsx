@@ -2,10 +2,10 @@
 import { memo, useEffect, useId, useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
-import ButtonLoading from '../ButtonLoading'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import { Button } from '@/components/ui/button'
+import { BrandButton } from '@/components/Application/Website/BrandButton'
 import Link from 'next/link'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Minus, Plus } from 'lucide-react'
@@ -151,7 +151,7 @@ const Filter = ({ filters }) => {
                                     <li key={category._id}>
                                         <label
                                             htmlFor={categoryId}
-                                            className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--dark-red)]' : 'text-foreground/60 hover:text-foreground'}`}
+                                            className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--brand-primary-hover)]' : 'font-semibold text-[var(--brand-ink)] hover:text-[var(--brand-primary-hover)]'}`}
                                         >
                                             <Checkbox
                                                 id={categoryId}
@@ -192,7 +192,7 @@ const Filter = ({ filters }) => {
                                     <li key={`${color}-${index}`}>
                                         <label
                                             htmlFor={colorId}
-                                            className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--dark-red)]' : 'text-foreground/60 hover:text-foreground'}`}
+                                            className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'font-semibold text-[var(--brand-primary-hover)]' : 'font-semibold text-[var(--brand-ink)] hover:text-[var(--brand-primary-hover)]'}`}
                                         >
                                             <Checkbox
                                                 id={colorId}
@@ -236,7 +236,7 @@ const Filter = ({ filters }) => {
                                     <li key={`${size}-${index}`}>
                                         <label
                                             htmlFor={sizeId}
-                                            className={`flex cursor-pointer items-center gap-2 px-1 py-1.5 text-[13px] transition ${active ? 'font-medium text-[var(--dark-red)]' : 'text-foreground/60 hover:text-foreground'}`}
+                                            className={`flex cursor-pointer items-center gap-2 px-1 py-1.5 text-[13px] transition ${active ? 'font-semibold text-[var(--brand-primary-hover)]' : 'font-semibold text-[var(--brand-ink)] hover:text-[var(--brand-primary-hover)]'}`}
                                         >
                                             <Checkbox
                                                 id={sizeId}
@@ -276,7 +276,9 @@ const Filter = ({ filters }) => {
                                 {priceFilter.maxPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                             </div>
                         </div>
-                        <ButtonLoading onClick={handlePriceFilter} type="button" text="Apply Price" variant="brand" className="h-9 w-full rounded-xs text-base font-semibold uppercase" />
+                        <BrandButton onClick={handlePriceFilter} type="button">
+                            Apply Filter
+                        </BrandButton>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

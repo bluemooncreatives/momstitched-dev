@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
 import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
 import { ChevronLeft, ChevronRight, Eye, ShoppingBag, Star } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { BrandButton, BrandOutlineButton } from '@/components/Application/Website/BrandButton'
 import { addIntoCart } from '@/store/reducer/cartReducer'
 import { showToast } from '@/lib/showToast'
 
@@ -154,35 +154,25 @@ const ProductBox = ({ product, priority = false }) => {
 
                 <div className="grid w-full grid-cols-2 gap-2">
                     {isInCart ? (
-                        <Button
-                            asChild
-                            variant="brand-outline"
-                            className="h-9 w-full rounded-xs text-base font-semibold uppercase"
-                        >
+                        <BrandOutlineButton asChild>
                             <Link href={WEBSITE_CART}>Go To Cart</Link>
-                        </Button>
+                        </BrandOutlineButton>
                     ) : (
-                        <Button
+                        <BrandOutlineButton
                             type="button"
-                            variant="brand-outline"
                             disabled={!variant || isAdding}
                             onClick={handleAddToCart}
-                            className="h-9 w-full rounded-xs text-base font-semibold uppercase"
                         >
                             <ShoppingBag className="size-3.5" />
                             Add To Cart
-                        </Button>
+                        </BrandOutlineButton>
                     )}
 
-                    <Button
-                        asChild
-                        variant="brand"
-                        className="h-9 w-full rounded-xs text-base font-semibold uppercase"
-                    >
+                    <BrandButton asChild>
                         <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} aria-label={`Buy Product: ${product?.name}`}>
                             Buy Product
                         </Link>
-                    </Button>
+                    </BrandButton>
                 </div>
             </div>
         </div>

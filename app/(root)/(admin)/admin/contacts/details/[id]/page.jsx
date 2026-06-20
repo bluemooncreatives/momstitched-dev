@@ -6,7 +6,7 @@ import PageHeader from '@/components/Application/Admin/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ADMIN_CONTACTS_SHOW, ADMIN_DASHBOARD } from '@/routes/AdminPanelRoute'
-import { Mail, User, MessageSquare, Calendar, Tag } from 'lucide-react'
+import { Mail, User, MessageSquare, Calendar, Tag, Phone, MapPin } from 'lucide-react'
 import dayjs from 'dayjs'
 
 const breadcrumbData = [
@@ -89,6 +89,31 @@ const ContactDetail = ({ params }) => {
                   >
                     {contact.email}
                   </a>
+                </div>
+              </div>
+
+              <div className="rounded-lg border p-4 flex gap-3">
+                <Phone className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5 uppercase tracking-wide">Mobile</p>
+                  {contact.phone ? (
+                    <a
+                      href={`tel:${contact.phone}`}
+                      className="font-medium text-sm text-blue-600 hover:underline dark:text-blue-400"
+                    >
+                      {contact.phone}
+                    </a>
+                  ) : (
+                    <p className="font-medium text-sm text-muted-foreground italic">Not provided</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-lg border p-4 flex gap-3">
+                <MapPin className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5 uppercase tracking-wide">Address</p>
+                  <p className="font-medium text-sm">{contact.address || <span className="text-muted-foreground italic">Not provided</span>}</p>
                 </div>
               </div>
 

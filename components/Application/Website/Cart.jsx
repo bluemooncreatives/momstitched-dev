@@ -1,5 +1,5 @@
 'use client'
-import { ShoppingCart, ShoppingCartIcon } from 'lucide-react'
+import { ShoppingBag, ShoppingCart, ShoppingCartIcon } from 'lucide-react'
 import {
     Sheet,
     SheetContent,
@@ -13,8 +13,8 @@ import Image from "next/image"
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import { removeFromCart } from "@/store/reducer/cartReducer"
 import Link from "next/link"
-import { WEBSITE_CART, WEBSITE_CHECKOUT } from "@/routes/WebsiteRoute"
-import { Button } from "@/components/ui/button"
+import { WEBSITE_CART, WEBSITE_CHECKOUT, WEBSITE_SHOP } from "@/routes/WebsiteRoute"
+import { BrandButton, BrandOutlineButton } from "@/components/Application/Website/BrandButton"
 import { useEffect, useState } from "react"
 import { showToast } from "@/lib/showToast"
 
@@ -68,15 +68,21 @@ const Cart = () => {
                 {/* Scrollable product list */}
                 <div className="no-scrollbar flex-1 overflow-y-auto px-5 py-5">
                     {cart.count === 0 ? (
-                        <div className="flex min-h-[360px] flex-col items-center justify-center gap-5 rounded-2xl border border-dashed border-border/60 bg-muted/10 px-6 text-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted/50">
-                                <ShoppingCartIcon className="h-7 w-7 text-muted-foreground/70" strokeWidth={1.5} />
+                        <div className="flex flex-col items-center rounded-lg border border-border/60 bg-background px-6 py-14 text-center shadow-sm">
+                            <div className="flex size-16 items-center justify-center rounded-full bg-[var(--brand-cream)]/50 text-[var(--brand-primary)]">
+                                <ShoppingCartIcon className="size-8" strokeWidth={1.5} />
                             </div>
-                            <div className="space-y-1.5">
-                                <p className="font-neue text-[1.05rem] font-semibold tracking-tight text-foreground">Your cart is empty</p>
-                                <p className="max-w-[220px] text-[13px] leading-relaxed text-muted-foreground">
-                                    Add pieces you love to see them here with pricing and quick checkout.
-                                </p>
+                            <h3 className="font-neue mt-5 text-xl font-semibold">Your cart is empty</h3>
+                            <p className="font-neue mt-2 max-w-[200px] text-sm text-muted-foreground">
+                                Add pieces you love to see them here with pricing and quick checkout.
+                            </p>
+                            <div className="mt-6 w-full">
+                                <BrandButton asChild onClick={() => setOpen(false)}>
+                                    <Link href={WEBSITE_SHOP}>
+                                        <ShoppingBag className="mr-2 size-4" />
+                                        Shop Now
+                                    </Link>
+                                </BrandButton>
                             </div>
                         </div>
                     ) : (
@@ -134,15 +140,15 @@ const Cart = () => {
                             {/* Price summary */}
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-[13px] text-muted-foreground">Subtotal</span>
-                                    <span className="text-[13px] font-medium text-foreground">{fmt(subtotal)}</span>
+                                    <span className="font-neue text-[15px] text-muted-foreground">Subtotal</span>
+                                    <span className="font-neue text-[15px] font-medium text-foreground">{fmt(subtotal)}</span>
                                 </div>
 
                                 <div className="my-1 border-t border-border/40" />
 
                                 <div className="flex items-center justify-between">
-                                    <span className="font-neue text-[15px] font-semibold text-foreground">Total</span>
-                                    <span className="font-neue text-[15px] font-semibold text-foreground">{fmt(subtotal)}</span>
+                                    <span className="font-neue text-[17px] font-semibold text-foreground">Total</span>
+                                    <span className="font-neue text-[17px] font-semibold text-foreground">{fmt(subtotal)}</span>
                                 </div>
                             </div>
 
@@ -161,20 +167,16 @@ const Cart = () => {
 
                     {/* Action buttons */}
                     <div className="mt-4 grid grid-cols-2 gap-2.5">
-                        <Button
+                        <BrandOutlineButton
                             type="button"
                             asChild
-                            variant="brand-outline"
-                            className="h-9 w-full rounded-xs text-base font-semibold uppercase"
                             onClick={() => setOpen(false)}
                         >
                             <Link href={WEBSITE_CART}>View Cart</Link>
-                        </Button>
-                        <Button
+                        </BrandOutlineButton>
+                        <BrandButton
                             type="button"
                             asChild
-                            variant="brand"
-                            className="h-9 w-full rounded-xs text-base font-semibold uppercase"
                             onClick={() => setOpen(false)}
                         >
                             {cart.count ? (
@@ -184,7 +186,7 @@ const Cart = () => {
                                     Checkout
                                 </span>
                             )}
-                        </Button>
+                        </BrandButton>
                     </div>
                 </div>
 
