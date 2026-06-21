@@ -1,150 +1,395 @@
 import { notFound } from 'next/navigation'
 import WebsiteBreadcrumb from "@/components/Application/Website/WebsiteBreadcrumb"
+import OrderDetailActions from "@/components/Application/Website/OrderDetailActions"
 import Image from "next/image"
 import placeholderImg from '@/public/assets/images/img-placeholder.webp'
 import Link from "next/link"
-import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute"
+import { USER_ORDERS, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute"
 import { getOrderDetailsByOrderId } from "@/lib/services/orderService"
+import {
+    ArrowLeft,
+    BadgeCheck,
+    CheckCircle2,
+    ChevronRight,
+    Clock,
+    CreditCard,
+    Headset,
+    MapPin,
+    Package,
+    PackageCheck,
+    ShoppingBag,
+    Truck,
+    Wallet,
+    XCircle,
+} from 'lucide-react'
+
+const fmt = (n) => Number(n || 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
+
+const formatDate = (d) => {
+    if (!d) return null
+    try {
+        return new Date(d).toLocaleString('en-IN', {
+            day: 'numeric', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit',
+        })
+    } catch {
+        return null
+    }
+}
+
+// ── Status presentation ────────────────────────────────────────────
+const STATUS_META = {
+    pending: { label: 'Order Placed', tone: 'amber', Icon: Clock, note: 'We have received your order and it is awaiting processing.' },
+    processing: { label: 'Processing', tone: 'blue', Icon: Package, note: 'Your order is being prepared for shipment.' },
+    shipped: { label: 'Shipped', tone: 'indigo', Icon: Truck, note: 'Your order is on the way to your address.' },
+    delivered: { label: 'Delivered', tone: 'emerald', Icon: PackageCheck, note: 'Your order has been delivered. We hope you love it!' },
+    cancelled: { label: 'Cancelled', tone: 'red', Icon: XCircle, note: 'This order has been cancelled.' },
+    unverified: { label: 'Payment Unverified', tone: 'red', Icon: Clock, note: 'We could not verify the payment for this order yet.' },
+}
+
+const TONE = {
+    amber: 'border-amber-500/30 bg-amber-500/10 text-amber-700',
+    blue: 'border-blue-500/30 bg-blue-500/10 text-blue-700',
+    indigo: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-700',
+    emerald: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700',
+    red: 'border-red-500/30 bg-red-500/10 text-red-700',
+}
+
+const PAYMENT_STATUS_META = {
+    unpaid: { label: 'Unpaid', tone: 'amber' },
+    partial_paid: { label: 'Partially Paid', tone: 'blue' },
+    fully_paid: { label: 'Fully Paid', tone: 'emerald' },
+}
+
+const PAYMENT_METHOD_LABEL = {
+    cod: 'Cash on Delivery',
+    full: 'Paid Online',
+    partial: 'Partial Payment',
+}
+
+const TRACK_STEPS = [
+    { key: 'pending', label: 'Placed', Icon: CheckCircle2 },
+    { key: 'processing', label: 'Processing', Icon: Package },
+    { key: 'shipped', label: 'Shipped', Icon: Truck },
+    { key: 'delivered', label: 'Delivered', Icon: PackageCheck },
+]
 
 const OrderDetails = async ({ params }) => {
     const { orderid } = await params
-    const order = await getOrderDetailsByOrderId(orderid)
+    const orderData = await getOrderDetailsByOrderId(orderid)
 
-    if (!order) notFound()
+    if (!orderData) notFound()
 
-    const orderData = order
+    const status = orderData?.status || 'pending'
+    const statusMeta = STATUS_META[status] || STATUS_META.pending
+    const isCancelled = status === 'cancelled'
+    const isUnverified = status === 'unverified'
+    const isTracked = !isCancelled && !isUnverified
+    const currentStep = TRACK_STEPS.findIndex((s) => s.key === status)
+
+    const products = orderData?.products ?? []
+    const itemCount = products.reduce((sum, p) => sum + (p?.qty || 0), 0)
+
+    const mrpTotal = products.reduce((sum, p) => sum + ((p?.mrp || p?.sellingPrice || 0) * (p?.qty || 0)), 0)
+    const mrpSavings = Math.max(0, mrpTotal - (orderData?.subtotal || 0))
+    const totalSavings = mrpSavings + (orderData?.couponDiscountAmount || 0)
+
+    const paymentMethod = orderData?.paymentMethod || 'full'
+    const paymentStatusMeta = PAYMENT_STATUS_META[orderData?.paymentStatus] || PAYMENT_STATUS_META.unpaid
+    const placedOn = formatDate(orderData?.createdAt)
 
     const breadcrumb = {
         title: 'Order Details',
         links: [{ label: 'Order Details' }]
     }
+
     return (
-        <div>
+        <div className='font-neue'>
             <WebsiteBreadcrumb props={breadcrumb} />
-            <div className="lg:px-32 px-5 my-20">
-                    <div>
-                        <div className="mb-5">
-                            <p><b>Order Id:</b> {orderData?.order_id}</p>
-                            <p><b>Transaction Id:</b> {orderData?.payment_id}</p>
-                            <p className="capitalize"><b>Status:</b> {orderData?.status}</p>
-                        </div>
-                        <table className="w-full border">
-                            <thead className="border-b bg-gray-50 md:table-header-group hidden">
-                                <tr>
-                                    <th className="text-start p-3">Product</th>
-                                    <th className="text-center p-3">Price</th>
-                                    <th className="text-center p-3">Quantity</th>
-                                    <th className="text-center p-3">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {orderData?.products?.map((product) => (
-                                    <tr key={product.variantId._id} className="md:table-row block border-b">
-                                        <td className="p-3">
-                                            <div className="flex items-center gap-5">
-                                                <Image src={product?.variantId?.media[0]?.secure_url || placeholderImg.src} width={60} height={60} alt="product" className="rounded" />
-                                                <div>
-                                                    <h4 className="text-lg line-clamp-1">
-                                                        <Link href={WEBSITE_PRODUCT_DETAILS(product?.productId?.slug)}>{product?.productId?.name}</Link>
-                                                        <p>Color: {product?.variantId?.color}</p>
-                                                        <p>Size: {product?.variantId?.size}</p>
-                                                    </h4>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
-                                            <span className="md:hidden font-medium">Price</span>
-                                            <span>{product.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                                        </td>
-                                        <td className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
-                                            <span className="md:hidden font-medium">Quantity</span>
-                                            <span>{product.qty}</span>
-                                        </td>
-                                        <td className="md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center">
-                                            <span className="md:hidden font-medium">Total</span>
-                                            <span>{(product.qty * product.sellingPrice).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
 
-                        <div className="grid md:grid-cols-2 grid-cols-1 gap-10 border mt-10">
-                            <div className="p-5">
-                                <h4 className="text-lg font-semibold mb-5">Shipping Address</h4>
-                                <div>
-                                    <table className="w-full">
-                                        <tbody>
-                                            <tr>
-                                                <td className="font-medium py-2">Name</td>
-                                                <td className="text-end py-2">{orderData?.name}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="font-medium py-2">Email</td>
-                                                <td className="text-end py-2">{orderData?.email}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="font-medium py-2">Phone</td>
-                                                <td className="text-end py-2">{orderData?.phone}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="font-medium py-2">Country</td>
-                                                <td className="text-end py-2">{orderData?.country}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="font-medium py-2">State</td>
-                                                <td className="text-end py-2">{orderData?.state}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="font-medium py-2">City</td>
-                                                <td className="text-end py-2">{orderData?.city}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="font-medium py-2">Pincode</td>
-                                                <td className="text-end py-2">{orderData?.pincode}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="font-medium py-2">Landmark</td>
-                                                <td className="text-end py-2">{orderData?.landmark}</td>
-                                            </tr>
-                                            <tr>
-                                                <td className="font-medium py-2">Order note</td>
-                                                <td className="text-end py-2">{orderData?.ordernote || '---'}</td>
-                                            </tr>
+            <section className='website-gutter py-10 lg:py-14'>
+                <div className='mx-auto w-full max-w-5xl'>
 
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div className="p-5 bg-gray-50">
-                                <h4 className="text-lg font-semibold mb-5">Order Summary</h4>
-                                <div>
-                                    <table className="w-full">
-                                        <tbody>
-                                            <tr>
-                                                <td className="font-medium py-2">Subtotal</td>
-                                                <td className="text-end py-2">{orderData?.subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
-                                            </tr>
-                                            {orderData?.couponDiscountAmount > 0 && (
-                                                <tr>
-                                                    <td className="font-medium py-2">Coupon Discount</td>
-                                                    <td className="text-end py-2">- {orderData?.couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
-                                                </tr>
-                                            )}
-                                            <tr>
-                                                <td className="font-medium py-2">Total</td>
-                                                <td className="text-end py-2">{orderData?.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
-                                            </tr>
-
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
+                    {/* ── Top bar ── */}
+                    <div className='mb-6 flex flex-wrap items-center justify-between gap-4'>
+                        <Link
+                            href={USER_ORDERS}
+                            className='inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground'
+                        >
+                            <ArrowLeft className='size-3.5' /> Back to orders
+                        </Link>
+                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] ${TONE[statusMeta.tone]}`}>
+                            <statusMeta.Icon className='size-3.5' /> {statusMeta.label}
+                        </span>
                     </div>
-            </div>
+
+                    {/* ── Header card ── */}
+                    <div className='overflow-hidden rounded-2xl border border-border/60 bg-background shadow-sm'>
+                        <div className='flex flex-col gap-4 border-b border-border/60 bg-[var(--brand-warm-bg)]/40 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6'>
+                            <div className='flex items-start gap-3'>
+                                <div className='flex size-11 flex-shrink-0 items-center justify-center rounded-full bg-[var(--dark-red)] text-white'>
+                                    <ShoppingBag className='size-5' />
+                                </div>
+                                <div>
+                                    <h1 className='text-lg font-semibold uppercase tracking-[0.02em] text-foreground'>
+                                        Order #{orderData?.order_id}
+                                    </h1>
+                                    {placedOn && (
+                                        <p className='mt-0.5 text-[13px] text-muted-foreground'>Placed on {placedOn}</p>
+                                    )}
+                                </div>
+                            </div>
+                            <p className='text-[13px] text-muted-foreground sm:text-right'>
+                                {itemCount} {itemCount === 1 ? 'item' : 'items'} · <span className='font-semibold text-foreground'>{fmt(orderData?.totalAmount)}</span>
+                            </p>
+                        </div>
+
+                        {/* ── Status note / tracker ── */}
+                        <div className='px-5 py-6 sm:px-6'>
+                            <p className={`mb-6 flex items-center gap-2 text-[13px] ${isCancelled || isUnverified ? 'text-red-600' : 'text-muted-foreground'}`}>
+                                <statusMeta.Icon className='size-4 flex-shrink-0' /> {statusMeta.note}
+                            </p>
+
+                            {isTracked ? (
+                                <ol className='flex items-center'>
+                                    {TRACK_STEPS.map((step, i) => {
+                                        const done = i <= currentStep
+                                        const isLast = i === TRACK_STEPS.length - 1
+                                        return (
+                                            <li key={step.key} className={`flex items-center ${isLast ? '' : 'flex-1'}`}>
+                                                <div className='flex flex-col items-center gap-2'>
+                                                    <span className={`flex size-9 items-center justify-center rounded-full border-2 transition-colors ${done ? 'border-[var(--dark-red)] bg-[var(--dark-red)] text-white' : 'border-border bg-background text-muted-foreground'}`}>
+                                                        <step.Icon className='size-4' />
+                                                    </span>
+                                                    <span className={`text-[10px] font-semibold uppercase tracking-[0.1em] ${done ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                                        {step.label}
+                                                    </span>
+                                                </div>
+                                                {!isLast && (
+                                                    <span className={`mx-1 h-0.5 flex-1 rounded-full sm:mx-2 ${i < currentStep ? 'bg-[var(--dark-red)]' : 'bg-border'}`} />
+                                                )}
+                                            </li>
+                                        )
+                                    })}
+                                </ol>
+                            ) : (
+                                <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${TONE[statusMeta.tone]}`}>
+                                    <statusMeta.Icon className='size-5 flex-shrink-0' />
+                                    <p className='text-[13px] font-medium'>
+                                        {isCancelled
+                                            ? 'If the amount was debited, it will be refunded to the original payment method within 5–7 business days.'
+                                            : 'Please complete or retry the payment. Contact support if the amount was already debited.'}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* ── Main grid ── */}
+                    <div className='mt-6 grid items-start gap-6 lg:grid-cols-[1fr_360px]'>
+
+                        {/* LEFT: items + shipping */}
+                        <div className='min-w-0 space-y-6'>
+
+                            {/* Items */}
+                            <div className='overflow-hidden rounded-2xl border border-border/60 bg-background shadow-sm'>
+                                <div className='flex items-center justify-between border-b border-border/60 px-5 py-4'>
+                                    <h2 className='flex items-center gap-2 text-base font-semibold uppercase tracking-[0.04em]'>
+                                        <Package className='size-[18px] text-[var(--dark-red)]' /> Items
+                                    </h2>
+                                    <span className='rounded-full bg-muted/60 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground'>
+                                        {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                                    </span>
+                                </div>
+
+                                {products.length === 0 ? (
+                                    <p className='px-5 py-10 text-center text-sm text-muted-foreground'>
+                                        No items found for this order.
+                                    </p>
+                                ) : (
+                                    <div className='divide-y divide-border/50'>
+                                        {products.map((product, idx) => {
+                                            const name = product?.productId?.name || product?.name || 'Product'
+                                            const slug = product?.productId?.slug
+                                            const media = product?.variantId?.media?.[0]?.secure_url || placeholderImg.src
+                                            const color = product?.variantId?.color
+                                            const size = product?.variantId?.size
+                                            const lineTotal = (product?.sellingPrice || 0) * (product?.qty || 0)
+                                            const lineMrp = (product?.mrp || product?.sellingPrice || 0) * (product?.qty || 0)
+                                            const nameNode = slug
+                                                ? <Link href={WEBSITE_PRODUCT_DETAILS(slug)} className='transition-colors hover:text-[var(--dark-red)]'>{name}</Link>
+                                                : name
+                                            return (
+                                                <div key={product?.variantId?._id || product?._id || idx} className='flex gap-4 p-5'>
+                                                    <div className='relative h-[96px] w-[72px] flex-shrink-0 overflow-hidden rounded-md border border-border/40'>
+                                                        <Image src={media} fill sizes='72px' alt={name} className='object-cover object-center' />
+                                                    </div>
+                                                    <div className='flex min-w-0 flex-1 flex-col'>
+                                                        <h4 className='line-clamp-2 text-sm font-semibold leading-snug text-foreground'>
+                                                            {nameNode}
+                                                        </h4>
+                                                        {(size || color) && (
+                                                            <span className='mt-1.5 w-fit rounded-full bg-muted/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground'>
+                                                                {[size, color].filter(Boolean).join(' / ')}
+                                                            </span>
+                                                        )}
+                                                        <div className='mt-auto flex items-end justify-between pt-3'>
+                                                            <span className='text-[13px] text-muted-foreground'>
+                                                                {fmt(product?.sellingPrice)} × {product?.qty}
+                                                            </span>
+                                                            <div className='text-right'>
+                                                                <p className='text-sm font-semibold text-foreground'>{fmt(lineTotal)}</p>
+                                                                {lineMrp > lineTotal && (
+                                                                    <p className='text-[11px] text-muted-foreground line-through'>{fmt(lineMrp)}</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Shipping address */}
+                            <div className='overflow-hidden rounded-2xl border border-border/60 bg-background shadow-sm'>
+                                <div className='flex items-center gap-2 border-b border-border/60 px-5 py-4'>
+                                    <MapPin className='size-[18px] text-[var(--dark-red)]' />
+                                    <h2 className='text-base font-semibold uppercase tracking-[0.04em]'>Shipping Address</h2>
+                                </div>
+                                <div className='px-5 py-5'>
+                                    <p className='text-sm font-semibold text-foreground'>{orderData?.name}</p>
+                                    <p className='mt-1 text-[13px] leading-relaxed text-muted-foreground'>
+                                        {[orderData?.landmark, orderData?.city, orderData?.state, orderData?.country, orderData?.pincode].filter(Boolean).join(', ')}
+                                    </p>
+                                    <div className='mt-3 flex flex-col gap-1 text-[13px] text-muted-foreground sm:flex-row sm:gap-6'>
+                                        <span><span className='font-medium text-foreground'>Phone:</span> {orderData?.phone || '—'}</span>
+                                        <span className='break-all'><span className='font-medium text-foreground'>Email:</span> {orderData?.email || '—'}</span>
+                                    </div>
+                                    {orderData?.ordernote && (
+                                        <div className='mt-4 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5'>
+                                            <p className='text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground'>Order Note</p>
+                                            <p className='mt-1 text-[13px] text-foreground'>{orderData.ordernote}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* RIGHT: summary + payment + actions */}
+                        <aside className='w-full'>
+                            <div className='space-y-4 lg:sticky lg:top-6'>
+
+                                {/* Payment summary */}
+                                <div className='overflow-hidden rounded-2xl border border-border/60 bg-background shadow-sm'>
+                                    <div className='border-b border-border/60 px-5 py-4'>
+                                        <h2 className='text-base font-semibold uppercase tracking-[0.04em]'>Order Summary</h2>
+                                    </div>
+
+                                    <div className='space-y-2.5 px-5 py-4'>
+                                        <div className='flex items-center justify-between text-sm'>
+                                            <span className='text-muted-foreground'>{mrpSavings > 0 ? 'Total MRP' : 'Subtotal'}</span>
+                                            <span className='font-medium text-foreground'>{fmt(mrpSavings > 0 ? mrpTotal : orderData?.subtotal)}</span>
+                                        </div>
+                                        {mrpSavings > 0 && (
+                                            <div className='flex items-center justify-between text-sm'>
+                                                <span className='text-muted-foreground'>Discount on MRP</span>
+                                                <span className='font-medium text-emerald-600'>- {fmt(mrpSavings)}</span>
+                                            </div>
+                                        )}
+                                        {orderData?.couponDiscountAmount > 0 && (
+                                            <div className='flex items-center justify-between text-sm'>
+                                                <span className='text-muted-foreground'>Coupon discount</span>
+                                                <span className='font-medium text-emerald-600'>- {fmt(orderData.couponDiscountAmount)}</span>
+                                            </div>
+                                        )}
+                                        <div className='flex items-center justify-between text-sm'>
+                                            <span className='text-muted-foreground'>Shipping</span>
+                                            <span className='font-medium text-emerald-600'>FREE</span>
+                                        </div>
+
+                                        <div className='my-1 border-t border-dashed border-border/70' />
+
+                                        <div className='flex items-center justify-between'>
+                                            <span className='text-base font-semibold text-foreground'>Total</span>
+                                            <span className='text-xl font-semibold text-foreground'>{fmt(orderData?.totalAmount)}</span>
+                                        </div>
+
+                                        {totalSavings > 0 && (
+                                            <div className='flex items-center justify-center gap-1.5 rounded-lg bg-emerald-500/[0.08] px-3 py-2 text-[13px] font-semibold text-emerald-700'>
+                                                <BadgeCheck className='size-4' />
+                                                You saved {fmt(totalSavings)} on this order
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Payment details */}
+                                    <div className='space-y-2.5 border-t border-border/60 bg-muted/20 px-5 py-4'>
+                                        <div className='flex items-center justify-between text-sm'>
+                                            <span className='flex items-center gap-1.5 text-muted-foreground'>
+                                                {paymentMethod === 'cod' ? <Wallet className='size-4' /> : <CreditCard className='size-4' />}
+                                                Payment
+                                            </span>
+                                            <span className='font-medium text-foreground'>{PAYMENT_METHOD_LABEL[paymentMethod] || 'Online'}</span>
+                                        </div>
+                                        <div className='flex items-center justify-between text-sm'>
+                                            <span className='text-muted-foreground'>Status</span>
+                                            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${TONE[paymentStatusMeta.tone]}`}>
+                                                {paymentStatusMeta.label}
+                                            </span>
+                                        </div>
+                                        {orderData?.paidAmount > 0 && (
+                                            <div className='flex items-center justify-between text-sm'>
+                                                <span className='text-muted-foreground'>Amount paid</span>
+                                                <span className='font-medium text-foreground'>{fmt(orderData.paidAmount)}</span>
+                                            </div>
+                                        )}
+                                        {orderData?.remainingAmount > 0 && (
+                                            <div className='flex items-center justify-between text-sm'>
+                                                <span className='text-muted-foreground'>{paymentMethod === 'cod' ? 'Pay on delivery' : 'Remaining'}</span>
+                                                <span className='font-semibold text-[var(--dark-red)]'>{fmt(orderData.remainingAmount)}</span>
+                                            </div>
+                                        )}
+                                        {orderData?.payment_id && (
+                                            <div className='flex items-center justify-between gap-3 text-sm'>
+                                                <span className='text-muted-foreground'>Transaction ID</span>
+                                                <span className='truncate font-mono text-[11px] text-foreground' title={orderData.payment_id}>{orderData.payment_id}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className='space-y-2.5 border-t border-border/60 px-5 py-5'>
+                                        <OrderDetailActions orderId={orderData?.order_id} />
+                                        <Link
+                                            href={WEBSITE_SHOP}
+                                            className='inline-flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-[var(--dark-red)] text-[12px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[var(--dark-red-2)]'
+                                        >
+                                            Continue Shopping <ChevronRight className='size-4' />
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                {/* Help */}
+                                <Link
+                                    href='/contact'
+                                    className='flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-5 py-4 shadow-sm transition-colors hover:border-[var(--dark-red)]/40'
+                                >
+                                    <span className='flex size-9 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-cream)]/60 text-[var(--dark-red)]'>
+                                        <Headset className='size-[18px]' />
+                                    </span>
+                                    <div className='flex-1'>
+                                        <p className='text-[13px] font-semibold text-foreground'>Need help with this order?</p>
+                                        <p className='text-[11px] text-muted-foreground'>Our support team is here for you.</p>
+                                    </div>
+                                    <ChevronRight className='size-4 text-muted-foreground' />
+                                </Link>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </section>
         </div>
     )
 }

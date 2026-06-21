@@ -1,3 +1,4 @@
+
 // Content-Security-Policy scoped to the third parties this app actually uses:
 // Razorpay checkout (script/frame/connect), Cloudinary images (res.cloudinary.com)
 // and the Cloudinary Upload Widget used in the admin Media section. The widget
@@ -33,6 +34,9 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // react-pdf relies on native-ish deps (fontkit, yoga-layout wasm) that must not
+    // be bundled — keep it external so it runs correctly in the Node server runtime.
+    serverExternalPackages: ['@react-pdf/renderer'],
     experimental: {
         optimizePackageImports: ['lucide-react', 'gsap', '@gsap/react', 'react-icons', 'radix-ui'],
     },
