@@ -7,11 +7,11 @@ const WebsiteBreadcrumb = ({ props }) => {
             <div className="absolute inset-0 bg-[var(--dark-red-2)]" />
 
             {/* Watermark title text — same pattern as /shop hero */}
-            <div className="absolute inset-x-0 top-10 z-10 flex justify-center sm:top-12 lg:top-14">
+            <div className="absolute inset-x-0 top-4 z-10 flex justify-center sm:top-6 lg:top-0">
                 <div
-                    className="pointer-events-none select-none font-neue font-semibold uppercase tracking-[0.02em] text-white/90"
+                    className="pointer-events-none select-none font-neue font-semibold uppercase tracking-tighter text-white"
                     style={{
-                        fontSize: 'clamp(3rem, 16vw, 8rem)',
+                        fontSize: 'clamp(3rem, 16vw, 18rem)',
                         WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 38%, rgba(0,0,0,0) 100%)',
                         maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 38%, rgba(0,0,0,0) 100%)',
                         textShadow: '0 12px 32px rgba(0,0,0,0.18)',

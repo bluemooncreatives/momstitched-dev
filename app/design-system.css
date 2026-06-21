@@ -385,10 +385,20 @@
   --badge-font:    0.75rem;
   --badge-radius:  var(--radius-4xl);
 
-  /* ── Form controls ── */
+  /* ── Form controls (admin / shadcn defaults) ── */
   --input-height:  2rem;
   --input-px:      0.625rem;
   --input-py:      0.25rem;
+
+  /* ── Website form fields (checkout, contact, etc.) ── */
+  --form-field-height:        2.25rem;   /* 36px — slightly taller than admin inputs */
+  --form-field-px:            0.75rem;   /* 12px horizontal padding                  */
+  --form-field-py:            0.5rem;    /*  8px vertical padding                    */
+  --form-field-radius:        var(--radius-sm);                           /* 4px      */
+  --form-field-border:        color-mix(in srgb, var(--brand-ink-soft) 40%, transparent);  /* ink-soft/40 */
+  --form-field-border-hover:  var(--brand-ink-soft);                                       /* full on hover */
+  --form-field-placeholder:   color-mix(in srgb, var(--brand-primary) 35%, transparent);  /* oxblood/35 */
+  --form-field-focus-ring:    color-mix(in srgb, var(--brand-primary) 20%, transparent);
 
   /* ── Cards ── */
   --card-px:    1rem;
@@ -569,7 +579,72 @@ body {
 
 
 /* ────────────────────────────────────────────────────────────────
-   20. ANIMATION KEYFRAMES
+   20. WEBSITE FORM FIELD
+   Reusable class for every text input / textarea on the public-
+   facing website (checkout, contact, coupon, etc.).
+   Built from the brand button token set — same border colour,
+   same focus ring, same radius — but adapted for text entry:
+   • no hover fill-colour (keeps background transparent on hover)
+   • placeholder inherits brand colour at reduced opacity
+   • typed text uses foreground so it is always legible
+   Apply:  className="form-field"
+   Extend: className="form-field form-field-area"  (for <textarea>)
+   ──────────────────────────────────────────────────────────────── */
+
+.form-field {
+  display:          block;
+  width:            100%;
+  height:           var(--form-field-height);
+  padding:          var(--form-field-py) var(--form-field-px);
+  font-size:        var(--text-base);
+  font-family:      var(--font-body);
+  font-weight:      var(--weight-regular);
+  color:            var(--foreground);
+  background-color: transparent;
+  border:           1px solid var(--form-field-border);
+  border-radius:    var(--form-field-radius);
+  outline:          none;
+  transition:       border-color var(--duration-fast) var(--ease-in-out),
+                    box-shadow   var(--duration-fast) var(--ease-in-out);
+}
+
+.form-field::placeholder {
+  color: var(--form-field-placeholder);
+}
+
+.form-field:hover:not(:disabled) {
+  border-color: var(--form-field-border-hover);
+}
+
+.form-field:focus,
+.form-field:focus-visible {
+  border-color: var(--form-field-border);
+  box-shadow:   0 0 0 3px var(--form-field-focus-ring);
+}
+
+.form-field:disabled {
+  pointer-events:   none;
+  cursor:           not-allowed;
+  opacity:          0.5;
+  background-color: color-mix(in srgb, var(--input) 50%, transparent);
+}
+
+.form-field[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow:   0 0 0 3px color-mix(in srgb, var(--destructive) 20%, transparent);
+}
+
+/* Textarea extension — overrides the fixed height from .form-field */
+.form-field-area {
+  height:       auto;
+  min-height:   5rem;
+  field-sizing: content;
+  resize:       vertical;
+}
+
+
+/* ────────────────────────────────────────────────────────────────
+   21. ANIMATION KEYFRAMES
    ──────────────────────────────────────────────────────────────── */
 
 /* Accordion open/close (Radix height transitions) */

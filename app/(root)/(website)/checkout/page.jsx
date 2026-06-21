@@ -1,14 +1,15 @@
 'use client'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import WebsiteBreadcrumb from '@/components/Application/Website/WebsiteBreadcrumb'
+import { BrandButton } from '@/components/Application/Website/BrandButton'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
 import { zSchema } from '@/lib/zodSchema'
-import { WEBSITE_ORDER_DETAILS, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
-import { addIntoCart, clearCart } from '@/store/reducer/cartReducer'
+import { WEBSITE_CART, WEBSITE_ORDER_DETAILS, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
+import { addIntoCart, clearCart, decreaseQuantity, increaseQuantity, removeFromCart } from '@/store/reducer/cartReducer'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import Image from 'next/image'
@@ -16,21 +17,36 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { Truck, XCircle } from 'lucide-react'
+import {
+    BadgeCheck,
+    Lock,
+    Minus,
+    Package,
+    Plus,
+    RotateCcw,
+    ShieldCheck,
+    Tag,
+    Trash2,
+    Truck,
+    User,
+    Wallet,
+    XCircle,
+} from 'lucide-react'
 import { z } from 'zod'
 import { Textarea } from '@/components/ui/textarea'
 import Script from 'next/script'
 import { useRouter } from 'next/navigation'
-import { FaShippingFast } from 'react-icons/fa'
-import { MdPayment } from 'react-icons/md'
+import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 
-import loading from '@/public/assets/images/loading.svg'
 const breadCrumb = {
     title: 'Checkout',
     links: [
         { label: "Checkout" }
     ]
 }
+
+const fmt = (n) => Number(n || 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
+
 const Checkout = () => {
     const router = useRouter()
     const dispatch = useDispatch()
@@ -42,6 +58,7 @@ const Checkout = () => {
 
     const [isCouponApplied, setIsCouponApplied] = useState(false)
     const [subtotal, setSubTotal] = useState(0)
+    const [mrpTotal, setMrpTotal] = useState(0)
     const [couponDiscountPercentage, setCouponDiscountPercentage] = useState(0)
     const [couponDiscountAmount, setCouponDiscountAmount] = useState(0)
     const [totalAmount, setTotalAmount] = useState(0)
@@ -54,6 +71,7 @@ const Checkout = () => {
 
     const [placingOrder, setPlacingOrder] = useState(false)
     const [savingOrder, setSavingOrder] = useState(false)
+
     useEffect(() => {
         if (getVerifiedCartData && getVerifiedCartData.success) {
             const cartData = getVerifiedCartData.data
@@ -70,12 +88,14 @@ const Checkout = () => {
         const cartProducts = cart.products
 
         const subTotalAmount = cartProducts.reduce((sum, product) => sum + (product.sellingPrice * product.qty), 0)
+        const mrpTotalAmount = cartProducts.reduce((sum, product) => sum + ((product.mrp || product.sellingPrice) * product.qty), 0)
 
-        // Coupon is the only discount. Always derive it from the live subtotal so it
-        // stays correct if the cart changes after a coupon has been applied.
+        // Coupon is the only checkout-stage discount. Always derive it from the live
+        // subtotal so it stays correct if the cart changes after a coupon is applied.
         const newCouponDiscount = Math.round((subTotalAmount * couponDiscountPercentage) / 100)
 
         setSubTotal(subTotalAmount)
+        setMrpTotal(mrpTotalAmount)
         setCouponDiscountAmount(newCouponDiscount)
         setTotalAmount(subTotalAmount - newCouponDiscount)
 
@@ -93,9 +113,11 @@ const Checkout = () => {
         }
     }, [paymentMethod, totalAmount])
 
+    // MRP savings (product-level discount, before coupon)
+    const mrpSavings = Math.max(0, mrpTotal - subtotal)
 
 
-    // coupon form 
+    // coupon form
 
     const couponFormSchema = zSchema.pick({
         code: true,
@@ -140,7 +162,7 @@ const Checkout = () => {
     }
 
 
-    // place order 
+    // place order
     const orderFormSchema = zSchema.pick({
         name: true,
         email: true,
@@ -188,7 +210,7 @@ const Checkout = () => {
         }
     }, [profileData])
 
-    // get order id 
+    // get order id
     const getOrderId = async (amount) => {
         try {
             const { data: orderIdData } = await axios.post('/api/payment/get-order-id', { amount })
@@ -204,10 +226,12 @@ const Checkout = () => {
     }
 
     const placeOrder = async (formData) => {
- 
+
         setPlacingOrder(true)
         try {
-            const products = verifiedCartData.map((cartItem) => ({
+            // Build the order line-items from the live cart so any quantity change
+            // made in the Order Summary is reflected in the order that is saved.
+            const products = cart.products.map((cartItem) => ({
                 productId: cartItem.productId,
                 variantId: cartItem.variantId,
                 name: cartItem.name,
@@ -295,7 +319,7 @@ const Checkout = () => {
                 },
 
                 "theme": {
-                    "color": "#7c3aed"
+                    "color": "#3E000D"
                 }
             }
 
@@ -317,347 +341,485 @@ const Checkout = () => {
         }
     }
 
+    // ── reusable bits ──────────────────────────────────────────────
+    const SectionHeading = ({ step, icon: Icon, title, hint }) => (
+        <div className="mb-5 flex items-center gap-3">
+            <span className="flex size-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--dark-red)] text-[12px] font-semibold text-white tabular-nums">
+                {step}
+            </span>
+            <div className="flex flex-1 items-center gap-2">
+                <Icon className="size-[18px] text-[var(--dark-red)]" strokeWidth={1.75} />
+                <h2 className="font-neue text-base font-semibold uppercase tracking-[0.06em] text-foreground">
+                    {title}
+                </h2>
+            </div>
+            {hint && (
+                <span className="hidden text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground sm:block">
+                    {hint}
+                </span>
+            )}
+        </div>
+    )
+
+    const TRUST = [
+        { Icon: ShieldCheck, label: '100% Secure Payments' },
+        { Icon: Truck, label: 'Free Shipping' },
+        { Icon: RotateCcw, label: '7-Day Easy Returns' },
+    ]
+
+    const ctaText = paymentMethod === 'cod'
+        ? (
+            <span className="inline-flex items-center gap-2">
+                <Wallet className="size-4" /> Place Order · {fmt(totalAmount)}
+            </span>
+        )
+        : (
+            <span className="inline-flex items-center gap-2">
+                <Lock className="size-4" /> Pay {fmt(payableAmount)} Securely
+            </span>
+        )
+
     return (
         <div>
 
             {savingOrder &&
-                <div className='h-screen w-screen fixed top-0 left-0 z-50 bg-black/10'>
-                    <div className='h-screen flex justify-center items-center'>
-                        <Image src={loading.src} height={80} width={80} alt='Loading' />
-                        <h4 className='font-semibold'>Order Confirming...</h4>
+                <div className='fixed inset-0 z-[400] flex items-center justify-center bg-[var(--brand-ink)]/40 px-4 backdrop-blur-sm'>
+                    <div className='flex w-full max-w-sm flex-col items-center gap-5 rounded-2xl border border-border/60 bg-background px-8 py-10 text-center shadow-xl'>
+                        <div className='relative flex size-16 items-center justify-center'>
+                            <span className='absolute inset-0 animate-spin rounded-full border-[3px] border-[var(--dark-red)]/15 border-t-[var(--dark-red)]' />
+                            <Package className='size-6 text-[var(--dark-red)]' strokeWidth={1.75} />
+                        </div>
+                        <div>
+                            <h4 className='font-neue text-lg font-semibold text-foreground'>Confirming your order…</h4>
+                            <p className='mt-1.5 text-sm text-muted-foreground'>Please don&apos;t close or refresh this window.</p>
+                        </div>
                     </div>
                 </div>
             }
 
             <WebsiteBreadcrumb props={breadCrumb} />
+
             {cart.count === 0
                 ?
-                <div className='w-screen h-[500px] flex justify-center items-center py-32'>
-                    <div className='text-center'>
-                        <h4 className='text-4xl font-semibold mb-5'>Your cart is empty!</h4>
-
-                        <Button type="button" asChild>
-                            <Link href={WEBSITE_SHOP}>Continue Shopping</Link>
-                        </Button>
-
-                    </div>
-                </div>
-                :
-                <div className='flex lg:flex-nowrap flex-wrap gap-10 my-20 lg:px-32 px-4'>
-                    <div className='lg:w-[60%] w-full'>
-                        <div className='flex font-semibold gap-2 items-center'>
-                            <Truck className='size-6' /> Shipping Address:
+                <section className='website-gutter py-20 lg:py-28'>
+                    <div className='mx-auto flex max-w-md flex-col items-center rounded-2xl border border-border/60 bg-background px-8 py-14 text-center shadow-sm'>
+                        <div className='flex size-16 items-center justify-center rounded-full bg-[var(--brand-cream)]/60 text-[var(--dark-red)]'>
+                            <Truck className='size-8' strokeWidth={1.5} />
                         </div>
-                        <div className='mt-5'>
+                        <h4 className='font-neue mt-5 text-2xl font-semibold'>Your cart is empty</h4>
+                        <p className='font-neue mt-2 max-w-[260px] text-sm text-muted-foreground'>
+                            There&apos;s nothing to check out yet. Discover pieces you&apos;ll love and come back to complete your order.
+                        </p>
+                        <div className='mt-6 w-full max-w-[220px]'>
+                            <BrandButton asChild>
+                                <Link href={WEBSITE_SHOP}>Continue Shopping</Link>
+                            </BrandButton>
+                        </div>
+                    </div>
+                </section>
+                :
+                <section className='website-gutter py-10 lg:py-14'>
+                    <div className='mx-auto grid w-full items-start gap-8 lg:grid-cols-[1fr_minmax(360px,420px)] lg:gap-10'>
 
+                        {/* ───────────────── LEFT: details + payment ───────────────── */}
+                        <div className='min-w-0'>
                             <Form {...orderForm}>
-                                <form className='grid grid-cols-2 gap-5' onSubmit={orderForm.handleSubmit(placeOrder)}>
-                                    <div className='mb-3'>
+                                <form id='checkout-form' onSubmit={orderForm.handleSubmit(placeOrder)}>
+
+                                    {/* Contact */}
+                                    <SectionHeading step={1} icon={User} title='Contact Details' hint='Order updates' />
+                                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                                         <FormField
                                             control={orderForm.control}
                                             name='name'
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input placeholder="Full name*" {...field} />
+                                                        <Input placeholder="Full name*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
-                                    </div>
-                                    <div className='mb-3'>
+                                        />
                                         <FormField
                                             control={orderForm.control}
                                             name='email'
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input type="email" placeholder="Email*" {...field} />
+                                                        <Input type="email" placeholder="Email*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
-                                    </div>
-                                    <div className='mb-3'>
+                                        />
                                         <FormField
                                             control={orderForm.control}
                                             name='phone'
                                             render={({ field }) => (
-                                                <FormItem>
+                                                <FormItem className='sm:col-span-2'>
                                                     <FormControl>
-                                                        <Input placeholder="Phone*" {...field} />
+                                                        <Input placeholder="Phone number*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
+                                        />
                                     </div>
-                                    <div className='mb-3'>
+
+                                    {/* Shipping */}
+                                    <div className='mt-10'>
+                                        <SectionHeading step={2} icon={Truck} title='Shipping Address' hint='Where we deliver' />
+                                    </div>
+                                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                                         <FormField
                                             control={orderForm.control}
                                             name='country'
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input placeholder="Country*" {...field} />
+                                                        <Input placeholder="Country*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
-                                    </div>
-                                    <div className='mb-3'>
+                                        />
                                         <FormField
                                             control={orderForm.control}
                                             name='state'
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input placeholder="State*" {...field} />
+                                                        <Input placeholder="State*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
-                                    </div>
-                                    <div className='mb-3'>
+                                        />
                                         <FormField
                                             control={orderForm.control}
                                             name='city'
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input placeholder="City*" {...field} />
+                                                        <Input placeholder="City*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
-                                    </div>
-                                    <div className='mb-3'>
+                                        />
                                         <FormField
                                             control={orderForm.control}
                                             name='pincode'
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input placeholder="Pincode*" {...field} />
+                                                        <Input placeholder="Pincode*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
-                                    </div>
-                                    <div className='mb-3'>
+                                        />
                                         <FormField
                                             control={orderForm.control}
                                             name='landmark'
                                             render={({ field }) => (
-                                                <FormItem>
+                                                <FormItem className='sm:col-span-2'>
                                                     <FormControl>
-                                                        <Input placeholder="Landmark*" {...field} />
+                                                        <Input placeholder="Landmark / Apartment / Street*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
-                                    </div>
-                                    <div className='mb-3 col-span-2'>
+                                        />
                                         <FormField
                                             control={orderForm.control}
                                             name='ordernote'
                                             render={({ field }) => (
-                                                <FormItem>
+                                                <FormItem className='sm:col-span-2'>
                                                     <FormControl>
-                                                        <Textarea placeholder="Enter order note" {...field} />
+                                                        <Textarea placeholder="Order note (optional) — delivery instructions, gift message, etc." className="form-field form-field-area" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        >
-
-                                        </FormField>
-                                    </div>
-
-                                    <div className='col-span-2 mb-3'>
-                                        <div className='flex font-semibold gap-2 items-center mb-3'>
-                                            <MdPayment size={25} /> Select Payment Method:
-                                        </div>
-                                        <div className='space-y-3 bg-gray-50 p-4 rounded-lg'>
-                                            <label className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === 'full' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'}`}>
-                                                <input
-                                                    type="radio"
-                                                    name="paymentMethod"
-                                                    value="full"
-                                                    checked={paymentMethod === 'full'}
-                                                    onChange={() => setPaymentMethod('full')}
-                                                    className="w-4 h-4 text-primary"
-                                                />
-                                                <div className='flex-1'>
-                                                    <p className='font-medium'>Full Payment</p>
-                                                    <p className='text-sm text-gray-500'>Pay {totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} now</p>
-                                                </div>
-                                                <span className='font-semibold text-primary'>{totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                                            </label>
-
-                                            <label className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === 'cod' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'}`}>
-                                                <input
-                                                    type="radio"
-                                                    name="paymentMethod"
-                                                    value="cod"
-                                                    checked={paymentMethod === 'cod'}
-                                                    onChange={() => setPaymentMethod('cod')}
-                                                    className="w-4 h-4 text-primary"
-                                                />
-                                                <div className='flex-1'>
-                                                    <p className='font-medium'>Cash on Delivery</p>
-                                                    <p className='text-sm text-gray-500'>Pay {totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} when you receive the order</p>
-                                                </div>
-                                                <span className='font-semibold text-green-600'>COD</span>
-                                            </label>
-                                        </div>
-
-                                        {paymentMethod !== 'cod' && (
-                                            <div className='mt-4 p-3 bg-primary/10 rounded-lg'>
-                                                <div className='flex justify-between text-sm'>
-                                                    <span>Pay Now:</span>
-                                                    <span className='font-semibold'>{payableAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className='mb-3'>
-                                        <ButtonLoading
-                                            type="submit"
-                                            text={paymentMethod === 'cod' ? 'Place Order (COD)' : `Pay ${payableAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}`}
-                                            loading={placingOrder}
-                                            className="bg-black rounded-full px-5 cursor-pointer"
                                         />
                                     </div>
-
                                 </form>
                             </Form>
-                        </div>
 
-                    </div>
-                    <div className='lg:w-[40%] w-full'>
-                        <div className='rounded bg-gray-50 p-5 sticky top-5'>
-                            <h4 className='text-lg font-semibold mb-5'>Order Summary</h4>
-                            <div>
-
-                                <table className='w-full border'>
-                                    <tbody>
-                                        {verifiedCartData && verifiedCartData?.map(product => (
-                                            <tr key={product.variantId}>
-                                                <td className='p-3'>
-                                                    <div className='flex items-center gap-5'>
-                                                        <Image src={product.media} width={60} height={60} alt={product.name} className='rounded' />
-                                                        <div>
-                                                            <h4 className='font-medium line-clamp-1'>
-                                                                <Link href={WEBSITE_PRODUCT_DETAILS(product.url)}>{product.name}</Link>
-                                                            </h4>
-                                                            <p className='text-sm'>Color: {product.color}</p>
-                                                            <p className='text-sm'>Size: {product.size}</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className='p-3 text-center'>
-                                                    <p className='text-nowrap text-sm'>
-                                                        {product.qty} x {product.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-
-                                <table className='w-full'>
-                                    <tbody>
-                                        <tr>
-                                            <td className='font-medium py-2'>Subtotal</td>
-                                            <td className='text-end py-2'>
-                                                {subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                            </td>
-                                        </tr>
-                                        {couponDiscountAmount > 0 && (
-                                            <tr>
-                                                <td className='font-medium py-2 text-emerald-600'>Coupon Discount</td>
-                                                <td className='text-end py-2 text-emerald-600'>
-                                                    - {couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                                </td>
-                                            </tr>
-                                        )}
-                                        <tr>
-                                            <td className='font-medium py-2 text-xl'>Total</td>
-                                            <td className='text-end py-2'>
-                                                {totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <div className='mt-2 mb-5'>
-                                    {!isCouponApplied
-                                        ?
-                                        <Form {...couponForm}>
-                                            <form className='flex justify-between gap-5' onSubmit={couponForm.handleSubmit(applyCoupon)}>
-                                                <div className='w-[calc(100%-100px)]'>
-                                                    <FormField
-                                                        control={couponForm.control}
-                                                        name='code'
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormControl>
-                                                                    <Input placeholder="Enter coupon code" {...field} />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    >
-
-                                                    </FormField>
-                                                </div>
-                                                <div className='w-[100px]'>
-                                                    <ButtonLoading type="submit" text="Apply" className="w-full cursor-pointer" loading={couponLoading} />
-                                                </div>
-                                            </form>
-                                        </Form>
-                                        :
-                                        <div className='flex justify-between py-1 px-5 rounded-lg bg-gray-200'>
-                                            <div>
-                                                <span className='text-xs'>Coupon:</span>
-                                                <p className='text-sm font-semibold'>{couponCode}</p>
+                            {/* Payment method */}
+                            <div className='mt-10'>
+                                <SectionHeading step={3} icon={Wallet} title='Payment Method' hint='Choose how to pay' />
+                                <div className='space-y-3'>
+                                    {/* Full / online */}
+                                    <label className={`flex cursor-pointer items-center gap-4 rounded-sm border p-4 transition-all ${paymentMethod === 'full' ? 'border-[var(--dark-red)] bg-[var(--dark-red)]/[0.04] shadow-sm' : 'border-border/60 hover:border-border'}`}>
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="full"
+                                            checked={paymentMethod === 'full'}
+                                            onChange={() => setPaymentMethod('full')}
+                                            className="sr-only"
+                                        />
+                                        <span className={`flex size-5 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors ${paymentMethod === 'full' ? 'border-[var(--dark-red)]' : 'border-muted-foreground/40'}`}>
+                                            {paymentMethod === 'full' && <span className='size-2.5 rounded-full bg-[var(--dark-red)]' />}
+                                        </span>
+                                        <div className='flex-1'>
+                                            <div className='flex items-center gap-2'>
+                                                <p className='font-neue text-base font-semibold text-foreground'>Pay Online</p>
+                                                <span className='rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-600'>Recommended</span>
                                             </div>
-                                            <button type='button' onClick={removeCoupon} className='text-red-500 cursor-pointer'>
-                                                <XCircle className='size-6' />
-                                            </button>
+                                            <p className='mt-0.5 text-[11px] text-muted-foreground'>UPI, Cards, Net Banking & Wallets — secured by Razorpay</p>
                                         </div>
-                                    }
-                                </div>
+                                        <span className='font-neue text-base font-semibold text-[var(--dark-red)]'>{fmt(totalAmount)}</span>
+                                    </label>
 
+                                    {/* COD */}
+                                    <label className={`flex cursor-pointer items-center gap-4 rounded-sm border p-4 transition-all ${paymentMethod === 'cod' ? 'border-[var(--dark-red)] bg-[var(--dark-red)]/[0.04] shadow-sm' : 'border-border/60 hover:border-border'}`}>
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="cod"
+                                            checked={paymentMethod === 'cod'}
+                                            onChange={() => setPaymentMethod('cod')}
+                                            className="sr-only"
+                                        />
+                                        <span className={`flex size-5 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors ${paymentMethod === 'cod' ? 'border-[var(--dark-red)]' : 'border-muted-foreground/40'}`}>
+                                            {paymentMethod === 'cod' && <span className='size-2.5 rounded-full bg-[var(--dark-red)]' />}
+                                        </span>
+                                        <div className='flex-1'>
+                                            <p className='font-neue text-base font-semibold text-foreground'>Cash on Delivery</p>
+                                            <p className='mt-0.5 text-[11px] text-muted-foreground'>Pay in cash when your order arrives at your doorstep</p>
+                                        </div>
+                                        <span className='rounded-full bg-muted/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground'>COD</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
+
+                        {/* ───────────────── RIGHT: order summary ───────────────── */}
+                        <aside className='w-full'>
+                            <div className='space-y-4 lg:sticky lg:top-6'>
+
+                                <div className='overflow-hidden rounded-md border border-border/60 bg-background shadow-sm'>
+                                    {/* header */}
+                                    <div className='flex items-center justify-between border-b border-border/60 px-5 py-4'>
+                                        <h2 className='font-neue text-lg font-semibold uppercase tracking-[0.04em]'>Order Summary</h2>
+                                        <span className='rounded-full bg-muted/60 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground'>
+                                            {cart.count} {cart.count === 1 ? 'item' : 'items'}
+                                        </span>
+                                    </div>
+
+                                    {/* line items */}
+                                    <div className='thin-scrollbar max-h-[340px] divide-y divide-border/50 overflow-y-auto px-5'>
+                                        {cart.products?.map(product => {
+                                            const lineTotal = product.sellingPrice * product.qty
+                                            const lineMrp = (product.mrp || product.sellingPrice) * product.qty
+                                            return (
+                                                <div key={product.variantId} className='flex gap-3 py-4'>
+                                                    <Link
+                                                        href={WEBSITE_PRODUCT_DETAILS(product.url)}
+                                                        className='relative h-[84px] w-[64px] flex-shrink-0 overflow-hidden rounded-md border border-border/40'
+                                                    >
+                                                        <Image
+                                                            src={product.media || imgPlaceholder.src}
+                                                            fill
+                                                            sizes='64px'
+                                                            alt={product.name}
+                                                            className='object-cover object-center'
+                                                        />
+                                                    </Link>
+
+                                                    <div className='flex min-w-0 flex-1 flex-col'>
+                                                        <div className='flex items-start justify-between gap-2'>
+                                                            <h4 className='line-clamp-2 font-neue text-[13px] font-semibold leading-snug text-foreground'>
+                                                                <Link href={WEBSITE_PRODUCT_DETAILS(product.url)}>{product.name}</Link>
+                                                            </h4>
+                                                            <button
+                                                                type='button'
+                                                                aria-label='Remove item'
+                                                                onClick={() => dispatch(removeFromCart({ productId: product.productId, variantId: product.variantId }))}
+                                                                className='flex-shrink-0 cursor-pointer text-muted-foreground/50 transition-colors hover:text-[var(--dark-red)]'
+                                                            >
+                                                                <Trash2 className='size-4' />
+                                                            </button>
+                                                        </div>
+
+                                                        <span className='mt-1 w-fit rounded-full bg-muted/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground'>
+                                                            {product.size} / {product.color}
+                                                        </span>
+
+                                                        <div className='mt-auto flex items-center justify-between pt-2.5'>
+                                                            {/* quantity stepper */}
+                                                            <div className='flex items-center rounded-full border border-border/60'>
+                                                                <Button
+                                                                    type='button'
+                                                                    variant='ghost'
+                                                                    size='icon-xs'
+                                                                    className='rounded-full disabled:opacity-40'
+                                                                    disabled={product.qty <= 1}
+                                                                    onClick={() => dispatch(decreaseQuantity({ productId: product.productId, variantId: product.variantId }))}
+                                                                    aria-label='Decrease quantity'
+                                                                >
+                                                                    <Minus className='size-3' />
+                                                                </Button>
+                                                                <span className='w-7 text-center text-[12px] font-semibold tabular-nums'>{product.qty}</span>
+                                                                <Button
+                                                                    type='button'
+                                                                    variant='ghost'
+                                                                    size='icon-xs'
+                                                                    className='rounded-full'
+                                                                    onClick={() => dispatch(increaseQuantity({ productId: product.productId, variantId: product.variantId }))}
+                                                                    aria-label='Increase quantity'
+                                                                >
+                                                                    <Plus className='size-3' />
+                                                                </Button>
+                                                            </div>
+
+                                                            <div className='text-right'>
+                                                                <p className='font-neue text-[14px] font-semibold text-foreground'>{fmt(lineTotal)}</p>
+                                                                {lineMrp > lineTotal && (
+                                                                    <p className='text-[11px] text-muted-foreground line-through'>{fmt(lineMrp)}</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+
+                                    {/* coupon */}
+                                    <div className='border-t border-border/60 px-5 py-4'>
+                                        {!isCouponApplied
+                                            ?
+                                            <Form {...couponForm}>
+                                                <form className='flex items-start gap-2.5' onSubmit={couponForm.handleSubmit(applyCoupon)}>
+                                                    <div className='relative flex-1'>
+                                                        <Tag className='pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground' />
+                                                        <FormField
+                                                            control={couponForm.control}
+                                                            name='code'
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormControl>
+                                                                        <Input placeholder="Coupon code" className="form-field !pl-9 uppercase" {...field} />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                    <ButtonLoading type="submit" text="Apply" className="h-9 shrink-0 rounded-sm px-5 cursor-pointer" loading={couponLoading} />
+                                                </form>
+                                            </Form>
+                                            :
+                                            <div className='flex items-center justify-between rounded-lg border border-emerald-500/30 bg-emerald-500/[0.06] px-4 py-2.5'>
+                                                <div className='flex items-center gap-2.5'>
+                                                    <BadgeCheck className='size-5 text-emerald-600' />
+                                                    <div>
+                                                        <p className='text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground'>Coupon applied</p>
+                                                        <p className='font-neue text-sm font-semibold uppercase text-emerald-700'>{couponCode}</p>
+                                                    </div>
+                                                </div>
+                                                <button type='button' onClick={removeCoupon} aria-label='Remove coupon' className='cursor-pointer text-muted-foreground transition-colors hover:text-[var(--dark-red)]'>
+                                                    <XCircle className='size-5' />
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    {/* totals */}
+                                    <div className='space-y-2.5 border-t border-border/60 bg-muted/20 px-5 py-4'>
+                                        <div className='flex items-center justify-between text-sm'>
+                                            <span className='text-muted-foreground'>{mrpSavings > 0 ? 'Total MRP' : 'Subtotal'}</span>
+                                            <span className='font-medium text-foreground'>{fmt(mrpSavings > 0 ? mrpTotal : subtotal)}</span>
+                                        </div>
+                                        {mrpSavings > 0 && (
+                                            <div className='flex items-center justify-between text-sm'>
+                                                <span className='text-muted-foreground'>Discount on MRP</span>
+                                                <span className='font-medium text-emerald-600'>- {fmt(mrpSavings)}</span>
+                                            </div>
+                                        )}
+                                        {couponDiscountAmount > 0 && (
+                                            <div className='flex items-center justify-between text-sm'>
+                                                <span className='text-muted-foreground'>Coupon discount</span>
+                                                <span className='font-medium text-emerald-600'>- {fmt(couponDiscountAmount)}</span>
+                                            </div>
+                                        )}
+                                        <div className='flex items-center justify-between text-sm'>
+                                            <span className='text-muted-foreground'>Shipping</span>
+                                            <span className='font-medium text-emerald-600'>FREE</span>
+                                        </div>
+
+                                        <div className='my-1 border-t border-dashed border-border/70' />
+
+                                        <div className='flex items-center justify-between'>
+                                            <span className='font-neue text-base font-semibold text-foreground'>Total</span>
+                                            <span className='font-neue text-xl font-semibold text-foreground'>{fmt(totalAmount)}</span>
+                                        </div>
+
+                                        {(mrpSavings + couponDiscountAmount) > 0 && (
+                                            <div className='flex items-center justify-center gap-1.5 rounded-lg bg-emerald-500/[0.08] px-3 py-2 text-[13px] font-semibold text-emerald-700'>
+                                                <BadgeCheck className='size-4' />
+                                                You&apos;re saving {fmt(mrpSavings + couponDiscountAmount)} on this order
+                                            </div>
+                                        )}
+
+                                        {/* payment split context */}
+                                        <div className='mt-1 rounded-lg bg-[var(--dark-red)]/[0.05] px-3 py-2'>
+                                            {paymentMethod === 'cod'
+                                                ? (
+                                                    <div className='flex items-center justify-between text-[13px]'>
+                                                        <span className='text-muted-foreground'>Pay on delivery</span>
+                                                        <span className='font-semibold text-foreground'>{fmt(remainingAmount)}</span>
+                                                    </div>
+                                                )
+                                                : (
+                                                    <div className='flex items-center justify-between text-[13px]'>
+                                                        <span className='text-muted-foreground'>Pay now</span>
+                                                        <span className='font-semibold text-[var(--dark-red)]'>{fmt(payableAmount)}</span>
+                                                    </div>
+                                                )}
+                                        </div>
+                                    </div>
+
+                                    {/* CTA */}
+                                    <div className='border-t border-border/60 px-5 py-5'>
+                                        <ButtonLoading
+                                            form='checkout-form'
+                                            type="submit"
+                                            text={ctaText}
+                                            loading={placingOrder}
+                                            className="h-12 w-full rounded-sm bg-[var(--dark-red)] text-base font-semibold uppercase tracking-[0.04em] hover:bg-[var(--dark-red-2)] cursor-pointer"
+                                        />
+                                        <Link
+                                            href={WEBSITE_CART}
+                                            className='mt-3 flex items-center justify-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground'
+                                        >
+                                            ← Edit cart
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                {/* trust badges */}
+                                <div className='grid grid-cols-3 gap-2.5'>
+                                    {TRUST.map(({ Icon, label }) => (
+                                        <div key={label} className='flex flex-col items-center gap-1.5 rounded-xl border border-border/50 bg-background px-2 py-3 text-center'>
+                                            <Icon className='size-5 text-[var(--dark-red)]' strokeWidth={1.6} />
+                                            <span className='text-[10px] font-medium leading-tight text-muted-foreground'>{label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <p className='flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground'>
+                                    <Lock className='size-3' /> Secure checkout — your details are encrypted &amp; protected.
+                                </p>
+                            </div>
+                        </aside>
                     </div>
-                </div>
+                </section>
             }
 
             <Script src='https://checkout.razorpay.com/v1/checkout.js' />
