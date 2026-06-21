@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { zSchema } from "@/lib/zodSchema";
+import { claimGuestOrders } from "@/lib/services/orderService";
 import OTPModel from "@/models/Otp.model";
 import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
@@ -31,11 +32,20 @@ export async function POST(request) {
             return response(false, 404, 'User not found.')
         }
 
+        // Safety-net reconciliation: link any still-unclaimed guest orders placed
+        // with this (verified) email to the account on every successful login.
+        try {
+            await claimGuestOrders(getUser._id, getUser.email)
+        } catch (claimError) {
+            console.error('Failed to claim guest orders on login:', claimError)
+        }
+
 
         const loggedInUserData = {
             _id: getUser._id.toString(),
             role: getUser.role,
             name: getUser.name,
+            email: getUser.email,
             avatar: getUser.avatar,
         }
 

@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
+import { claimGuestOrders } from "@/lib/services/orderService";
 import UserModel from "@/models/User.model";
 import { jwtVerify } from "jose";
 import { isValidObjectId } from "mongoose";
@@ -29,6 +30,13 @@ export async function POST(request) {
         user.isEmailVerified = true
         await user.save()
 
+        // The user has now proven they control this email address, so any guest
+        // orders placed with the same email can be safely linked to their account.
+        try {
+            await claimGuestOrders(user._id, user.email)
+        } catch (claimError) {
+            console.error('Failed to claim guest orders on email verification:', claimError)
+        }
 
         return response(true, 200, 'Email verification success.')
 
