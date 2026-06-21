@@ -5,7 +5,8 @@ import Image from "next/image"
 import placeholderImg from '@/public/assets/images/img-placeholder.webp'
 import Link from "next/link"
 import { USER_ORDERS, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute"
-import { getOrderDetailsByOrderId } from "@/lib/services/orderService"
+import { getOrderDetailsByOrderId, userCanViewOrder } from "@/lib/services/orderService"
+import { getCurrentUser } from "@/lib/authentication"
 import {
     ArrowLeft,
     BadgeCheck,
@@ -79,6 +80,11 @@ const OrderDetails = async ({ params }) => {
     const orderData = await getOrderDetailsByOrderId(orderid)
 
     if (!orderData) notFound()
+
+    // Authorization: only the order's owner (or an admin) may view its details.
+    // Prevents one logged-in user from reading another customer's order PII by id.
+    const currentUser = await getCurrentUser()
+    if (!userCanViewOrder(orderData, currentUser)) notFound()
 
     const status = orderData?.status || 'pending'
     const statusMeta = STATUS_META[status] || STATUS_META.pending

@@ -5,7 +5,6 @@ import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
 import { isAuthenticated } from "@/lib/authentication";
 import OrderModel from "@/models/Order.model";
-import UserModel from "@/models/User.model";
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils";
 import { z } from "zod";
 
@@ -48,7 +47,13 @@ export async function POST(request) {
         }
 
         const validatedData = validate.data
+
+        // Checkout is account-required. An order can only ever be placed by a
+        // signed-in user, so it is always tied to a real account (no guest orders).
         const auth = await isAuthenticated('user', request)
+        if (!auth.isAuth) {
+            return response(false, 401, 'Please sign in to place your order.')
+        }
 
         const roundToTwo = (value) => Number(Number(value || 0).toFixed(2))
         const hasRazorpayPayload = Boolean(
@@ -100,15 +105,8 @@ export async function POST(request) {
             return response(false, 400, 'Payment amount mismatch. Please review the selected payment mode and retry.')
         }
 
-        // Use authenticated user (custom JWT or NextAuth) when available.
-        let resolvedUserId = auth.isAuth ? auth.userId : validatedData.userId
-
-        if (!resolvedUserId && validatedData.email) {
-            const linkedUser = await UserModel.findOne({ email: validatedData.email }).select('_id').lean()
-            if (linkedUser?._id) {
-                resolvedUserId = linkedUser._id
-            }
-        }
+        // The order belongs to the authenticated account that placed it.
+        const resolvedUserId = auth.userId
 
         let paymentVerification = paymentMethod === 'cod'
         let orderId = validatedData.order_id || null

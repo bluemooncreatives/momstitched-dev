@@ -2,7 +2,8 @@ import React from 'react'
 import { NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import InvoiceDocument from '@/components/Application/Website/InvoiceDocument'
-import { getOrderDetailsByOrderId } from '@/lib/services/orderService'
+import { getOrderDetailsByOrderId, userCanViewOrder } from '@/lib/services/orderService'
+import { getCurrentUser } from '@/lib/authentication'
 
 // react-pdf needs the Node runtime (fontkit / yoga wasm); never run on edge.
 export const runtime = 'nodejs'
@@ -15,6 +16,13 @@ export async function GET(_request, { params }) {
         const order = await getOrderDetailsByOrderId(orderid)
         if (!order) {
             return NextResponse.json({ success: false, message: 'Order not found' }, { status: 404 })
+        }
+
+        // Only the order owner (or an admin) can download the invoice — it carries
+        // the customer's name, address and purchase details.
+        const currentUser = await getCurrentUser()
+        if (!userCanViewOrder(order, currentUser)) {
+            return NextResponse.json({ success: false, message: 'Not authorized to view this invoice.' }, { status: 403 })
         }
 
         const buffer = await renderToBuffer(React.createElement(InvoiceDocument, { order }))

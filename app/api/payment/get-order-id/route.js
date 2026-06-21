@@ -1,3 +1,4 @@
+import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { zSchema } from "@/lib/zodSchema";
@@ -6,6 +7,13 @@ import Razorpay from "razorpay";
 export async function POST(request) {
     try {
         await connectDB()
+
+        // Only signed-in users can initiate a payment (account-required checkout).
+        const auth = await isAuthenticated('user', request)
+        if (!auth.isAuth) {
+            return response(false, 401, 'Please sign in to continue with payment.')
+        }
+
         const payload = await request.json()
         const schema = zSchema.pick({
             amount: true

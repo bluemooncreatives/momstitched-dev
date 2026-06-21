@@ -3,18 +3,26 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { WEBSITE_CHECKOUT, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
+import { WEBSITE_CHECKOUT, WEBSITE_LOGIN, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
-import { Minus, Plus, XCircle } from 'lucide-react'
+import { LogIn, Minus, Plus, XCircle } from 'lucide-react'
 import { decreaseQuantity, increaseQuantity, removeFromCart } from '@/store/reducer/cartReducer'
+import useFetch from '@/hooks/useFetch'
 
 const CartPageClient = () => {
     const dispatch = useDispatch()
+    const router = useRouter()
     const cart = useSelector((store) => store.cartStore)
+
+    // Authoritative (cookie-based) auth check so the checkout CTA reflects the real
+    // session state — redux auth is not persisted and is unreliable on the client.
+    const { data: profile, loading: authLoading } = useFetch('/api/profile/get')
+    const isLoggedIn = Boolean(profile?.success)
 
     const [subtotal, setSubTotal] = useState(0)
 
@@ -27,6 +35,23 @@ const CartPageClient = () => {
     }, [cart])
 
     const isEmpty = cart.count === 0
+
+    // Checkout is account-required: signed-in users go straight to checkout, guests
+    // are sent to sign-in and bounced back to checkout afterwards via ?callback.
+    const handleCheckout = () => {
+        if (authLoading) {
+            // Auth state not resolved yet — let the protected route + middleware decide.
+            router.push(WEBSITE_CHECKOUT)
+            return
+        }
+        if (isLoggedIn) {
+            router.push(WEBSITE_CHECKOUT)
+        } else {
+            router.push(`${WEBSITE_LOGIN}?callback=${encodeURIComponent(WEBSITE_CHECKOUT)}`)
+        }
+    }
+
+    const showSignInCta = !authLoading && !isLoggedIn
 
     return (
         <div>
@@ -95,9 +120,20 @@ const CartPageClient = () => {
                                             </p>
                                         </CardContent>
                                         <CardFooter className="flex flex-col gap-3">
-                                            <Button type="button" asChild variant="brand" className="h-11 w-full text-[11px] font-semibold uppercase tracking-[0.2em]">
-                                                <Link href={WEBSITE_CHECKOUT}>Proceed to Checkout</Link>
+                                            <Button type="button" onClick={handleCheckout} disabled={authLoading} variant="brand" className="h-11 w-full text-[11px] font-semibold uppercase tracking-[0.2em]">
+                                                {showSignInCta ? (
+                                                    <span className="inline-flex items-center gap-2">
+                                                        <LogIn className="size-4" /> Sign in to Checkout
+                                                    </span>
+                                                ) : (
+                                                    'Proceed to Checkout'
+                                                )}
                                             </Button>
+                                            {showSignInCta && (
+                                                <p className="text-center text-[11px] text-muted-foreground">
+                                                    You&apos;ll need an account to place your order.
+                                                </p>
+                                            )}
                                             <Button type="button" variant="link" asChild className="h-auto p-0 text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground">
                                                 <Link href={WEBSITE_SHOP}>Continue Shopping</Link>
                                             </Button>

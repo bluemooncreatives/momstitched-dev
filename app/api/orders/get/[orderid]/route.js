@@ -1,3 +1,4 @@
+import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import MediaModel from "@/models/Media.model";
@@ -8,6 +9,14 @@ import ProductVariantModel from "@/models/ProductVariant.model";
 export async function GET(request, { params }) {
     try {
         await connectDB()
+
+        // This endpoint backs the admin order-details view and exposes full order
+        // data, so it is restricted to admins.
+        const auth = await isAuthenticated('admin', request)
+        if (!auth.isAuth) {
+            return response(false, 403, 'Unauthorized')
+        }
+
         const getParams = await params
         const orderid = getParams.orderid
 

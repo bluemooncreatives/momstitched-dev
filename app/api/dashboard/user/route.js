@@ -15,14 +15,13 @@ export async function GET(request) {
         }
 
         const userId = auth.userId
-        const userEmail = auth.email
 
+        // Orders are always tied to the account that placed them, so match strictly
+        // by user. (The order's contact email is user-supplied and must NOT be used
+        // for access, or one customer could surface their order on another's account.)
         const orderFilter = {
             deletedAt: null,
-            $or: [
-                { user: userId },
-                ...(userEmail ? [{ email: userEmail }] : [])
-            ]
+            user: userId
         }
 
         // get recent orders 

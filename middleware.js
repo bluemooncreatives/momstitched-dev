@@ -12,7 +12,8 @@ export async function middleware(request) {
             pathname.startsWith('/my-account') ||
             pathname.startsWith('/profile') ||
             pathname.startsWith('/orders') ||
-            pathname.startsWith('/order-details')
+            pathname.startsWith('/order-details') ||
+            pathname.startsWith('/checkout')
         const hasToken = request.cookies.has('access_token')
         const nextAuthToken = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
 
@@ -39,9 +40,12 @@ export async function middleware(request) {
         }
 
         if (!role) {
-            // if the user is not loggedin and trying to access a protected route, redirect to login page. 
+            // if the user is not loggedin and trying to access a protected route, redirect to login page.
             if (!isAuthRoute) {
-                const response = NextResponse.redirect(new URL(WEBSITE_LOGIN, request.nextUrl))
+                const loginUrl = new URL(WEBSITE_LOGIN, request.nextUrl)
+                // Remember where the user was headed so we can send them back after login.
+                loginUrl.searchParams.set('callback', pathname + request.nextUrl.search)
+                const response = NextResponse.redirect(loginUrl)
                 if (invalidCustomToken) {
                     response.cookies.delete('access_token')
                 }
@@ -85,5 +89,5 @@ export async function middleware(request) {
 
 
 export const config = {
-    matcher: ['/admin/:path*', '/my-account/:path*', '/profile/:path*', '/orders/:path*', '/order-details/:path*', '/auth/:path*']
+    matcher: ['/admin/:path*', '/my-account/:path*', '/profile/:path*', '/orders/:path*', '/order-details/:path*', '/checkout/:path*', '/auth/:path*']
 }

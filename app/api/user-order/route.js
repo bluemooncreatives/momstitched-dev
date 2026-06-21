@@ -13,25 +13,19 @@ export async function GET(request) {
         }
 
         const userId = auth.userId
-        const userEmail = auth.email
         const userObjectId = mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : null
 
-        const matchConditions = [{ deletedAt: null }]
-        if (userObjectId) {
-            matchConditions.push({ user: userObjectId })
+        // No valid user id => no orders. Orders are matched strictly by owner; the
+        // order's contact email is user-supplied and is never used for access.
+        if (!userObjectId) {
+            return response(true, 200, 'Order info.', [])
         }
-        if (userEmail) {
-            matchConditions.push({ email: userEmail })
-        }
-
 
         const orders = await OrderModel.aggregate([
             {
                 $match: {
-                    $and: [
-                        { deletedAt: null },
-                        { $or: matchConditions.filter((condition) => condition.user || condition.email) }
-                    ]
+                    deletedAt: null,
+                    user: userObjectId
                 }
             },
             {
