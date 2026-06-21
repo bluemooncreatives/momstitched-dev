@@ -1,6 +1,6 @@
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
-import { catchError, response } from "@/lib/helperFunction"
+import { catchError, escapeRegex, response } from "@/lib/helperFunction"
 import ProductModel from "@/models/Product.model"
 import { NextResponse } from "next/server"
 
@@ -32,17 +32,18 @@ export async function GET(request) {
             matchQuery = { deletedAt: { $ne: null } }
         }
 
-        // Global search 
+        // Global search — escape so special chars don't build an invalid regex
         if (globalFilter) {
+            const safeGlobalFilter = escapeRegex(globalFilter)
             matchQuery["$or"] = [
-                { name: { $regex: globalFilter, $options: 'i' } },
-                { slug: { $regex: globalFilter, $options: 'i' } },
-                { "categoryData.name": { $regex: globalFilter, $options: 'i' } },
+                { name: { $regex: safeGlobalFilter, $options: 'i' } },
+                { slug: { $regex: safeGlobalFilter, $options: 'i' } },
+                { "categoryData.name": { $regex: safeGlobalFilter, $options: 'i' } },
                 {
                     $expr: {
                         $regexMatch: {
                             input: { $toString: "$mrp" },
-                            regex: globalFilter,
+                            regex: safeGlobalFilter,
                             options: 'i'
                         }
                     }
@@ -51,7 +52,7 @@ export async function GET(request) {
                     $expr: {
                         $regexMatch: {
                             input: { $toString: "$sellingPrice" },
-                            regex: globalFilter,
+                            regex: safeGlobalFilter,
                             options: 'i'
                         }
                     }
@@ -60,7 +61,7 @@ export async function GET(request) {
                     $expr: {
                         $regexMatch: {
                             input: { $toString: "$discountPercentage" },
-                            regex: globalFilter,
+                            regex: safeGlobalFilter,
                             options: 'i'
                         }
                     }
@@ -68,13 +69,13 @@ export async function GET(request) {
             ]
         }
 
-        //  Column filteration  
+        //  Column filteration
 
         filters.forEach(filter => {
             if (filter.id === 'mrp' || filter.id === 'sellingPrice' || filter.id === 'discountPercentage') {
                 matchQuery[filter.id] = Number(filter.value)
             } else {
-                matchQuery[filter.id] = { $regex: filter.value, $options: 'i' }
+                matchQuery[filter.id] = { $regex: escapeRegex(String(filter.value)), $options: 'i' }
             }
         });
 

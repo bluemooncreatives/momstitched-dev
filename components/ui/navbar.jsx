@@ -13,16 +13,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import Cart from "@/components/Application/Website/Cart"
+import GlobalSearch from "@/components/Application/Website/GlobalSearch"
 import userIcon from "@/public/assets/images/user.png"
 
 const defaultMenu = [
@@ -59,6 +52,18 @@ export default function Navbar({
 
   const accountUrl = auth?.account?.url || "/my-account"
 
+  // Global keyboard shortcut — Ctrl/Cmd + K toggles the search modal.
+  React.useEffect(() => {
+    const onKeyDown = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault()
+        setOpenSearch((prev) => !prev)
+      }
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [])
+
   return (
     <section className="py-4">
       <div className="w-full px-4 lg:px-10">
@@ -89,6 +94,7 @@ export default function Navbar({
               onClick={() => setOpenSearch(true)}
               className="text-stone-600 transition-colors hover:text-[var(--brand-primary-hover)]"
               aria-label="Open search"
+              title="Search (Ctrl K)"
             >
               <SearchIcon className="h-6 w-6" strokeWidth={1.75} />
             </button>
@@ -195,18 +201,7 @@ export default function Navbar({
         </div>
       </div>
 
-      <CommandDialog open={openSearch} onOpenChange={setOpenSearch}>
-        <CommandInput placeholder="Search products, blogs, resources..." />
-        <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions" className="text-gray-500">
-            <CommandItem className="text-gray-800 dark:text-gray-200">Latest Blog</CommandItem>
-            <CommandItem className="text-gray-800 dark:text-gray-200">Pricing Plans</CommandItem>
-            <CommandItem className="text-gray-800 dark:text-gray-200">Support</CommandItem>
-            <CommandItem className="text-gray-800 dark:text-gray-200">Careers</CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </CommandDialog>
+      <GlobalSearch open={openSearch} setOpen={setOpenSearch} isLoggedIn={!!user} />
     </section>
   )
 }

@@ -531,6 +531,27 @@
   border-radius:    var(--radius-full);
 }
 
+/* Search command palette list — visible neutral scrollbar.
+   Class specificity beats the 1px global brand scrollbar so the modal's
+   result list is actually grabbable/scrollable. */
+.command-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--filter-scrollbar-color) transparent;
+}
+.command-scroll::-webkit-scrollbar {
+  width:      8px;
+  height:     8px;
+  background: transparent;
+}
+.command-scroll::-webkit-scrollbar-track { background: transparent; }
+.command-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--filter-scrollbar-color);
+  border-radius:    var(--radius-full);
+}
+.command-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--filter-scrollbar-color) 70%, var(--brand-ink));
+}
+
 
 /* ────────────────────────────────────────────────────────────────
    17. PAGE LAYOUT BASE
