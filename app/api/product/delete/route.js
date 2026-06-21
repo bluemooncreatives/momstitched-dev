@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
@@ -35,6 +36,9 @@ export async function PUT(request) {
             await ProductModel.updateMany({ _id: { $in: ids } }, { $set: { deletedAt: null } });
         }
 
+        // Trashing or restoring a bestseller changes what the storefront carousel
+        // should show, so drop its cache.
+        revalidateTag('storefront-bestseller-products')
 
         return response(true, 200, deleteType === 'SD' ? 'Data moved into trash.' : "Data restored.")
 
@@ -72,6 +76,8 @@ export async function DELETE(request) {
         }
 
         await ProductModel.deleteMany({ _id: { $in: ids } })
+
+        revalidateTag('storefront-bestseller-products')
 
         return response(true, 200, 'Data deleted permanently')
     } catch (error) {

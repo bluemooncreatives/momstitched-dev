@@ -52,6 +52,17 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    isBestseller: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+    // Lower number = appears earlier in the storefront Bestsellers carousel.
+    // Only meaningful when isBestseller is true.
+    bestsellerSortOrder: {
+        type: Number,
+        default: 0
+    },
     deletedAt: {
         type: Date,
         default: null,
@@ -62,5 +73,7 @@ const productSchema = new mongoose.Schema({
 
 
 productSchema.index({ category: 1 })
+// Drives the storefront Bestsellers query: active bestsellers, ordered by rank.
+productSchema.index({ isBestseller: 1, deletedAt: 1, bestsellerSortOrder: 1 })
 const ProductModel = mongoose.models.Product || mongoose.model('Product', productSchema, 'products')
 export default ProductModel

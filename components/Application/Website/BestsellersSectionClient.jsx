@@ -106,7 +106,9 @@ const BestsellersSectionClient = ({ products = [] }) => {
     const formatPrice = (price) =>
         price ? `₹${price.toLocaleString('en-IN')}` : null
 
-    const items = products.length > 0 ? products : Array(9).fill(null)
+    if (!products.length) return null
+
+    const items = products
 
     return (
         <section ref={sectionRef} className={styles.section}>

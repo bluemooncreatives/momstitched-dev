@@ -59,19 +59,19 @@ function Select({
                    variant="outline"
                    role="combobox"
                    aria-expanded={open}
-                   className="justify-between dark:bg-card"
+                   className="h-auto min-h-9 justify-between whitespace-normal text-left dark:bg-card"
                >
-                   <div>
+                   <div className="flex flex-wrap items-center gap-1">
 
                        {Array.isArray(selected) && selected.length > 0
                            ?
                            selected.map((value) => {
                                const option = options.find((o) => o.value === value);
                                return (
-                                   <Badge key={value} className="me-2">
-                                       {option.label}
+                                   <Badge key={value}>
+                                       {option?.label ?? value}
                                        <span onClick={(e) => { e.stopPropagation(e); handleRemove(value) }} >
-                                           <XIcon className="ml-2 h-4 w-4 cursor-pointer" />
+                                           <XIcon className="ml-1 h-4 w-4 cursor-pointer" />
                                        </span>
                                    </Badge>
                                )
@@ -82,7 +82,7 @@ function Select({
 
                    </div>
 
-                   <div className="flex items-center gap-2">
+                   <div className="flex shrink-0 items-center gap-2">
                        {selected && selected.length > 0 &&
                            <span onClick={(e) => { e.stopPropagation(); handleClearAll() }}>
                                <XIcon className="h-4 w-4 shrink-0 opacity-50" />
