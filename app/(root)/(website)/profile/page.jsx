@@ -19,6 +19,7 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { login } from '@/store/reducer/authReducer'
 import { z } from 'zod'
+import ChangePasswordSection from '@/components/Application/Website/ChangePasswordSection'
 
 const breadCrumbData = {
     title: 'Profile',
@@ -62,10 +63,12 @@ const Profile = () => {
     })
 
     const [email, setEmail] = useState("")
+    const [hasPassword, setHasPassword] = useState(false)
 
     useEffect(() => {
         if (user && user.success) {
             const userData = user.data
+            setHasPassword(Boolean(userData?.hasPassword))
             form.reset({
                 name: userData?.name || "",
                 phone: userData?.phone || "",
@@ -131,6 +134,7 @@ const Profile = () => {
         <div>
             <WebsiteBreadcrumb props={breadCrumbData} />
             <UserPanelLayout>
+              <div className="space-y-6">
                 <div className="rounded-[var(--radius)] border border-[var(--dark-red)]/20 bg-background">
 
                     {/* Section header */}
@@ -340,6 +344,13 @@ const Profile = () => {
                     </div>
 
                 </div>
+
+                {/* Password & security */}
+                <ChangePasswordSection
+                    hasPassword={hasPassword}
+                    onPasswordSet={() => setHasPassword(true)}
+                />
+              </div>
             </UserPanelLayout>
         </div>
     )

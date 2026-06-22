@@ -48,7 +48,14 @@ export async function POST(request) {
             return response(false, 401, 'Your email is not verified. We have sent a verification link to your registered email address.')
         }
 
-        // password verification 
+        // Account created via Google sign-in has no password yet. Guide the user
+        // instead of running bcrypt.compare against an undefined hash (which would
+        // throw and surface a confusing error).
+        if (!getUser.password) {
+            return response(false, 400, 'This account uses Google sign-in. Please continue with “Login with Google”, or set a password using “Forgot password”.')
+        }
+
+        // password verification
         const isPasswordVerified = await getUser.comparePassword(password)
 
         if (!isPasswordVerified) {

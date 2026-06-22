@@ -25,10 +25,15 @@ export async function PUT(request) {
         }
 
         getUser.password = password
+        // Completing the emailed OTP flow proves the user controls this inbox, so we
+        // can safely treat the email as verified. This also lets a Google-only account
+        // (which had no password) use "Forgot password" to set one and unlock
+        // email + password login.
+        getUser.isEmailVerified = true
         await getUser.save()
 
-        return response(true, 200, 'Password update success.')
+        return response(true, 200, 'Password updated successfully. You can now sign in with your email and password.')
     } catch (error) {
-        catchError(error)
+        return catchError(error)
     }
 }

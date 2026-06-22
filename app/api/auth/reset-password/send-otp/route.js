@@ -44,6 +44,6 @@ export async function POST(request) {
         return response(true, 200, 'Please verify your account.')
 
     } catch (error) {
-        catchError(error)
+        return catchError(error)
     }
 }

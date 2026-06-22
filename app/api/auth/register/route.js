@@ -24,13 +24,19 @@ export async function POST(request) {
 
         const { name, email, password } = validatedData.data
 
-        // check already registered user 
-        const checkUser = await UserModel.exists({ email, deletedAt: null })
-        if (checkUser) {
-            return response(true, 409, 'User already registered.')
+        // Emails are unique (one account per email). If the address is already taken
+        // we never create a duplicate — instead we guide the user to the right path.
+        const existingUser = await UserModel.findOne({ email, deletedAt: null }).select('+password')
+        if (existingUser) {
+            // Account exists via Google but has no password yet → tell them how to
+            // either continue with Google or set a password (account linking).
+            if (existingUser.googleId && !existingUser.password) {
+                return response(false, 409, 'This email is already registered with Google. Please use “Login with Google”, or set a password from “Forgot password”.')
+            }
+            return response(false, 409, 'An account with this email already exists. Please log in instead.')
         }
 
-        // new registration  
+        // new registration
 
         const NewRegistration = new UserModel({
             name, email, password
