@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import loadingSvg from '@/public/assets/images/loading.svg'
 import ProductReveiw from "@/components/Application/Website/ProductReveiw";
 import SizeGuideModal from "@/components/Application/Website/SizeGuideModal";
+import { normalizeColor } from "@/lib/utils";
 const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
 
     const dispatch = useDispatch()
@@ -171,9 +172,9 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
                             <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Color: <span className="text-foreground">{variant?.color}</span></p>
                             <div className="flex flex-wrap gap-2">
                                 {colors.map(color => (
-                                    <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${color}&size=${variant.size}`}
+                                    <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${encodeURIComponent(color)}&size=${variant.size}`}
                                         key={color}
-                                        className={`rounded-md border px-3 py-1.5 text-sm transition ${color === variant.color ? 'border-[var(--dark-red)] bg-[var(--dark-red)] text-white' : 'border-border/70 hover:border-foreground/40 hover:bg-muted/30'}`}
+                                        className={`rounded-md border px-3 py-1.5 text-sm transition ${normalizeColor(color) === normalizeColor(variant.color) ? 'border-[var(--dark-red)] bg-[var(--dark-red)] text-white' : 'border-border/70 hover:border-foreground/40 hover:bg-muted/30'}`}
                                     >
                                         {color}
                                     </Link>
@@ -195,7 +196,7 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {sizes.map(size => (
-                                    <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${variant.color}&size=${size}`}
+                                    <Link onClick={() => setIsProductLoading(true)} href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${encodeURIComponent(variant.color)}&size=${size}`}
                                         key={size}
                                         className={`rounded-md border px-3 py-1.5 text-sm transition ${size === variant.size ? 'border-[var(--dark-red)] bg-[var(--dark-red)] text-white' : 'border-border/70 hover:border-foreground/40 hover:bg-muted/30'}`}
                                     >

@@ -19,6 +19,7 @@ export async function POST(request) {
             product: true,
             sku: true,
             color: true,
+            colorHex: true,
             size: true,
             mrp: true,
             sellingPrice: true,
@@ -66,6 +67,7 @@ export async function POST(request) {
         const newProductVariant = new ProductVariantModel({
             product: variantData.product,
             color: variantData.color,
+            colorHex: variantData.colorHex || '',
             size: variantData.size,
             sku,
             mrp: variantData.mrp,

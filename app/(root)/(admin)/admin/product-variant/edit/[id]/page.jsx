@@ -14,6 +14,7 @@ import axios from 'axios'
 import useFetch from '@/hooks/useFetch'
 import Select from '@/components/Application/Select'
 import MediaModal from '@/components/Application/Admin/MediaModal'
+import ColorHexPicker from '@/components/Application/Admin/ColorHexPicker'
 import Image from 'next/image'
 import { sizes } from '@/lib/utils'
 
@@ -46,6 +47,7 @@ const EditProductVariant = ({ params }) => {
     product: true,
     sku: true,
     color: true,
+    colorHex: true,
     size: true,
     mrp: true,
     sellingPrice: true,
@@ -59,6 +61,7 @@ const EditProductVariant = ({ params }) => {
       product: '',
       sku: '',
       color: '',
+      colorHex: '',
       size: '',
       mrp: '',
       sellingPrice: '',
@@ -74,6 +77,7 @@ const EditProductVariant = ({ params }) => {
         product: variant.product,
         sku: variant.sku,
         color: variant.color,
+        colorHex: variant.colorHex || '',
         size: variant.size,
         mrp: variant.mrp,
         sellingPrice: variant.sellingPrice,
@@ -183,6 +187,26 @@ const EditProductVariant = ({ params }) => {
                       </FormLabel>
                       <FormControl>
                         <Input type="text" placeholder="Enter color" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="colorHex"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Swatch Color</FormLabel>
+                      <FormControl>
+                        <ColorHexPicker
+                          value={field.value}
+                          onChange={field.onChange}
+                          colorName={form.watch('color')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

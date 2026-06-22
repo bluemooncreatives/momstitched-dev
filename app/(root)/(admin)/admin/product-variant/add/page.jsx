@@ -14,6 +14,7 @@ import axios from 'axios'
 import useFetch from '@/hooks/useFetch'
 import Select from '@/components/Application/Select'
 import MediaModal from '@/components/Application/Admin/MediaModal'
+import ColorHexPicker from '@/components/Application/Admin/ColorHexPicker'
 import Image from 'next/image'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { sizes } from '@/lib/utils'
@@ -41,6 +42,7 @@ const AddProduct = () => {
     product: true,
     sku: true,
     color: true,
+    colorHex: true,
     size: true,
     mrp: true,
     sellingPrice: true,
@@ -53,6 +55,7 @@ const AddProduct = () => {
       product: "",
       sku: "",
       color: "",
+      colorHex: "",
       size: "",
       mrp: "",
       sellingPrice: "",
@@ -277,6 +280,25 @@ const AddProduct = () => {
                       </FormLabel>
                       <FormControl>
                         <Input type="text" placeholder="Enter color" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div>
+                <FormField
+                  control={form.control}
+                  name="colorHex"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Swatch Color</FormLabel>
+                      <FormControl>
+                        <ColorHexPicker
+                          value={field.value}
+                          onChange={field.onChange}
+                          colorName={form.watch('color')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

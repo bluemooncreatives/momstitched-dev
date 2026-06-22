@@ -9,6 +9,7 @@ import { BrandButton } from '@/components/Application/Website/BrandButton'
 import Link from 'next/link'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Minus, Plus, Crown, Sparkles } from 'lucide-react'
+import { resolveColorStyle } from '@/lib/colorMap'
 const Filter = ({ filters }) => {
     const instanceId = useId()
     const searchParams = useSearchParams()
@@ -245,28 +246,44 @@ const Filter = ({ filters }) => {
                             {colorsReady && colors.length === 0 && (
                                 <li className="px-2 py-1.5 text-[12px] text-muted-foreground">No colors available.</li>
                             )}
-                            {colorsReady && colors.map((color, index) => {
+                            {colorsReady && colors.map((colorItem, index) => {
+                                // Colors arrive as { name, hex }. Older cached payloads may still
+                                // be plain strings, so accept both shapes defensively.
+                                const colorName = typeof colorItem === 'string' ? colorItem : colorItem?.name
+                                const colorHex = typeof colorItem === 'string' ? '' : colorItem?.hex
+                                if (!colorName) return null
                                 // Index keeps the id unique even when colors differ only by case
                                 // (e.g. "Purple" vs "purple"), which would otherwise collide.
                                 const colorId = `${instanceId}-color-${index}`
-                                const active = selectedColor.includes(color)
+                                const active = selectedColor.includes(colorName)
+                                // Admin hex wins, then the curated dictionary / CSS name.
+                                // null => render a neutral "no swatch" placeholder.
+                                const swatchStyle = resolveColorStyle(colorName, colorHex)
                                 return (
-                                    <li key={`${color}-${index}`}>
+                                    <li key={`${colorName}-${index}`}>
                                         <label
                                             htmlFor={colorId}
                                             className={`flex cursor-pointer items-center gap-3 px-1 py-1.5 text-[13px] transition ${active ? 'font-semibold text-[var(--brand-primary-hover)]' : 'font-semibold text-[var(--brand-ink)] hover:text-[var(--brand-primary-hover)]'}`}
                                         >
                                             <Checkbox
                                                 id={colorId}
-                                                onCheckedChange={() => handleColorFilter(color)}
-                                                checked={selectedColor.includes(color)}
+                                                onCheckedChange={() => handleColorFilter(colorName)}
+                                                checked={selectedColor.includes(colorName)}
                                             />
-                                            <span
-                                                className="h-3.5 w-3.5 rounded-full border border-black/20"
-                                                style={{ backgroundColor: color }}
-                                                aria-hidden
-                                            />
-                                            <span>{color}</span>
+                                            {swatchStyle ? (
+                                                <span
+                                                    className="h-3.5 w-3.5 rounded-full border border-black/20"
+                                                    style={swatchStyle}
+                                                    aria-hidden
+                                                />
+                                            ) : (
+                                                <span
+                                                    className="h-3.5 w-3.5 rounded-full border border-black/20 bg-[repeating-linear-gradient(45deg,#e5e7eb,#e5e7eb_2px,#fff_2px,#fff_4px)]"
+                                                    aria-hidden
+                                                    title="No swatch color set"
+                                                />
+                                            )}
+                                            <span>{colorName}</span>
                                         </label>
                                     </li>
                                 )
