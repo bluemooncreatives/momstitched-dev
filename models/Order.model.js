@@ -35,9 +35,17 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // Street line: Flat / House no. / Building / Street / Area.
+    // Optional at the schema level for backward compatibility with legacy orders
+    // that only captured "landmark"; the checkout form requires it for new orders.
+    address: {
+        type: String,
+        required: false
+    },
+    // Nearby landmark — optional helper for the delivery agent.
     landmark: {
         type: String,
-        required: true
+        required: false
     },
     ordernote: {
         type: String,

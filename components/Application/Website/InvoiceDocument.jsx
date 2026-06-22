@@ -113,7 +113,7 @@ const InvoiceDocument = ({ order = {} }) => {
     const totalSavings = mrpSavings + (order?.couponDiscountAmount || 0)
     const paymentMethod = order?.paymentMethod || 'full'
 
-    const addressLine = [order?.landmark, order?.city, order?.state, order?.country, order?.pincode]
+    const addressLine = [order?.address, order?.landmark, order?.city, order?.state, order?.country, order?.pincode]
         .filter(Boolean).join(', ')
 
     return (

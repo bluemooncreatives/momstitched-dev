@@ -177,8 +177,12 @@ const OrderDetails = ({ params }) => {
                                                     <td className="text-end py-2">{orderData?.pincode}</td>
                                                 </tr>
                                                 <tr>
+                                                    <td className="font-medium py-2 align-top">Address</td>
+                                                    <td className="text-end py-2">{orderData?.address || '---'}</td>
+                                                </tr>
+                                                <tr>
                                                     <td className="font-medium py-2">Landmark</td>
-                                                    <td className="text-end py-2">{orderData?.landmark}</td>
+                                                    <td className="text-end py-2">{orderData?.landmark || '---'}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="font-medium py-2">Order note</td>

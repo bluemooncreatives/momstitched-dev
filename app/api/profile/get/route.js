@@ -13,9 +13,17 @@ export async function GET(request) {
 
         const userId = auth.userId
 
-        const user = await UserModel.findById(userId).lean()
+        // Return only the fields the profile/checkout forms need. Avoids leaking
+        // internal blobs like googleProfile.raw to the client.
+        const user = await UserModel.findById(userId)
+            .select('role name email phone address landmark city state pincode country avatar isEmailVerified')
+            .lean()
 
-        return response(true, 200, 'User  data.', user)
+        if (!user) {
+            return response(false, 404, 'User not found.')
+        }
+
+        return response(true, 200, 'User data.', user)
     } catch (error) {
         return catchError(error)
     }

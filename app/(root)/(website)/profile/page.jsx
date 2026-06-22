@@ -18,6 +18,7 @@ import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { login } from '@/store/reducer/authReducer'
+import { z } from 'zod'
 
 const breadCrumbData = {
     title: 'Profile',
@@ -31,8 +32,19 @@ const Profile = () => {
     const [preview, setPreview] = useState()
     const [file, setFile] = useState()
     const MAX_IMAGE_BYTES = 5 * 1024 * 1024
-    const formSchema = zSchema.pick({
-        name: true, phone: true, address: true
+
+    // Profile address fields are a saved convenience for faster checkout, so they
+    // are OPTIONAL here (a user can save just their name). Empty string is allowed.
+    const optional = (field) => field.or(z.literal('')).optional()
+    const formSchema = z.object({
+        name: zSchema.shape.name,
+        phone: optional(zSchema.shape.phone),
+        address: optional(zSchema.shape.address),
+        landmark: zSchema.shape.landmark,
+        city: optional(zSchema.shape.city),
+        state: optional(zSchema.shape.state),
+        pincode: optional(zSchema.shape.pincode),
+        country: optional(zSchema.shape.country),
     })
 
     const form = useForm({
@@ -41,18 +53,31 @@ const Profile = () => {
             name: "",
             phone: "",
             address: "",
+            landmark: "",
+            city: "",
+            state: "",
+            pincode: "",
+            country: "",
         }
     })
+
+    const [email, setEmail] = useState("")
 
     useEffect(() => {
         if (user && user.success) {
             const userData = user.data
             form.reset({
-                name: userData?.name,
-                phone: userData?.phone,
-                address: userData?.address,
+                name: userData?.name || "",
+                phone: userData?.phone || "",
+                address: userData?.address || "",
+                landmark: userData?.landmark || "",
+                city: userData?.city || "",
+                state: userData?.state || "",
+                pincode: userData?.pincode || "",
+                country: userData?.country || "",
             })
 
+            setEmail(userData?.email || "")
             setPreview(userData?.avatar?.url)
         }
     }, [user])
@@ -79,9 +104,14 @@ const Profile = () => {
             if (file) {
                 formData.set('file', file)
             }
-            formData.set('name', values.name)
-            formData.set('phone', values.phone)
-            formData.set('address', values.address)
+            formData.set('name', values.name ?? '')
+            formData.set('phone', values.phone ?? '')
+            formData.set('address', values.address ?? '')
+            formData.set('landmark', values.landmark ?? '')
+            formData.set('city', values.city ?? '')
+            formData.set('state', values.state ?? '')
+            formData.set('pincode', values.pincode ?? '')
+            formData.set('country', values.country ?? '')
 
             const { data: response } = await axios.put('/api/profile/update', formData)
             if (!response.success) {
@@ -164,7 +194,7 @@ const Profile = () => {
                                             <FormItem>
                                                 <FormLabel className="text-[13px] text-foreground/60">Phone</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="Enter your phone number" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                                    <Input type="tel" inputMode="numeric" autoComplete="tel" placeholder="Enter your phone number" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -172,16 +202,122 @@ const Profile = () => {
                                     />
                                 </div>
 
-                                {/* Address */}
+                                {/* Email (account identity — read only) */}
+                                <div className='mb-3 md:col-span-2 col-span-1'>
+                                    <FormItem>
+                                        <FormLabel className="text-[13px] text-foreground/60">Email</FormLabel>
+                                        <Input
+                                            type="email"
+                                            value={email}
+                                            readOnly
+                                            disabled
+                                            className="h-11 text-base font-semibold text-[var(--brand-primary)] opacity-80"
+                                        />
+                                        <p className="mt-1 text-xs text-foreground/50">Your account email can&apos;t be changed here.</p>
+                                    </FormItem>
+                                </div>
+
+                                {/* Address divider */}
+                                <div className='md:col-span-2 col-span-1 -mb-1 mt-2'>
+                                    <p className="text-sm font-semibold text-[var(--brand-primary)]">Saved Address</p>
+                                    <p className="text-xs text-foreground/50">We&apos;ll use this to pre-fill your checkout. You can change it anytime.</p>
+                                </div>
+
+                                {/* Address line */}
                                 <div className='mb-3 md:col-span-2 col-span-1'>
                                     <FormField
                                         control={form.control}
                                         name="address"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[13px] text-foreground/60">Address</FormLabel>
+                                                <FormLabel className="text-[13px] text-foreground/60">Address (Flat, House no., Building, Street, Area)</FormLabel>
                                                 <FormControl>
-                                                    <Textarea placeholder="Enter your address" className="min-h-[120px] text-base font-semibold text-[var(--brand-primary)] resize-y" {...field} />
+                                                    <Textarea placeholder="e.g. 12B, Sunrise Apartments, MG Road, Andheri West" className="min-h-[90px] text-base font-semibold text-[var(--brand-primary)] resize-y" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                {/* Landmark */}
+                                <div className='mb-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="landmark"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] text-foreground/60">Landmark (optional)</FormLabel>
+                                                <FormControl>
+                                                    <Input type="text" placeholder="e.g. Near City Mall" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                {/* Pincode */}
+                                <div className='mb-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="pincode"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] text-foreground/60">Pincode</FormLabel>
+                                                <FormControl>
+                                                    <Input type="text" inputMode="numeric" autoComplete="postal-code" placeholder="e.g. 400058" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                {/* City */}
+                                <div className='mb-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="city"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] text-foreground/60">City</FormLabel>
+                                                <FormControl>
+                                                    <Input type="text" autoComplete="address-level2" placeholder="e.g. Mumbai" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                {/* State */}
+                                <div className='mb-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="state"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] text-foreground/60">State</FormLabel>
+                                                <FormControl>
+                                                    <Input type="text" autoComplete="address-level1" placeholder="e.g. Maharashtra" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                {/* Country */}
+                                <div className='mb-3'>
+                                    <FormField
+                                        control={form.control}
+                                        name="country"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-[13px] text-foreground/60">Country</FormLabel>
+                                                <FormControl>
+                                                    <Input type="text" autoComplete="country-name" placeholder="e.g. India" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

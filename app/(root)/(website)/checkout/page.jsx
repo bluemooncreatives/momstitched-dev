@@ -167,6 +167,7 @@ const Checkout = () => {
         name: true,
         email: true,
         phone: true,
+        address: true,
         country: true,
         state: true,
         city: true,
@@ -183,6 +184,7 @@ const Checkout = () => {
             name: '',
             email: '',
             phone: '',
+            address: '',
             country: '',
             state: '',
             city: '',
@@ -192,6 +194,11 @@ const Checkout = () => {
             userId: authStore?.auth?._id,
         }
     })
+
+    // Opt-in to persist the entered shipping address back onto the user profile so
+    // the next checkout is pre-filled (Amazon-style "save address"). Defaulted on or
+    // off based on whether the saved profile address is already complete (see below).
+    const [saveAddress, setSaveAddress] = useState(false)
 
 
     useEffect(() => {
@@ -203,10 +210,31 @@ const Checkout = () => {
     useEffect(() => {
         if (profileData?.success) {
             const user = profileData.data
-            orderForm.setValue('userId', user?._id || '')
-            orderForm.setValue('name', user?.name || '')
-            orderForm.setValue('email', user?.email || '')
-            orderForm.setValue('phone', user?.phone || '')
+            // Pre-fill from the saved profile. keepDirtyValues ensures that if the
+            // profile fetch resolves AFTER the customer has already started typing,
+            // we never overwrite the fields they edited.
+            orderForm.reset({
+                userId: user?._id || '',
+                name: user?.name || '',
+                email: user?.email || '',
+                phone: user?.phone || '',
+                address: user?.address || '',
+                landmark: user?.landmark || '',
+                city: user?.city || '',
+                state: user?.state || '',
+                pincode: user?.pincode || '',
+                country: user?.country || '',
+                ordernote: '',
+            }, { keepDirtyValues: true })
+
+            // If the saved address is incomplete, default the "save to profile" opt-in
+            // ON (so a first-time buyer gets pre-filled next time). If it's already
+            // complete, leave it OFF so a one-off/gift address never silently
+            // overwrites the customer's saved default.
+            const hasCompleteAddress = Boolean(
+                user?.phone && user?.address && user?.city && user?.state && user?.pincode && user?.country
+            )
+            setSaveAddress(!hasCompleteAddress)
         }
     }, [profileData])
 
@@ -246,6 +274,7 @@ const Checkout = () => {
 
                 const { data: orderResponse } = await axios.post('/api/payment/save-order', {
                     ...formData,
+                    saveAddress,
                     products,
                     subtotal,
                     couponDiscountAmount,
@@ -291,6 +320,7 @@ const Checkout = () => {
                     const { data: paymentResponseData } = await axios.post('/api/payment/save-order', {
                         ...formData,
                         ...response,
+                        saveAddress,
                         products,
                         subtotal,
                         couponDiscountAmount,
@@ -459,7 +489,7 @@ const Checkout = () => {
                                             render={({ field }) => (
                                                 <FormItem className='sm:col-span-2'>
                                                     <FormControl>
-                                                        <Input placeholder="Phone number*" className="form-field" {...field} />
+                                                        <Input type="tel" inputMode="numeric" autoComplete="tel" placeholder="Phone number*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -474,23 +504,11 @@ const Checkout = () => {
                                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                                         <FormField
                                             control={orderForm.control}
-                                            name='country'
+                                            name='address'
                                             render={({ field }) => (
-                                                <FormItem>
+                                                <FormItem className='sm:col-span-2'>
                                                     <FormControl>
-                                                        <Input placeholder="Country*" className="form-field" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={orderForm.control}
-                                            name='state'
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <Input placeholder="State*" className="form-field" {...field} />
+                                                        <Textarea autoComplete="street-address" placeholder="Flat, House no., Building, Street, Area*" className="form-field form-field-area" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -502,7 +520,7 @@ const Checkout = () => {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input placeholder="City*" className="form-field" {...field} />
+                                                        <Input autoComplete="address-level2" placeholder="City*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -514,7 +532,31 @@ const Checkout = () => {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input placeholder="Pincode*" className="form-field" {...field} />
+                                                        <Input inputMode="numeric" autoComplete="postal-code" placeholder="Pincode*" className="form-field" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={orderForm.control}
+                                            name='state'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input autoComplete="address-level1" placeholder="State*" className="form-field" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={orderForm.control}
+                                            name='country'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input autoComplete="country-name" placeholder="Country*" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -526,7 +568,7 @@ const Checkout = () => {
                                             render={({ field }) => (
                                                 <FormItem className='sm:col-span-2'>
                                                     <FormControl>
-                                                        <Input placeholder="Landmark / Apartment / Street*" className="form-field" {...field} />
+                                                        <Input placeholder="Landmark (optional) — e.g. near City Mall" className="form-field" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -544,6 +586,19 @@ const Checkout = () => {
                                                 </FormItem>
                                             )}
                                         />
+
+                                        {/* Save address back to profile for faster checkout next time */}
+                                        <label className='sm:col-span-2 flex cursor-pointer items-start gap-3 rounded-sm border border-border/60 p-3.5 transition-colors hover:border-border'>
+                                            <input
+                                                type='checkbox'
+                                                checked={saveAddress}
+                                                onChange={(e) => setSaveAddress(e.target.checked)}
+                                                className='mt-0.5 size-4 flex-shrink-0 cursor-pointer accent-[var(--dark-red)]'
+                                            />
+                                            <span className='text-[13px] text-muted-foreground'>
+                                                <span className='font-semibold text-foreground'>Save this address to my profile</span> for faster checkout next time.
+                                            </span>
+                                        </label>
                                     </div>
                                 </form>
                             </Form>

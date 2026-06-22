@@ -23,10 +23,28 @@ export async function PUT(request) {
         const file = formData.get('file')
         const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 
+        // Only touch a field when the client actually sent it, so a partial
+        // request can never blank out previously-saved data. Empty string is a
+        // legitimate "clear this field" value and is preserved.
+        const applyField = (key) => {
+            if (formData.has(key)) {
+                const value = formData.get(key)
+                user[key] = typeof value === 'string' ? value.trim() : value
+            }
+        }
 
-        user.name = formData.get('name')
-        user.phone = formData.get('phone')
-        user.address = formData.get('address')
+        applyField('name')
+        applyField('phone')
+        applyField('address')
+        applyField('landmark')
+        applyField('city')
+        applyField('state')
+        applyField('pincode')
+        applyField('country')
+
+        if (!user.name) {
+            return response(false, 400, 'Name is required.')
+        }
 
         if (file) {
             if (typeof file.size === 'number' && file.size > MAX_IMAGE_BYTES) {
@@ -58,6 +76,14 @@ export async function PUT(request) {
             _id: user._id.toString(),
             role: user.role,
             name: user.name,
+            email: user.email,
+            phone: user.phone,
+            address: user.address,
+            landmark: user.landmark,
+            city: user.city,
+            state: user.state,
+            pincode: user.pincode,
+            country: user.country,
             avatar: user.avatar
         })
     } catch (error) {

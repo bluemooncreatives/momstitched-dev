@@ -5,6 +5,7 @@ import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
 import { isAuthenticated } from "@/lib/authentication";
 import OrderModel from "@/models/Order.model";
+import UserModel from "@/models/User.model";
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils";
 import { z } from "zod";
 
@@ -23,7 +24,7 @@ export async function POST(request) {
         })
 
         const orderSchema = zSchema.pick({
-            name: true, email: true, phone: true, country: true, state: true, city: true, pincode: true, landmark: true, ordernote: true
+            name: true, email: true, phone: true, address: true, country: true, state: true, city: true, pincode: true, landmark: true, ordernote: true
         }).extend({
             userId: z.string().optional(),
             razorpay_payment_id: z.string().optional(),
@@ -146,6 +147,7 @@ export async function POST(request) {
             name: validatedData.name,
             email: validatedData.email,
             phone: validatedData.phone,
+            address: validatedData.address,
             country: validatedData.country,
             state: validatedData.state,
             city: validatedData.city,
@@ -165,6 +167,26 @@ export async function POST(request) {
             order_id: orderId,
             status: paymentVerification ? 'pending' : 'unverified'
         })
+
+        // Optionally persist the shipping address back onto the user's profile so the
+        // next checkout is pre-filled. Best-effort only — the order is already saved,
+        // so a profile-update failure must never fail the order. Account identity
+        // fields (name/email) are deliberately NOT touched here.
+        if (payload.saveAddress === true) {
+            try {
+                await UserModel.findByIdAndUpdate(resolvedUserId, {
+                    phone: validatedData.phone,
+                    address: validatedData.address,
+                    landmark: validatedData.landmark || '',
+                    city: validatedData.city,
+                    state: validatedData.state,
+                    pincode: validatedData.pincode,
+                    country: validatedData.country,
+                })
+            } catch (error) {
+                console.log('Failed to save address to profile:', error)
+            }
+        }
 
         try {
             const mailData = {

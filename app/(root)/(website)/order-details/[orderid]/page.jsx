@@ -267,7 +267,7 @@ const OrderDetails = async ({ params }) => {
                                 <div className='px-5 py-5'>
                                     <p className='text-sm font-semibold text-foreground'>{orderData?.name}</p>
                                     <p className='mt-1 text-[13px] leading-relaxed text-muted-foreground'>
-                                        {[orderData?.landmark, orderData?.city, orderData?.state, orderData?.country, orderData?.pincode].filter(Boolean).join(', ')}
+                                        {[orderData?.address, orderData?.landmark, orderData?.city, orderData?.state, orderData?.country, orderData?.pincode].filter(Boolean).join(', ')}
                                     </p>
                                     <div className='mt-3 flex flex-col gap-1 text-[13px] text-muted-foreground sm:flex-row sm:gap-6'>
                                         <span><span className='font-medium text-foreground'>Phone:</span> {orderData?.phone || '—'}</span>
