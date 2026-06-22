@@ -26,6 +26,7 @@ const Shop = async ({ searchParams }) => {
             maxPrice: resolvedSearchParams?.maxPrice,
             category: resolvedSearchParams?.category,
             bestseller: resolvedSearchParams?.bestseller,
+            freshlyArrived: resolvedSearchParams?.freshlyArrived,
             q: resolvedSearchParams?.q,
             sort: resolvedSearchParams?.sort,
             limit: resolvedSearchParams?.limit,

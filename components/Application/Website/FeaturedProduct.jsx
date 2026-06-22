@@ -1,10 +1,10 @@
 import dynamic from 'next/dynamic'
-import { getFeaturedProducts } from '@/lib/services/productService'
+import { getFreshlyArrivedProducts } from '@/lib/services/productService'
 
 const FeaturedProductClient = dynamic(() => import('./FeaturedProductClient'))
 
 const FeaturedProduct = async () => {
-    const products = await getFeaturedProducts()
+    const products = await getFreshlyArrivedProducts()
 
     return <FeaturedProductClient products={products || []} />
 }

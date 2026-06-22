@@ -41,6 +41,9 @@ export const ADMIN_COUPON_EDIT = (id) => id ? `/admin/coupon/edit/${id}` : ''
 // Bestseller route
 export const ADMIN_BESTSELLER_SHOW = '/admin/bestseller'
 
+// Freshly Arrived route
+export const ADMIN_FRESHLY_ARRIVED_SHOW = '/admin/freshly-arrived'
+
 
 // Customer route
 export const ADMIN_CUSTOMERS_SHOW = '/admin/customers'

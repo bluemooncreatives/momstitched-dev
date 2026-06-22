@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { BrandButton } from '@/components/Application/Website/BrandButton'
 import Link from 'next/link'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { Minus, Plus, Crown } from 'lucide-react'
+import { Minus, Plus, Crown, Sparkles } from 'lucide-react'
 const Filter = ({ filters }) => {
     const instanceId = useId()
     const searchParams = useSearchParams()
@@ -18,6 +18,7 @@ const Filter = ({ filters }) => {
     const [selectedColor, setSelectedColor] = useState([])
     const [selectedSize, setSelectedSize] = useState([])
     const [bestsellerOnly, setBestsellerOnly] = useState(false)
+    const [freshlyArrivedOnly, setFreshlyArrivedOnly] = useState(false)
 
     const categories = filters?.categories ?? null
     const colors = filters?.colors ?? null
@@ -38,6 +39,8 @@ const Filter = ({ filters }) => {
         searchParams.get('size') ? setSelectedSize(searchParams.get('size').split(',')) : setSelectedSize([])
 
         setBestsellerOnly(['true', '1', 'yes'].includes((searchParams.get('bestseller') || '').toLowerCase()))
+
+        setFreshlyArrivedOnly(['true', '1', 'yes'].includes((searchParams.get('freshlyArrived') || '').toLowerCase()))
 
         const minPrice = parseInt(searchParams.get('minPrice'))
         const maxPrice = parseInt(searchParams.get('maxPrice'))
@@ -122,6 +125,21 @@ const Filter = ({ filters }) => {
         router.push(`${WEBSITE_SHOP}?${urlSearchParams}`)
     }
 
+    const handleFreshlyArrivedFilter = () => {
+        const next = !freshlyArrivedOnly
+        setFreshlyArrivedOnly(next)
+
+        if (next) {
+            urlSearchParams.set('freshlyArrived', 'true')
+        } else {
+            urlSearchParams.delete('freshlyArrived')
+        }
+        // Reset pagination so toggling the filter doesn't land on an out-of-range page.
+        urlSearchParams.delete('page')
+
+        router.push(`${WEBSITE_SHOP}?${urlSearchParams}`)
+    }
+
     const handlePriceFilter = () => {
         urlSearchParams.set('minPrice', priceFilter.minPrice)
         urlSearchParams.set('maxPrice', priceFilter.maxPrice)
@@ -141,17 +159,31 @@ const Filter = ({ filters }) => {
                 </Button>
             )}
 
-            <button
-                type="button"
-                onClick={handleBestsellerFilter}
-                aria-pressed={bestsellerOnly}
-                className={`flex w-full items-center justify-center gap-2 border px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.18em] transition ${bestsellerOnly
-                    ? 'border-[var(--brand-primary)] bg-[var(--brand-primary)] text-white'
-                    : 'border-border/60 text-[var(--brand-ink)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]'}`}
-            >
-                <Crown className="size-4" />
-                Bestsellers
-            </button>
+            <div className="space-y-2.5">
+                <button
+                    type="button"
+                    onClick={handleBestsellerFilter}
+                    aria-pressed={bestsellerOnly}
+                    className={`flex w-full items-center justify-center gap-2 border px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.18em] transition ${bestsellerOnly
+                        ? 'border-[var(--brand-primary)] bg-[var(--brand-primary)] text-white'
+                        : 'border-border/60 text-[var(--brand-ink)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]'}`}
+                >
+                    <Crown className="size-4" />
+                    Bestsellers
+                </button>
+
+                <button
+                    type="button"
+                    onClick={handleFreshlyArrivedFilter}
+                    aria-pressed={freshlyArrivedOnly}
+                    className={`flex w-full items-center justify-center gap-2 border px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.18em] transition ${freshlyArrivedOnly
+                        ? 'border-[var(--brand-primary)] bg-[var(--brand-primary)] text-white'
+                        : 'border-border/60 text-[var(--brand-ink)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]'}`}
+                >
+                    <Sparkles className="size-4" />
+                    Freshly Arrived
+                </button>
+            </div>
 
             <Accordion
                 type="multiple"

@@ -39,6 +39,7 @@ export async function PUT(request) {
         // Trashing or restoring a bestseller changes what the storefront carousel
         // should show, so drop its cache.
         revalidateTag('storefront-bestseller-products')
+        revalidateTag('storefront-freshly-arrived-products')
 
         return response(true, 200, deleteType === 'SD' ? 'Data moved into trash.' : "Data restored.")
 
@@ -78,6 +79,7 @@ export async function DELETE(request) {
         await ProductModel.deleteMany({ _id: { $in: ids } })
 
         revalidateTag('storefront-bestseller-products')
+        revalidateTag('storefront-freshly-arrived-products')
 
         return response(true, 200, 'Data deleted permanently')
     } catch (error) {

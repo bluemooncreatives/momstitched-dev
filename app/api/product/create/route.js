@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
@@ -53,6 +54,10 @@ export async function POST(request) {
         })
 
         await newProduct.save()
+
+        // The Freshly Arrived section tops up with the newest products, so a new
+        // product can change what it shows — refresh that cache.
+        revalidateTag('storefront-freshly-arrived-products')
 
         return response(true, 200, 'Product added successfully.', { _id: newProduct._id })
 

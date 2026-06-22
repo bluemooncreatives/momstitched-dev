@@ -63,6 +63,17 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    isFreshlyArrived: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+    // Lower number = appears earlier in the storefront Freshly Arrived section.
+    // Only meaningful when isFreshlyArrived is true.
+    freshlyArrivedSortOrder: {
+        type: Number,
+        default: 0
+    },
     deletedAt: {
         type: Date,
         default: null,
@@ -75,5 +86,7 @@ const productSchema = new mongoose.Schema({
 productSchema.index({ category: 1 })
 // Drives the storefront Bestsellers query: active bestsellers, ordered by rank.
 productSchema.index({ isBestseller: 1, deletedAt: 1, bestsellerSortOrder: 1 })
+// Drives the storefront Freshly Arrived query: active picks, ordered by rank.
+productSchema.index({ isFreshlyArrived: 1, deletedAt: 1, freshlyArrivedSortOrder: 1 })
 const ProductModel = mongoose.models.Product || mongoose.model('Product', productSchema, 'products')
 export default ProductModel
