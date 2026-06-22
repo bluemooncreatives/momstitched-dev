@@ -6,6 +6,9 @@ const couponSchema = new mongoose.Schema({
         required: true,
         unique: true,
         trim: true,
+        // Canonical storage is always UPPERCASE. Mongoose applies this setter on every
+        // write (create + save) and when casting query filters, so lookups stay consistent.
+        uppercase: true,
     },
     discountPercentage: {
         type: Number,

@@ -17,9 +17,11 @@ export async function POST(request) {
             return response(false, 400, 'Missing or invalid data.', validate.error)
         }
 
+        // code is already trimmed + uppercased by the zod schema.
         const { code, minShoppingAmount } = validate.data
 
-        const couponData = await CouponModel.findOne({ code }).lean()
+        // deletedAt: null guards against redeeming a coupon that was moved to trash.
+        const couponData = await CouponModel.findOne({ code, deletedAt: null }).lean()
         if (!couponData) {
             return response(false, 400, 'Invalid or expired coupon code.')
         }

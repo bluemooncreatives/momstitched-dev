@@ -144,7 +144,8 @@ const Checkout = () => {
             // Store the percentage; the cart effect derives the discount amount + total.
             setCouponDiscountPercentage(discountPercentage)
             showToast('success', response.message)
-            setCouponCode(couponForm.getValues('code'))
+            // values.code is the trimmed + uppercased value from the zod schema.
+            setCouponCode(values.code)
             setIsCouponApplied(true)
 
             couponForm.resetField('code', '')
@@ -759,7 +760,7 @@ const Checkout = () => {
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormControl>
-                                                                        <Input placeholder="Coupon code" className="form-field !pl-9 uppercase" {...field} />
+                                                                        <Input placeholder="Coupon code" className="form-field !pl-9 uppercase" {...field} onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>

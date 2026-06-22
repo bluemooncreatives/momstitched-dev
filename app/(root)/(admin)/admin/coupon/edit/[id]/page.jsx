@@ -98,7 +98,7 @@ const EditCoupon = ({ params }) => {
                         Code<span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input type="text" placeholder="Enter code" {...field} />
+                        <Input type="text" placeholder="Enter code" className="uppercase" {...field} onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
