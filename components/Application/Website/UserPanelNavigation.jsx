@@ -22,6 +22,7 @@ const UserPanelNavigation = () => {
     const pathname = usePathname()
     const dispatch = useDispatch()
     const user = useSelector((store) => store.authStore?.auth)
+    const hydrated = useSelector((store) => store.authStore?.hydrated)
 
     const handleLogout = async () => {
         try {
@@ -52,22 +53,34 @@ const UserPanelNavigation = () => {
         <div className="overflow-hidden rounded-[var(--radius)] border border-[var(--dark-red)]/20 bg-background font-neue">
             {/* User greeting */}
             <div className="border-b border-[var(--dark-red)]/20 px-5 py-4">
-                <div className="flex items-center gap-3">
-                    <Avatar className="size-9 border border-[var(--dark-red)]/10">
-                        <AvatarImage src={user?.avatar?.url} alt={user?.name || 'User'} className="object-cover" />
-                        <AvatarFallback className="bg-[var(--dark-red)] font-neue text-[11px] font-semibold uppercase tracking-[0.04em] text-white">
-                            {user?.name ? user.name.charAt(0) : 'U'}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                        <p className="text-[13px] text-foreground/60">
-                            Welcome back
-                        </p>
-                        <p className="truncate text-base font-semibold text-[var(--brand-primary)]">
-                            {user?.name || 'User'}
-                        </p>
+                {!hydrated ? (
+                    // Auth state not resolved yet — show a skeleton instead of a
+                    // misleading "User" placeholder that would flash before hydration.
+                    <div className="flex items-center gap-3">
+                        <span className="size-9 shrink-0 animate-pulse rounded-full bg-border/60" />
+                        <div className="min-w-0 flex-1 space-y-1.5">
+                            <span className="block h-2.5 w-16 animate-pulse rounded bg-border/60" />
+                            <span className="block h-3.5 w-28 animate-pulse rounded bg-border/60" />
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="flex items-center gap-3">
+                        <Avatar className="size-9 border border-[var(--dark-red)]/10">
+                            <AvatarImage src={user?.avatar?.url} alt={user?.name || 'User'} className="object-cover" />
+                            <AvatarFallback className="bg-[var(--dark-red)] font-neue text-[11px] font-semibold uppercase tracking-[0.04em] text-white">
+                                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                            <p className="text-[13px] text-foreground/60">
+                                Welcome back
+                            </p>
+                            <p className="truncate text-base font-semibold text-[var(--brand-primary)]">
+                                {user?.name || 'User'}
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Navigation links */}

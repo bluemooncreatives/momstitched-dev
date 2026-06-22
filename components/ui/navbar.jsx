@@ -13,7 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import Cart from "@/components/Application/Website/Cart"
 import GlobalSearch from "@/components/Application/Website/GlobalSearch"
 import userIcon from "@/public/assets/images/user.png"
@@ -49,6 +49,7 @@ export default function Navbar({
 }) {
   const [openSearch, setOpenSearch] = React.useState(false)
   const user = useSelector((store) => store?.authStore?.auth)
+  const hydrated = useSelector((store) => store?.authStore?.hydrated)
 
   const accountUrl = auth?.account?.url || "/my-account"
 
@@ -103,7 +104,10 @@ export default function Navbar({
               <Cart />
             </div>
 
-            {!user ? (
+            {!hydrated ? (
+              // Don't flash a logged-out icon before the auth state is resolved.
+              <span className="h-8 w-8 shrink-0 animate-pulse rounded-full bg-stone-200/70" aria-hidden />
+            ) : !user ? (
               <Link
                 href={auth.login.url}
                 className="text-stone-600 transition-colors hover:text-[var(--brand-primary-hover)]"
@@ -115,6 +119,9 @@ export default function Navbar({
               <Link href={accountUrl} aria-label="My account">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user?.avatar?.url || userIcon.src} />
+                  <AvatarFallback className="bg-[var(--dark-red)] text-[11px] font-semibold uppercase text-white">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </AvatarFallback>
                 </Avatar>
               </Link>
             )}
