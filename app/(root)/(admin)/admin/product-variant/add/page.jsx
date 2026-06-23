@@ -6,6 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import { zSchema } from '@/lib/zodSchema'
+import { computeDiscountPercentage, validatePricing } from '@/lib/pricing'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Suspense, useEffect, useState } from 'react'
@@ -122,16 +123,11 @@ const AddProduct = () => {
 
 
 
-  // discount percentage calculation 
+  // Discount is always derived from MRP & Selling Price (single source of truth
+  // in lib/pricing). Recompute on every change so 0% (SP == MRP) and later edits
+  // are reflected instead of leaving a stale value behind.
   useEffect(() => {
-    const mrp = form.getValues('mrp') || 0
-    const sellingPrice = form.getValues('sellingPrice') || 0
-
-    if (mrp > 0 && sellingPrice > 0) {
-      const discountPercentage = ((mrp - sellingPrice) / mrp) * 100
-      form.setValue('discountPercentage', Math.round(discountPercentage))
-    }
-
+    form.setValue('discountPercentage', computeDiscountPercentage(form.getValues('mrp'), form.getValues('sellingPrice')))
   }, [form.watch('mrp'), form.watch('sellingPrice')])
 
 
@@ -142,6 +138,13 @@ const AddProduct = () => {
       if (selectedMedia.length <= 0) {
         return showToast('error', 'Please select media.')
       }
+
+      const pricing = validatePricing(values.mrp, values.sellingPrice)
+      if (!pricing.ok) {
+        form.setError(pricing.field, { type: 'manual', message: pricing.message })
+        return showToast('error', pricing.message)
+      }
+      values.discountPercentage = pricing.discountPercentage
 
       const sku = (values.sku || '').trim()
       const skuPrefix = parentSku ? `${parentSku}-` : ''

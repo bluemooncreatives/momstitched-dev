@@ -159,8 +159,15 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
 
                     <div className="mt-4 flex flex-wrap items-center gap-2">
                         <span className="text-2xl font-semibold text-foreground">{variant.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                        <span className="text-sm line-through text-muted-foreground">{variant.mrp.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
-                        <span className="ms-2 rounded-md bg-[var(--dark-red)] px-2.5 py-1 text-[11px] font-semibold text-white">-{variant.discountPercentage}%</span>
+                        {/* Only show the struck-through MRP + discount badge when the
+                            item is actually discounted, so a 0% (SP == MRP) product
+                            doesn't show the same price crossed out with "-0%". */}
+                        {variant.mrp > variant.sellingPrice && (
+                            <>
+                                <span className="text-sm line-through text-muted-foreground">{variant.mrp.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span>
+                                <span className="ms-2 rounded-md bg-[var(--dark-red)] px-2.5 py-1 text-[11px] font-semibold text-white">-{variant.discountPercentage}%</span>
+                            </>
+                        )}
                     </div>
 
                     <div className="mt-5 rounded-md border border-border/70 bg-muted/30 p-3 text-sm leading-relaxed text-foreground/85">
