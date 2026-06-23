@@ -35,7 +35,7 @@ export async function POST(request) {
 
         await newOtpData.save()
 
-        const otpSendStatus = await sendMail('Your login verification code.', email, otpEmail(otp))
+        const otpSendStatus = await sendMail('Reset your password — MomStitched', email, otpEmail(otp, { name: getUser.name, purpose: 'reset' }))
 
         if (!otpSendStatus.success) {
             return response(false, 400, 'Failed to resend otp.')

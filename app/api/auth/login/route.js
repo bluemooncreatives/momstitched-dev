@@ -43,7 +43,11 @@ export async function POST(request) {
                 .sign(secret)
 
 
-            await sendMail('Email Verification request from MomStitched', email, emailVerificationLink(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email/${token}`))
+            await sendMail(
+                'Verify your email — MomStitched',
+                email,
+                emailVerificationLink(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email/${token}`, { name: getUser.name })
+            )
 
             return response(false, 401, 'Your email is not verified. We have sent a verification link to your registered email address.')
         }
@@ -76,8 +80,8 @@ export async function POST(request) {
         await newOtpData.save()
 
         // send OTP email
-        const OTPEmailTemplate = otpEmail(OTP)
-        const otpEmailStatus = await sendMail("Your login verification code.", email, OTPEmailTemplate)
+        const OTPEmailTemplate = otpEmail(OTP, { name: getUser.name, purpose: 'login' })
+        const otpEmailStatus = await sendMail("Your MomStitched login code", email, OTPEmailTemplate)
         if (!otpEmailStatus.success) {
             return response(false, 500, 'Something went wrong.')
         }

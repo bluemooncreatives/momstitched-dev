@@ -1,5 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
+import { sendMail } from "@/lib/sendMail";
+import { passwordChanged } from "@/email/passwordChanged";
 import { zSchema } from "@/lib/zodSchema";
 import UserModel from "@/models/User.model";
 
@@ -31,6 +33,13 @@ export async function PUT(request) {
         // email + password login.
         getUser.isEmailVerified = true
         await getUser.save()
+
+        // Security notice. Best-effort — the reset already succeeded.
+        try {
+            await sendMail('Your MomStitched password was reset', getUser.email, passwordChanged({ name: getUser.name, action: 'reset' }))
+        } catch (mailError) {
+            console.error('Failed to send password-reset email:', mailError?.message || mailError)
+        }
 
         return response(true, 200, 'Password updated successfully. You can now sign in with your email and password.')
     } catch (error) {

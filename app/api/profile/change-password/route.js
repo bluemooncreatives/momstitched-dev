@@ -1,6 +1,8 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
+import { sendMail } from "@/lib/sendMail";
+import { passwordChanged } from "@/email/passwordChanged";
 import { zSchema } from "@/lib/zodSchema";
 import UserModel from "@/models/User.model";
 import { z } from "zod";
@@ -62,6 +64,17 @@ export async function PUT(request) {
 
         user.password = password
         await user.save()
+
+        // Security notice. Best-effort — the change already succeeded.
+        try {
+            await sendMail(
+                hasPassword ? 'Your MomStitched password was changed' : 'Your MomStitched password is set',
+                user.email,
+                passwordChanged({ name: user.name, action: hasPassword ? 'changed' : 'set' })
+            )
+        } catch (mailError) {
+            console.error('Failed to send password-changed email:', mailError?.message || mailError)
+        }
 
         return response(true, 200, hasPassword
             ? 'Password changed successfully.'

@@ -46,7 +46,8 @@ export async function POST(request) {
     await sendMail(
       `New Contact Message${payload.subject ? `: ${payload.subject}` : ''} — from ${payload.name}`,
       process.env.NODEMAILER_EMAIL,
-      contactNotification(payload)
+      contactNotification(payload),
+      { replyTo: payload.email }
     )
 
     return response(true, 200, 'Message sent successfully.')

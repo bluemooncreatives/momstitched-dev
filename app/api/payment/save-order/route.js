@@ -188,13 +188,38 @@ export async function POST(request) {
             }
         }
 
+        // Order confirmation email. Best-effort only — the order is already saved,
+        // so a mail failure must never fail the request. All money values here are
+        // the server-computed ones (not the client's), so the email can never show
+        // a tampered total.
         try {
             const mailData = {
+                name: validatedData.name,
                 order_id: orderId,
-                orderDetailsUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order-details/${orderId}`
+                orderDetailsUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order-details/${orderId}`,
+                items: validatedData.products.map((p) => ({
+                    name: p.name,
+                    qty: p.qty,
+                    sellingPrice: p.sellingPrice,
+                })),
+                subtotal,
+                couponDiscountAmount,
+                totalAmount,
+                paymentMethod,
+                paidAmount,
+                remainingAmount,
+                phone: validatedData.phone,
+                address: {
+                    address: validatedData.address,
+                    landmark: validatedData.landmark,
+                    city: validatedData.city,
+                    state: validatedData.state,
+                    pincode: validatedData.pincode,
+                    country: validatedData.country,
+                },
             }
 
-            await sendMail('Order placed successfully.', validatedData.email, orderNotification(mailData))
+            await sendMail('Your MomStitched order is confirmed', validatedData.email, orderNotification(mailData))
 
         } catch (error) {
             console.log(error)
