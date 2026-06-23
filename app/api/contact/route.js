@@ -1,5 +1,7 @@
 import { contactNotification } from '@/email/contactNotification'
+import { contactConfirmation } from '@/email/contactConfirmation'
 import { catchError, response } from '@/lib/helperFunction'
+import { generateTicketId } from '@/lib/generateTicketId'
 import { sendMail } from '@/lib/sendMail'
 import ContactModel from '@/models/Contact.model'
 import { connectDB } from '@/lib/databaseConnection'
@@ -41,16 +43,48 @@ export async function POST(request) {
     }
 
     await connectDB()
-    await ContactModel.create(payload)
 
-    await sendMail(
-      `New Contact Message${payload.subject ? `: ${payload.subject}` : ''} — from ${payload.name}`,
-      process.env.NODEMAILER_EMAIL,
-      contactNotification(payload),
-      { replyTo: payload.email }
-    )
+    // Mint a unique, human-readable reference. A random id can (extremely
+    // rarely) collide with an existing one; the unique index turns that into a
+    // duplicate-key error (code 11000), so we retry with a fresh id a few times
+    // rather than failing the customer's submission.
+    let contact = null
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        contact = await ContactModel.create({
+          ...payload,
+          ticketId: generateTicketId(),
+        })
+        break
+      } catch (err) {
+        const isDuplicateTicket =
+          err?.code === 11000 && err?.keyPattern && 'ticketId' in err.keyPattern
+        if (isDuplicateTicket && attempt < 4) continue
+        throw err
+      }
+    }
 
-    return response(true, 200, 'Message sent successfully.')
+    const ticketId = contact.ticketId
+    const emailPayload = { ...payload, ticketId }
+
+    // Notify the store inbox and acknowledge the customer. Both are best-effort:
+    // the query is already saved, and sendMail never throws (it returns a
+    // result), so a mail outage must not break the user-facing flow.
+    await Promise.allSettled([
+      sendMail(
+        `New Contact Message [${ticketId}]${payload.subject ? `: ${payload.subject}` : ''} — from ${payload.name}`,
+        process.env.NODEMAILER_EMAIL,
+        contactNotification(emailPayload),
+        { replyTo: payload.email }
+      ),
+      sendMail(
+        `We've received your message — Ref ${ticketId}`,
+        payload.email,
+        contactConfirmation(emailPayload)
+      ),
+    ])
+
+    return response(true, 200, 'Message sent successfully.', { ticketId })
   } catch (error) {
     return catchError(error, 'Failed to send message.')
   }
@@ -83,6 +117,7 @@ export async function GET(request) {
 
     if (globalFilter) {
       matchQuery['$or'] = [
+        { ticketId: { $regex: globalFilter, $options: 'i' } },
         { name: { $regex: globalFilter, $options: 'i' } },
         { email: { $regex: globalFilter, $options: 'i' } },
         { phone: { $regex: globalFilter, $options: 'i' } },

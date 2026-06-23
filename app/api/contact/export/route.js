@@ -13,7 +13,7 @@ export async function GET(request) {
     await connectDB()
 
     const contacts = await ContactModel.find({ deletedAt: null })
-      .select('name email phone address subject message isRead createdAt')
+      .select('ticketId name email phone address subject message isRead createdAt')
       .sort({ createdAt: -1 })
       .lean()
 

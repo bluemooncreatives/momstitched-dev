@@ -10,6 +10,7 @@ const ContactPage = () => {
   const container = useRef();
   const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", subject: "", message: "" });
   const [loading, setLoading] = useState(false);
+  const [ticketId, setTicketId] = useState(null);
 
   useGSAP(
     () => {
@@ -55,8 +56,15 @@ const ContactPage = () => {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success("Message sent! We'll get back to you soon.");
+        // Newer API returns a reference id; fall back to a plain toast if a
+        // stale deployment omits it so the success flow never breaks.
+        const ref = data?.data?.ticketId || null;
         setForm({ name: "", email: "", phone: "", address: "", subject: "", message: "" });
+        if (ref) {
+          setTicketId(ref);
+        } else {
+          toast.success("Message sent! We'll get back to you soon.");
+        }
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }
@@ -65,6 +73,19 @@ const ContactPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCopyRef = async () => {
+    try {
+      await navigator.clipboard.writeText(ticketId);
+      toast.success("Reference number copied.");
+    } catch {
+      toast.error("Couldn't copy. Please copy it manually.");
+    }
+  };
+
+  const handleSendAnother = () => {
+    setTicketId(null);
   };
 
   return (
@@ -87,10 +108,33 @@ const ContactPage = () => {
         <div className={styles.formInner}>
 
           <div className={styles.formHeader}>
-            <p className={styles.formEyebrow}>Send a message</p>
+            <p className={styles.formEyebrow}>{ticketId ? "Message sent" : "Send a message"}</p>
             <div className={styles.divider} />
           </div>
 
+          {ticketId ? (
+            <div className={styles.successPanel} role="status" aria-live="polite">
+              <h2 className={styles.successTitle}>Thanks — we've received your message.</h2>
+              <p className={styles.successText}>
+                Our team will get back to you soon. We've also emailed you a copy.
+                Please keep your reference number for any follow-up.
+              </p>
+
+              <div className={styles.refBox}>
+                <div className={styles.refMeta}>
+                  <p className={styles.refLabel}>Reference number</p>
+                  <p className={styles.refValue}>{ticketId}</p>
+                </div>
+                <button type="button" onClick={handleCopyRef} className={styles.copyBtn}>
+                  Copy
+                </button>
+              </div>
+
+              <button type="button" onClick={handleSendAnother} className={styles.resetBtn}>
+                Send another message
+              </button>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
@@ -195,6 +239,7 @@ const ContactPage = () => {
               </button>
             </div>
           </form>
+          )}
 
         </div>
       </div>

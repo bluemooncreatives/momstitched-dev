@@ -15,7 +15,7 @@ import {
  * deep-links to the visitor's email; the route also sets Reply-To so a plain
  * "Reply" works.
  */
-export const contactNotification = ({ name, email, phone, address, subject, message }) => {
+export const contactNotification = ({ ticketId, name, email, phone, address, subject, message }) => {
     const row = (label, value) => `
 <tr>
   <td style="padding:0 0 18px;">
@@ -28,6 +28,7 @@ export const contactNotification = ({ name, email, phone, address, subject, mess
 ${eyebrow("Contact Form")}
 ${heading("New message received")}
 <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-top:8px;">
+  ${ticketId ? row("Reference", esc(ticketId)) : ""}
   ${row("From", `${esc(name)} &nbsp;·&nbsp; <a href="mailto:${esc(email)}" style="color:${BRAND.crimson};">${esc(email)}</a>`)}
   ${row("Mobile", esc(phone) || "—")}
   ${row("Address", esc(address) || "(Not provided)")}

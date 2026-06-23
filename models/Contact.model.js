@@ -2,6 +2,15 @@ import mongoose from 'mongoose'
 
 const contactSchema = new mongoose.Schema(
   {
+    // Human-readable support reference (e.g. MS-A7K3Q2XY) shown to the
+    // customer and the admin. Sparse so historical documents created before
+    // this field existed (which have no ticketId) don't violate uniqueness.
+    ticketId: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
     name: {
       type: String,
       required: true,

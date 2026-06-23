@@ -52,7 +52,12 @@ const ContactDetail = ({ params }) => {
 
             {/* Status + date row */}
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                {contact.ticketId && (
+                  <span className="font-mono text-sm font-semibold tracking-wide">
+                    {contact.ticketId}
+                  </span>
+                )}
                 {contact.isRead ? (
                   <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300">
                     Read
