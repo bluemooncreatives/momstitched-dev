@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
-import OrderModel from "@/models/Order.model";
+import OrderModel, { withDefaultShipmentMany } from "@/models/Order.model";
 
 export async function GET(request) {
     try {
@@ -22,7 +22,7 @@ export async function GET(request) {
             return response(false, 404, 'Collection empty.')
         }
 
-        return response(true, 200, 'Data found.', getOrder)
+        return response(true, 200, 'Data found.', withDefaultShipmentMany(getOrder))
 
 
     } catch (error) {

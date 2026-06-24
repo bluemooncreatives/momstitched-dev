@@ -2,7 +2,7 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import MediaModel from "@/models/Media.model";
-import OrderModel from "@/models/Order.model";
+import OrderModel, { withDefaultShipment } from "@/models/Order.model";
 import ProductModel from "@/models/Product.model";
 import ProductVariantModel from "@/models/ProductVariant.model";
 
@@ -33,7 +33,7 @@ export async function GET(request, { params }) {
             return response(false, 404, 'Order not found.')
         }
 
-        return response(true, 200, 'Order found.', orderData)
+        return response(true, 200, 'Order found.', withDefaultShipment(orderData))
 
     } catch (error) {
         return catchError(error)

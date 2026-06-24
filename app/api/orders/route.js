@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
-import OrderModel from "@/models/Order.model"
+import OrderModel, { withDefaultShipmentMany } from "@/models/Order.model"
 
 import { NextResponse } from "next/server"
 
@@ -81,7 +81,7 @@ export async function GET(request) {
 
         return NextResponse.json({
             success: true,
-            data: getOrders,
+            data: withDefaultShipmentMany(getOrders),
             meta: { totalRowCount }
         })
 

@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import OrderModel from "@/models/Order.model";
+import OrderModel, { withDefaultShipmentMany } from "@/models/Order.model";
 import MediaModel from "@/models/Media.model";
 import ProductModel from "@/models/Product.model";
 import ProductVariantModel from "@/models/ProductVariant.model";
@@ -33,7 +33,7 @@ export async function GET(request) {
         // get total order count 
         const totalOrder = await OrderModel.countDocuments(orderFilter)
 
-        return response(true, 200, 'Dashboard info.', { recentOrders, totalOrder })
+        return response(true, 200, 'Dashboard info.', { recentOrders: withDefaultShipmentMany(recentOrders), totalOrder })
 
     } catch (error) {
         return catchError(error)

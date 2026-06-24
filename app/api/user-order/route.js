@@ -1,7 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import OrderModel from "@/models/Order.model";
+import OrderModel, { withDefaultShipmentMany } from "@/models/Order.model";
 import mongoose from "mongoose";
 
 export async function GET(request) {
@@ -130,7 +130,7 @@ export async function GET(request) {
         ])
 
 
-        return response(true, 200, 'Order info.', orders)
+        return response(true, 200, 'Order info.', withDefaultShipmentMany(orders))
 
     } catch (error) {
         return catchError(error)

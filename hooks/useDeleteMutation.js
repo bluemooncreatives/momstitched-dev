@@ -29,4 +29,4 @@ const useDeleteMutation = (queryKey, deleteEndpoint) => {
 
 }
 
-export default useDeleteMutation
+export default useDeleteMutation    

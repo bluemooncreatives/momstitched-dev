@@ -8,6 +8,7 @@ import { use, useEffect, useState } from "react"
 import { ADMIN_DASHBOARD, ADMIN_ORDER_SHOW } from "@/routes/AdminPanelRoute"
 import BreadCrumb from "@/components/Application/Admin/BreadCrumb"
 import PageHeader from "@/components/Application/Admin/PageHeader"
+import ShipmentManagement from "@/components/Application/Admin/ShipmentManagement"
 import ButtonLoading from "@/components/Application/ButtonLoading"
 import { showToast } from "@/lib/showToast"
 import axios from "axios"
@@ -140,6 +141,16 @@ const OrderDetails = ({ params }) => {
                                     ))}
                                     </TableBody>
                                 </Table>
+                            </div>
+
+                            <div className="mt-10">
+                                <ShipmentManagement
+                                    orderData={orderData}
+                                    onShipmentCreated={(updatedOrder) => {
+                                        setOrderData(updatedOrder)
+                                        setOrderStatus(updatedOrder?.status)
+                                    }}
+                                />
                             </div>
 
                             <div className="mt-10 grid gap-4 md:grid-cols-2">
