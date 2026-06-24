@@ -67,7 +67,7 @@
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.76.1",
     "@types/node": "^26.0.0",
-    "@types/react": "^19.2.17",
+    "@types/react": "19.2.17",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9",
     "eslint-config-next": "^15.5.12",
