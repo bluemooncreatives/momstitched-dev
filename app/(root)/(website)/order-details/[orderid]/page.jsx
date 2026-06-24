@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import WebsiteBreadcrumb from "@/components/Application/Website/WebsiteBreadcrumb"
 import OrderDetailActions from "@/components/Application/Website/OrderDetailActions"
+import OrderShipmentTimeline from "@/components/Application/Website/OrderShipmentTimeline"
 import Image from "next/image"
 import placeholderImg from '@/public/assets/images/img-placeholder.webp'
 import Link from "next/link"
@@ -10,7 +11,6 @@ import { getCurrentUser } from "@/lib/authentication"
 import {
     ArrowLeft,
     BadgeCheck,
-    CheckCircle2,
     ChevronRight,
     Clock,
     CreditCard,
@@ -68,13 +68,6 @@ const PAYMENT_METHOD_LABEL = {
     partial: 'Partial Payment',
 }
 
-const TRACK_STEPS = [
-    { key: 'pending', label: 'Placed', Icon: CheckCircle2 },
-    { key: 'processing', label: 'Processing', Icon: Package },
-    { key: 'shipped', label: 'Shipped', Icon: Truck },
-    { key: 'delivered', label: 'Delivered', Icon: PackageCheck },
-]
-
 const OrderDetails = async ({ params }) => {
     const { orderid } = await params
     const orderData = await getOrderDetailsByOrderId(orderid)
@@ -88,10 +81,6 @@ const OrderDetails = async ({ params }) => {
 
     const status = orderData?.status || 'pending'
     const statusMeta = STATUS_META[status] || STATUS_META.pending
-    const isCancelled = status === 'cancelled'
-    const isUnverified = status === 'unverified'
-    const isTracked = !isCancelled && !isUnverified
-    const currentStep = TRACK_STEPS.findIndex((s) => s.key === status)
 
     const products = orderData?.products ?? []
     const itemCount = products.reduce((sum, p) => sum + (p?.qty || 0), 0)
@@ -151,44 +140,10 @@ const OrderDetails = async ({ params }) => {
                         </div>
 
                         {/* ── Status note / tracker ── */}
-                        <div className='px-5 py-6 sm:px-6'>
-                            <p className={`mb-6 flex items-center gap-2 text-[13px] ${isCancelled || isUnverified ? 'text-red-600' : 'text-muted-foreground'}`}>
-                                <statusMeta.Icon className='size-4 flex-shrink-0' /> {statusMeta.note}
-                            </p>
-
-                            {isTracked ? (
-                                <ol className='flex items-center'>
-                                    {TRACK_STEPS.map((step, i) => {
-                                        const done = i <= currentStep
-                                        const isLast = i === TRACK_STEPS.length - 1
-                                        return (
-                                            <li key={step.key} className={`flex items-center ${isLast ? '' : 'flex-1'}`}>
-                                                <div className='flex flex-col items-center gap-2'>
-                                                    <span className={`flex size-9 items-center justify-center rounded-full border-2 transition-colors ${done ? 'border-[var(--dark-red)] bg-[var(--dark-red)] text-white' : 'border-border bg-background text-muted-foreground'}`}>
-                                                        <step.Icon className='size-4' />
-                                                    </span>
-                                                    <span className={`text-[10px] font-semibold uppercase tracking-[0.1em] ${done ? 'text-foreground' : 'text-muted-foreground'}`}>
-                                                        {step.label}
-                                                    </span>
-                                                </div>
-                                                {!isLast && (
-                                                    <span className={`mx-1 h-0.5 flex-1 rounded-full sm:mx-2 ${i < currentStep ? 'bg-[var(--dark-red)]' : 'bg-border'}`} />
-                                                )}
-                                            </li>
-                                        )
-                                    })}
-                                </ol>
-                            ) : (
-                                <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${TONE[statusMeta.tone]}`}>
-                                    <statusMeta.Icon className='size-5 flex-shrink-0' />
-                                    <p className='text-[13px] font-medium'>
-                                        {isCancelled
-                                            ? 'If the amount was debited, it will be refunded to the original payment method within 5–7 business days.'
-                                            : 'Please complete or retry the payment. Contact support if the amount was already debited.'}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
+                        <OrderShipmentTimeline
+                            shipment={orderData?.shipment}
+                            fallbackLastUpdatedAt={orderData?.updatedAt || orderData?.createdAt}
+                        />
                     </div>
 
                     {/* ── Main grid ── */}

@@ -2,7 +2,7 @@
 
 import axios, { AxiosError } from "axios"
 import { useEffect, useMemo, useState } from "react"
-import { AlertCircle, CheckCircle2, Copy, PackageCheck, Truck } from "lucide-react"
+import { AlertCircle, CheckCircle2, Copy, PackageCheck, RefreshCw, Truck } from "lucide-react"
 import ButtonLoading from "@/components/Application/ButtonLoading"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -97,6 +97,7 @@ const ShipmentManagement = ({ orderData, onShipmentCreated }: ShipmentManagement
     const hasAwb = Boolean(shipment.awb)
     const [dimensions, setDimensions] = useState(dimensionDefaults)
     const [creatingShipment, setCreatingShipment] = useState(false)
+    const [syncingShipment, setSyncingShipment] = useState(false)
 
     useEffect(() => {
         setDimensions({
@@ -144,6 +145,25 @@ const ShipmentManagement = ({ orderData, onShipmentCreated }: ShipmentManagement
             showToast("error", axiosError.response?.data?.message || axiosError.message || "Unable to create shipment.")
         } finally {
             setCreatingShipment(false)
+        }
+    }
+
+    const syncShipment = async () => {
+        setSyncingShipment(true)
+        try {
+            const { data } = await axios.post<ApiResponse<OrderData>>("/api/orders/track-shipment", {
+                orderId: orderData._id,
+            })
+
+            if (!data.success) throw new Error(data.message)
+
+            onShipmentCreated(data.data)
+            showToast("success", data.message)
+        } catch (error) {
+            const axiosError = error as AxiosError<ApiResponse<unknown>>
+            showToast("error", axiosError.response?.data?.message || axiosError.message || "Unable to sync tracking.")
+        } finally {
+            setSyncingShipment(false)
         }
     }
 
@@ -201,15 +221,29 @@ const ShipmentManagement = ({ orderData, onShipmentCreated }: ShipmentManagement
                                 <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
                                 <span>Dimensions are sent to Delhivery once. Edit them before creating the shipment.</span>
                             </div>
-                            <ButtonLoading
-                                type="button"
-                                text={hasAwb ? "Shipment Created" : "Create Shipment"}
-                                loading={creatingShipment}
-                                disabled={hasAwb || creatingShipment}
-                                onClick={createShipment}
-                                variant="brand"
-                                className="h-9 w-full cursor-pointer sm:w-auto"
-                            />
+                            <div className="flex w-full gap-2 sm:w-auto">
+                                {hasAwb && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="h-9 flex-1 cursor-pointer sm:flex-none"
+                                        disabled={syncingShipment}
+                                        onClick={syncShipment}
+                                    >
+                                        <RefreshCw className={cn("size-3.5", syncingShipment && "animate-spin")} />
+                                        {syncingShipment ? "Syncing" : "Sync Tracking"}
+                                    </Button>
+                                )}
+                                <ButtonLoading
+                                    type="button"
+                                    text={hasAwb ? "Shipment Created" : "Create Shipment"}
+                                    loading={creatingShipment}
+                                    disabled={hasAwb || creatingShipment}
+                                    onClick={createShipment}
+                                    variant="brand"
+                                    className="h-9 flex-1 cursor-pointer sm:flex-none"
+                                />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
