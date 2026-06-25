@@ -191,6 +191,11 @@
         grid-template-columns: 1fr;
     }
 
+    /* Hide the small image on mobile, keep the "See More" button */
+    .smallImage {
+        display: none;
+    }
+
     .heading {
         font-size: clamp(1.8rem, 8vw, 2.45rem);
     }
@@ -198,10 +203,6 @@
     .leftImage {
         grid-column: 1;
         aspect-ratio: 3 / 4;
-    }
-
-    .smallImage {
-        aspect-ratio: 16 / 9;
     }
 
     .bodyText {
