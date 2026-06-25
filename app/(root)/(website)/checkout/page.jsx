@@ -5,6 +5,7 @@ import { BrandButton } from '@/components/Application/Website/BrandButton'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
 import useFetch from '@/hooks/useFetch'
 import { showToast } from '@/lib/showToast'
 import { zSchema } from '@/lib/zodSchema'
@@ -490,7 +491,7 @@ const Checkout = () => {
                                             render={({ field }) => (
                                                 <FormItem className='sm:col-span-2'>
                                                     <FormControl>
-                                                        <Input type="tel" inputMode="numeric" autoComplete="tel" placeholder="Phone number*" className="form-field" {...field} />
+                                                        <PhoneInput placeholder="Phone number*" className="form-field" value={field.value} onChange={field.onChange} onBlur={field.onBlur} name={field.name} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>

@@ -4,6 +4,7 @@ import UserPanelLayout from '@/components/Application/Website/UserPanelLayout'
 import WebsiteBreadcrumb from '@/components/Application/Website/WebsiteBreadcrumb'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { PhoneInput } from '@/components/ui/phone-input'
 import { Textarea } from '@/components/ui/textarea'
 import useFetch from '@/hooks/useFetch'
 import { zSchema } from '@/lib/zodSchema'
@@ -198,7 +199,7 @@ const Profile = () => {
                                             <FormItem>
                                                 <FormLabel className="text-[13px] text-foreground/60">Phone</FormLabel>
                                                 <FormControl>
-                                                    <Input type="tel" inputMode="numeric" autoComplete="tel" placeholder="Enter your phone number" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                                    <PhoneInput placeholder="Enter your phone number" className="h-11 text-base font-semibold text-[var(--brand-primary)]" value={field.value} onChange={field.onChange} onBlur={field.onBlur} name={field.name} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

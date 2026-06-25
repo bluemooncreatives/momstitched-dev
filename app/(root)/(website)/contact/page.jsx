@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { toast } from "sonner";
 import styles from "./contact.module.css";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 const ContactPage = () => {
   const container = useRef();
@@ -170,16 +171,17 @@ const ContactPage = () => {
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label htmlFor="phone" className={styles.label}>Mobile Number</label>
-                <input
+                <PhoneInput
+                  native
                   id="phone"
                   name="phone"
-                  type="tel"
                   required
-                  autoComplete="tel"
-                  placeholder="+91 98765 43210"
+                  placeholder="98765 43210"
                   value={form.phone}
-                  onChange={handleChange}
+                  onChange={(val) => setForm((prev) => ({ ...prev, phone: val }))}
                   className={styles.input}
+                  codeOffset="0"
+                  inputOffset="3.75rem"
                 />
               </div>
               <div className={styles.formGroup}>
