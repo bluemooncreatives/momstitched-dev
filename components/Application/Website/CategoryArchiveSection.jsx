@@ -1,413 +1,68 @@
-'use client'
+import dynamic from 'next/dynamic'
+import { getHomeCategories } from '@/lib/services/categoryService'
+import { getHomeColors } from '@/lib/services/colorService'
 
-import { useEffect, useRef } from 'react'
-import Link from 'next/link'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { WEBSITE_SHOP } from '@/routes/WebsiteRoute'
-import styles from './CategoryArchiveSection.module.css'
+// Heavy GSAP/ScrollTrigger client logic is split into its own chunk so it does
+// not block parsing/hydration of the critical path.
+const ArchiveSectionClient = dynamic(() => import('./ArchiveSectionClient'))
 
-gsap.registerPlugin(ScrollTrigger)
+const WRITEUP =
+    'Discover signature silhouettes, everyday essentials, and statement pieces curated for every ' +
+    'wardrobe. Each category brings together styles designed for comfort, movement, and everyday ' +
+    'confidence, from relaxed daily basics to elevated looks for special moments. Explore collections ' +
+    'that balance fit, fabric, and finish, so every piece feels as good as it looks. Whether you are ' +
+    'building a capsule wardrobe, updating seasonal staples, or searching for one standout outfit, this ' +
+    'archive helps you find the right mood, shape, and style with ease.'
 
-const CATEGORIES = [
-    {
-        id: 'mens',
-        name: 'MENS',
-        collection: 'Core Essentials',
-        year: '2025',
-        href: `${WEBSITE_SHOP}?category=mens`,
-        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1779221853/mtonkotfj50dwoswlr2j.jpg'
-    },
-    {
-        id: 'womens',
-        name: 'WOMENS',
-        collection: 'Tailored Icons',
-        year: '2025',
-        href: `${WEBSITE_SHOP}?category=womens`,
-        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1773413317/ybacm7phf5v1rwmh2brn.jpg'
-    },
-    {
-        id: 'kids',
-        name: 'KIDS',
-        collection: 'Play Collection',
-        year: '2025',
-        href: `${WEBSITE_SHOP}?category=kids`,
-        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1767809739/3_yor7mf.jpg'
-    },
-    {
-        id: 'outwear',
-        name: 'OUTWEAR',
-        collection: 'All-Season Layers',
-        year: '2025',
-        href: `${WEBSITE_SHOP}?category=outwear`,
-        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1768029766/njlqt8ppnjuxjklvdst5.jpg'
-    },
-    {
-        id: 'hoodies',
-        name: 'HOODIES & SWEATSHIRTS',
-        collection: 'Off-Duty Comfort',
-        year: '2025',
-        href: `${WEBSITE_SHOP}?category=hoodies`,
-        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1779221853/f8yysmcswpvraytlu75i.jpg'
-    },
-    {
-        id: 'dresses',
-        name: 'DRESSES & SKIRTS',
-        collection: 'Flow & Form',
-        year: '2025',
-        href: `${WEBSITE_SHOP}?category=dresses`,
-        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1767809739/3_yor7mf.jpg'
-    },
-    {
-        id: 'tshirts',
-        name: 'T-SHIRTS',
-        collection: 'Daily Uniform',
-        year: '2025',
-        href: `${WEBSITE_SHOP}?category=t-shirts`,
-        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1779221853/mtonkotfj50dwoswlr2j.jpg'
-    },
-    {
-        id: 'trousers',
-        name: 'TROUSERS & SHORTS',
-        collection: 'Relaxed Fit',
-        year: '2025',
-        href: `${WEBSITE_SHOP}?category=trousers`,
-        previewImage: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1773413317/ybacm7phf5v1rwmh2brn.jpg'
+const mapCategory = (category) => ({
+    // Prefixed so a category id can never collide with a colour key.
+    id: `cat-${category.id}`,
+    href: category.href,
+    name: category.name,
+    metaLabel: category.collectionLabel,
+    secondaryLabel: String(category.year),
+    previewImage: category.previewImage
+})
+
+const mapColor = (color) => ({
+    id: `col-${color.id}`,
+    href: color.href,
+    name: color.name,
+    metaLabel: color.stylesLabel,
+    secondaryLabel: String(color.year),
+    previewImage: color.previewImage
+})
+
+const CategoryArchiveSection = async () => {
+    const [categories, colors] = await Promise.all([
+        getHomeCategories(),
+        getHomeColors()
+    ])
+
+    const categoryItems = (categories || []).map(mapCategory)
+    const colorItems = (colors || []).map(mapColor)
+
+    // Nothing shoppable with an image yet: hide the section entirely rather than
+    // render an empty archive on the live storefront.
+    if (categoryItems.length === 0 && colorItems.length === 0) return null
+
+    // Interleave categories and colours into one continuous list — Category,
+    // Colour, Category, Colour … — with any leftover from the longer list
+    // appended at the end.
+    const items = []
+    const max = Math.max(categoryItems.length, colorItems.length)
+    for (let i = 0; i < max; i++) {
+        if (categoryItems[i]) items.push(categoryItems[i])
+        if (colorItems[i]) items.push(colorItems[i])
     }
-]
-
-const CategoryArchiveSection = () => {
-    const containerRef = useRef(null)
-    const archiveItemsRef = useRef(null)
-    const previewRef = useRef(null)
-
-    const archiveRectRef = useRef(null)
-    const mousePosRef = useRef({ x: 0, y: 0 })
-    const mouseTimeoutRef = useRef(null)
-    const pointerRafRef = useRef(null)
-    const rectRafRef = useRef(null)
-    const archiveVisibleRef = useRef(false)
-
-    const clearMouseTimeout = () => {
-        if (mouseTimeoutRef.current) {
-            clearTimeout(mouseTimeoutRef.current)
-            mouseTimeoutRef.current = null
-        }
-    }
-
-    const updateArchiveRect = () => {
-        if (!archiveItemsRef.current) return
-        archiveRectRef.current = archiveItemsRef.current.getBoundingClientRect()
-    }
-
-    const isInsideArchive = (x, y) => {
-        const rect = archiveRectRef.current
-        if (!rect) return false
-
-        return (
-            x >= rect.left &&
-            x <= rect.right &&
-            y >= rect.top &&
-            y <= rect.bottom
-        )
-    }
-
-    const removeImage = (img) => {
-        if (img.dataset.removing === 'true') return
-
-        img.dataset.removing = 'true'
-        gsap.to(img, {
-            scale: 0,
-            duration: 0.4,
-            ease: 'power2.out',
-            onComplete: () => img.remove()
-        })
-    }
-
-    const removeAllImages = () => {
-        if (!previewRef.current) return
-
-        const previewImages = previewRef.current.querySelectorAll('img[data-preview="true"]')
-        previewImages.forEach((img) => removeImage(img))
-    }
-
-    const cleanupOldImages = () => {
-        if (!previewRef.current) return
-
-        const images = previewRef.current.querySelectorAll('img[data-preview="true"]')
-        if (images.length <= 1) return
-
-        const lastImage = images[images.length - 1]
-        images.forEach((img) => {
-            if (img !== lastImage) removeImage(img)
-        })
-    }
-
-    const createPreviewImage = (previewImage) => {
-        if (!previewRef.current) return
-
-        const { x, y } = mousePosRef.current
-        if (!isInsideArchive(x, y)) return
-
-        const img = document.createElement('img')
-        img.src = previewImage
-        img.alt = ''
-        img.dataset.preview = 'true'
-        img.className = styles.previewImage
-        img.style.zIndex = String(Date.now())
-
-        previewRef.current.appendChild(img)
-
-        gsap.to(img, {
-            scale: 1,
-            duration: 0.4,
-            ease: 'power2.out'
-        })
-    }
-
-    useEffect(() => {
-        if (!containerRef.current) return
-
-        updateArchiveRect()
-
-        const context = gsap.context(() => {
-            const headerRevealerP = containerRef.current.querySelectorAll(`.${styles.header} .${styles.revealer} p`)
-            const items = containerRef.current.querySelectorAll(`.${styles.item}`)
-
-            // Set initial hidden state — all text pushed below clip
-            gsap.set(headerRevealerP, { y: '100%' })
-            items.forEach((item) => {
-                const pTags = item.querySelectorAll(`.${styles.revealer} p`)
-                gsap.set(pTags, { y: '100%' })
-            })
-
-            // ScrollTrigger: only fire when section enters viewport
-            ScrollTrigger.create({
-                trigger: containerRef.current,
-                start: 'top 75%',
-                once: true,
-                onEnter: () => {
-                    // Phase 1: Header text reveals
-                    const headerTl = gsap.timeline({
-                        defaults: { ease: 'power3.out' },
-                        delay: 0.15
-                    })
-
-                    headerTl.to(headerRevealerP, {
-                        y: '0%',
-                        duration: 0.75,
-                    })
-
-                    // Phase 2: Each row's text reveals in a staggered cascade
-                    const rowTl = gsap.timeline({ delay: 0.25 })
-
-                    items.forEach((item, index) => {
-                        const pTags = item.querySelectorAll(`.${styles.revealer} p`)
-                        rowTl.to(
-                            pTags,
-                            { y: '0%', duration: 0.75, ease: 'power3.out' },
-                            index * 0.05
-                        )
-                    })
-
-                }
-            })
-
-            ScrollTrigger.create({
-                trigger: containerRef.current,
-                start: 'top bottom',
-                end: 'bottom 10%',
-                onEnter: () => {
-                    archiveVisibleRef.current = true
-                },
-                onEnterBack: () => {
-                    archiveVisibleRef.current = true
-                },
-                onLeave: () => {
-                    archiveVisibleRef.current = false
-                    clearMouseTimeout()
-                    removeAllImages()
-                },
-                onLeaveBack: () => {
-                    archiveVisibleRef.current = false
-                    clearMouseTimeout()
-                    removeAllImages()
-                }
-            })
-
-            // Scroll-triggered preview for touch / mobile — mirrors the desktop hover effect
-            if (window.matchMedia('(hover: none), (pointer: coarse)').matches) {
-                const showScrollPreview = (category) => {
-                    cleanupOldImages()
-                    if (!previewRef.current) return
-                    const img = document.createElement('img')
-                    img.src = category.previewImage
-                    img.alt = ''
-                    img.dataset.preview = 'true'
-                    img.className = styles.previewImage
-                    img.style.zIndex = String(Date.now())
-                    previewRef.current.appendChild(img)
-                    gsap.to(img, { scale: 1, duration: 0.4, ease: 'power2.out' })
-                }
-
-                const allItems = Array.from(items)
-                const lastIndex = allItems.length - 1
-
-                allItems.forEach((item, index) => {
-                    const category = CATEGORIES[index % CATEGORIES.length]
-                    ScrollTrigger.create({
-                        trigger: item,
-                        start: 'top 55%',
-                        end: 'bottom 45%',
-                        onEnter: () => showScrollPreview(category),
-                        onEnterBack: () => showScrollPreview(category),
-                        // Remove when last item exits downward (section ends)
-                        onLeave: () => { if (index === lastIndex) removeAllImages() },
-                        // Remove when first item exits upward (section starts)
-                        onLeaveBack: () => { if (index === 0) removeAllImages() }
-                    })
-                })
-            }
-        }, containerRef)
-
-        const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches
-
-        const scheduleRectUpdate = () => {
-            if (rectRafRef.current) return
-            rectRafRef.current = requestAnimationFrame(() => {
-                rectRafRef.current = null
-                updateArchiveRect()
-
-                // On touch devices mousePosRef is always {0,0} — skip the pointer check
-                // or it would call removeAllImages() on every scroll event
-                if (isTouchDevice) return
-
-                const { x, y } = mousePosRef.current
-                if (!isInsideArchive(x, y)) {
-                    clearMouseTimeout()
-                    removeAllImages()
-                }
-            })
-        }
-
-        const handleResize = () => scheduleRectUpdate()
-
-        const handleScroll = () => {
-            scheduleRectUpdate()
-        }
-
-        const handleMouseMove = (event) => {
-            if (!archiveVisibleRef.current) return
-            mousePosRef.current = { x: event.clientX, y: event.clientY }
-            if (pointerRafRef.current) return
-            pointerRafRef.current = requestAnimationFrame(() => {
-                pointerRafRef.current = null
-                const { x, y } = mousePosRef.current
-                if (!isInsideArchive(x, y)) {
-                    clearMouseTimeout()
-                    removeAllImages()
-                    return
-                }
-
-                clearMouseTimeout()
-                mouseTimeoutRef.current = setTimeout(() => {
-                    cleanupOldImages()
-                }, 2000)
-            })
-        }
-
-        document.addEventListener('mousemove', handleMouseMove)
-        window.addEventListener('resize', handleResize)
-        window.addEventListener('scroll', handleScroll, { passive: true })
-
-        return () => {
-            clearMouseTimeout()
-            removeAllImages()
-            if (pointerRafRef.current) {
-                cancelAnimationFrame(pointerRafRef.current)
-                pointerRafRef.current = null
-            }
-            if (rectRafRef.current) {
-                cancelAnimationFrame(rectRafRef.current)
-                rectRafRef.current = null
-            }
-            document.removeEventListener('mousemove', handleMouseMove)
-            window.removeEventListener('resize', handleResize)
-            window.removeEventListener('scroll', handleScroll)
-            context.revert()
-        }
-    }, [])
 
     return (
-        <section className={styles.section} ref={containerRef}>
-            <div className={styles.archivePage}>
-                <div className={styles.archive}>
-                    <div className={styles.copyBlock}>
-                        <h2 className={styles.title}>Categories</h2>
-                        <p className={styles.writeup}>
-                            Discover signature silhouettes, everyday essentials, and statement pieces curated for every
-                            wardrobe. Each category brings together styles designed for comfort, movement, and everyday
-                            confidence, from relaxed daily basics to elevated looks for special moments. Explore collections
-                            that balance fit, fabric, and finish, so every piece feels as good as it looks. Whether you are
-                            building a capsule wardrobe, updating seasonal staples, or searching for one standout outfit, this
-                            archive helps you find the right mood, shape, and style with ease.
-                        </p>
-                    </div>
-
-                    <div className={styles.header}>
-                        <div className={styles.headerName}>
-                            <div className={styles.revealer}>
-                                <p className={styles.headerText}>Category</p>
-                            </div>
-                        </div>
-                        <div className={styles.headerDesigner}>
-                            <div className={styles.revealer}>
-                                <p className={styles.headerText}>Collection</p>
-                            </div>
-                        </div>
-                        <div className={styles.headerYear}>
-                            <div className={styles.revealer}>
-                                <p className={styles.headerText}>Year</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className={styles.archiveItems} ref={archiveItemsRef}>
-                        {[...Array(2)].flatMap((_, repetition) =>
-                            CATEGORIES.map((category) => (
-                                <Link
-                                    href={category.href}
-                                    className={styles.item}
-                                    key={`${repetition}-${category.id}`}
-                                    onMouseEnter={() => createPreviewImage(category.previewImage)}
-                                    onFocus={() => createPreviewImage(category.previewImage)}
-                                >
-                                    <div className={styles.itemName}>
-                                        <div className={styles.revealer}>
-                                            <p className={styles.itemText}>{category.name}</p>
-                                        </div>
-                                    </div>
-                                    <div className={styles.itemDesigner}>
-                                        <div className={styles.revealer}>
-                                            <p className={styles.metaText}>{category.collection}</p>
-                                        </div>
-                                    </div>
-                                    <div className={styles.itemYear}>
-                                        <div className={styles.revealer}>
-                                            <p className={styles.yearText}>{category.year}</p>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))
-                        )}
-                    </div>
-
-
-                </div>
-                <div className={styles.emptyCol}></div>
-            </div>
-            <div className={styles.preview} ref={previewRef} aria-hidden="true"></div>
-        </section>
+        <ArchiveSectionClient
+            title="Categories"
+            writeup={WRITEUP}
+            columns={{ name: 'Category', meta: 'Collection', secondary: 'Year' }}
+            items={items}
+        />
     )
 }
 

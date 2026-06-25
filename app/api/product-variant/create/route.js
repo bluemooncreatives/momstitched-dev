@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
@@ -86,6 +87,11 @@ export async function POST(request) {
         })
 
         await newProductVariant.save()
+
+        // A new variant can introduce a new colour/size — refresh the shop filter
+        // list and the homepage "Shop by Colour" section.
+        revalidateTag('storefront-shop-filters')
+        revalidateTag('storefront-home-colors')
 
         return response(true, 200, 'Product Variant added successfully.')
 

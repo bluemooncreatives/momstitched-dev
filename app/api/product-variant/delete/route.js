@@ -1,7 +1,15 @@
+import { revalidateTag } from "next/cache";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import ProductVariantModel from "@/models/ProductVariant.model";
+
+// Adding/removing/restoring a variant can change which colours/sizes exist, so
+// drop the shop filter list and the homepage "Shop by Colour" caches.
+const revalidateColorCaches = () => {
+    revalidateTag('storefront-shop-filters')
+    revalidateTag('storefront-home-colors')
+}
  
 export async function PUT(request) {
     try {
@@ -35,6 +43,7 @@ export async function PUT(request) {
             await ProductVariantModel.updateMany({ _id: { $in: ids } }, { $set: { deletedAt: null } });
         }
 
+        revalidateColorCaches()
 
         return response(true, 200, deleteType === 'SD' ? 'Data moved into trash.' : "Data restored.")
 
@@ -72,6 +81,8 @@ export async function DELETE(request) {
         }
 
         await ProductVariantModel.deleteMany({ _id: { $in: ids } })
+
+        revalidateColorCaches()
 
         return response(true, 200, 'Data deleted permanently')
     } catch (error) {

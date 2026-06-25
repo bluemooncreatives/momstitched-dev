@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
@@ -63,6 +64,10 @@ export async function PUT(request) {
         getProduct.description = encode(validatedData.description)
         getProduct.media = validatedData.media
         await getProduct.save()
+
+        // Re-categorising a product or changing its media can change category
+        // counts and the homepage "Categories" representative image.
+        revalidateTag('storefront-home-categories')
 
         return response(true, 200, 'Product updated successfully.')
 

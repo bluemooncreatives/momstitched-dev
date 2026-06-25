@@ -66,6 +66,9 @@ export async function POST(request) {
         // The Freshly Arrived section tops up with the newest products, so a new
         // product can change what it shows — refresh that cache.
         revalidateTag('storefront-freshly-arrived-products')
+        // A new product changes its category's product count and may become the
+        // representative image for the homepage "Categories" section.
+        revalidateTag('storefront-home-categories')
 
         return response(true, 200, 'Product added successfully.', { _id: newProduct._id })
 

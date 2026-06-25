@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
@@ -35,6 +36,10 @@ export async function POST() {
 
         if (operations.length > 0) {
             await ProductVariantModel.bulkWrite(operations)
+            // Canonicalising labels can merge/rename colours, so refresh the shop
+            // filter list and the homepage "Shop by Colour" section.
+            revalidateTag('storefront-shop-filters')
+            revalidateTag('storefront-home-colors')
         }
 
         return response(true, 200, `Color normalization complete. Updated ${operations.length} of ${variants.length} variants.`)

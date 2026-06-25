@@ -1,8 +1,16 @@
+import { revalidateTag } from "next/cache";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import mongoose from "mongoose";
 import CategoryModel from "@/models/Category.model";
+
+// Trashing/restoring/deleting a category changes the shop filter list and the
+// homepage "Categories" section, so both storefront caches must be dropped.
+const revalidateCategoryCaches = () => {
+    revalidateTag('storefront-shop-filters')
+    revalidateTag('storefront-home-categories')
+}
 
 export async function PUT(request) {
     try {
@@ -36,6 +44,7 @@ export async function PUT(request) {
             await CategoryModel.updateMany({ _id: { $in: ids } }, { $set: { deletedAt: null } });
         }
 
+        revalidateCategoryCaches()
 
         return response(true, 200, deleteType === 'SD' ? 'Data moved into trash.' : "Data restored.")
 
@@ -73,6 +82,8 @@ export async function DELETE(request) {
         }
 
         await CategoryModel.deleteMany({ _id: { $in: ids } })
+
+        revalidateCategoryCaches()
 
         return response(true, 200, 'Data deleted permanently')
     } catch (error) {

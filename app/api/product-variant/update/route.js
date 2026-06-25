@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
@@ -88,6 +89,11 @@ export async function PUT(request) {
         getProductVariant.discountPercentage = pricing.discountPercentage
         getProductVariant.media = validatedData.media
         await getProductVariant.save()
+
+        // Colour / media edits can change the shop filter list and the homepage
+        // "Shop by Colour" section (label + representative image).
+        revalidateTag('storefront-shop-filters')
+        revalidateTag('storefront-home-colors')
 
         return response(true, 200, 'Product variant updated successfully.')
 

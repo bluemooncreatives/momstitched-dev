@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
@@ -33,6 +34,11 @@ export async function PUT(request) {
         getCategory.name = name
         getCategory.slug = slug
         await getCategory.save()
+
+        // Name/slug changes ripple to the shop filter list and the homepage
+        // "Categories" section (label + shop link), so refresh those caches.
+        revalidateTag('storefront-shop-filters')
+        revalidateTag('storefront-home-categories')
 
         return response(true, 200, 'Category updated successfully.')
 

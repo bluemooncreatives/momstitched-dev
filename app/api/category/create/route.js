@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError,  response } from "@/lib/helperFunction"
@@ -30,6 +31,11 @@ export async function POST(request) {
         })
 
         await newCategory.save()
+
+        // The new category can change the shop filter list and the homepage
+        // "Categories" section (once it has products), so refresh those caches.
+        revalidateTag('storefront-shop-filters')
+        revalidateTag('storefront-home-categories')
 
         return response(true, 200, 'Category added successfully.')
 
