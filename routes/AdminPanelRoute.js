@@ -49,8 +49,11 @@ export const ADMIN_FRESHLY_ARRIVED_SHOW = '/admin/freshly-arrived'
 export const ADMIN_CUSTOMERS_SHOW = '/admin/customers'
 
 
-// Review route 
+// Review route
 export const ADMIN_REVIEW_SHOW = '/admin/review'
+
+// Testimonial route (homepage "Customer Reviews" / "What They Say" section)
+export const ADMIN_TESTIMONIAL_SHOW = '/admin/testimonial'
 
 // orders routes  
 
