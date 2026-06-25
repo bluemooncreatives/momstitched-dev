@@ -14,12 +14,9 @@ gsap.registerPlugin(ScrollTrigger)
 
 const CONTACT_EMAIL = 'momstitched.official@gmail.com'
 
-const categoryLinks = [
-    { label: 'T-shirt', href: `${WEBSITE_SHOP}?category=t-shirts` },
-    { label: 'Hoodies', href: `${WEBSITE_SHOP}?category=hoodies` },
-    { label: 'Oversized', href: `${WEBSITE_SHOP}?category=oversized` },
-    { label: 'Full Sleeves', href: `${WEBSITE_SHOP}?category=full-sleeves` },
-    { label: 'Polo', href: `${WEBSITE_SHOP}?category=polo` },
+// Shown when the catalogue has no categories yet, so the column is never empty.
+const fallbackCategoryLinks = [
+    { label: 'All Products', href: WEBSITE_SHOP },
 ]
 
 const usefulLinks = [
@@ -60,8 +57,9 @@ const LinkColumn = ({ title, links }) => (
     </div>
 )
 
-const Footer = () => {
+const Footer = ({ categoryLinks = [] }) => {
     const rootRef = useRef(null)
+    const categories = categoryLinks.length ? categoryLinks : fallbackCategoryLinks
 
     useGSAP(() => {
         const reveal = (selector, vars = {}) =>
@@ -126,7 +124,7 @@ const Footer = () => {
 
                 {/* ───── Middle row: link columns + contact / office ───── */}
                 <div className='footer-cols grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 mt-14'>
-                    <LinkColumn title='Categories' links={categoryLinks} />
+                    <LinkColumn title='Categories' links={categories} />
                     <LinkColumn title='Useful Links' links={usefulLinks} />
                     <LinkColumn title='Help Center' links={helpLinks} />
 

@@ -1,14 +1,17 @@
 import Footer from '@/components/Application/Website/Footer'
 import Header from '@/components/Application/Website/Header'
+import { getFooterCategories } from '@/lib/services/categoryService'
 
-const Layout = ({ children }) => {
+const Layout = async ({ children }) => {
+    const footerCategories = await getFooterCategories()
+
     return (
         <div className='font-neue overflow-x-hidden'>
             <Header />
             <main className='relative min-h-screen bg-background'>
                 {children}
             </main>
-            <Footer />
+            <Footer categoryLinks={footerCategories} />
         </div>
     )
 }
