@@ -26,7 +26,7 @@ import { useEffect, useMemo, useState } from "react"
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import ButtonLoading from "@/components/Application/ButtonLoading"
 import { useDispatch, useSelector } from "react-redux"
-import { addIntoCart } from "@/store/reducer/cartReducer"
+import { addIntoCart, increaseQuantity, decreaseQuantity, removeFromCart } from "@/store/reducer/cartReducer"
 import { showToast } from "@/lib/showToast"
 import { Button } from "@/components/ui/button"
 import loadingSvg from '@/public/assets/images/loading.svg'
@@ -35,8 +35,9 @@ import ProductBox from "@/components/Application/Website/ProductBox"
 import SizeGuideModal from "@/components/Application/Website/SizeGuideModal"
 import { cn, decodeHTMLDeep, htmlToText, normalizeColor } from "@/lib/utils"
 import { resolveColorStyle } from "@/lib/colorMap"
+import { MAX_CART_QTY } from "@/lib/cartConstants"
 
-const MAX_QTY = 10
+const MAX_QTY = MAX_CART_QTY
 
 // Renders 5 stars reflecting a real average (full / half / empty) instead of
 // a hard-coded 5-star row, so an unrated product shows empty stars.
@@ -62,12 +63,13 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
     const media = variant?.media?.length ? variant.media : []
     const [activeIndex, setActiveIndex] = useState(0)
     const [qty, setQty] = useState(1)
-    const [isAddedIntoCart, setIsAddedIntoCart] = useState(false)
     const [isProductLoading, setIsProductLoading] = useState(false)
     const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false)
     // Color swatch resolution uses CSS.supports (browser-only). Gate the
     // resolved fill behind a mount flag to avoid an SSR/client hydration
-    // mismatch for CSS-named colors.
+    // mismatch for CSS-named colors. The same flag gates the cart-state UI so
+    // the server-rendered "Add to Cart" matches the first client paint (the
+    // persisted cart only rehydrates after mount).
     const [mounted, setMounted] = useState(false)
     useEffect(() => setMounted(true), [])
 
@@ -79,13 +81,18 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
         setIsProductLoading(false)
     }, [variant?._id])
 
-    useEffect(() => {
-        if (!variant?._id) return
-        const exists = cartStore.products.some(
-            (p) => p.productId === product._id && p.variantId === variant._id
-        )
-        setIsAddedIntoCart(exists)
-    }, [variant?._id, cartStore.products, product._id])
+    // The live cart line for the *currently selected* variant (or null). Derived
+    // straight from the store so add / increase / decrease / remove anywhere —
+    // including the cart page — is always reflected here without local state to
+    // keep in sync. Keyed by variantId, so switching color/size re-evaluates.
+    const cartLine = useMemo(
+        () => cartStore.products.find(
+            (p) => p.productId === product._id && p.variantId === variant?._id
+        ) || null,
+        [cartStore.products, product._id, variant?._id]
+    )
+    const inCart = mounted && Boolean(cartLine)
+    const cartQty = cartLine?.qty || 0
 
     const activeImage = media[activeIndex]?.secure_url || imgPlaceholder.src
 
@@ -94,6 +101,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
         setActiveIndex((prev) => (prev + dir + media.length) % media.length)
     }
 
+    // Pre-add quantity selector (how many to add). Capped at the shared max.
     const handleQty = (actionType) => {
         setQty((prev) => {
             if (actionType === 'inc') return Math.min(prev + 1, MAX_QTY)
@@ -101,9 +109,11 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
         })
     }
 
+    const cartKey = { productId: product._id, variantId: variant?._id }
+
     const handleAddToCart = () => {
         if (!variant?._id) return
-        const cartProduct = {
+        dispatch(addIntoCart({
             productId: product._id,
             variantId: variant._id,
             name: product.name,
@@ -114,11 +124,24 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
             sellingPrice: variant.sellingPrice,
             media: media[0]?.secure_url || imgPlaceholder.src,
             qty: qty,
-        }
+        }))
+        showToast('success', qty > 1 ? `${qty} added to cart.` : 'Product added into cart.')
+    }
 
-        dispatch(addIntoCart(cartProduct))
-        setIsAddedIntoCart(true)
-        showToast('success', 'Product added into cart.')
+    // In-cart stepper: + / − adjust the cart line live. Dropping below 1 removes
+    // the line entirely (the buy box reverts to "Add to Cart"), matching the
+    // quick-commerce stepper pattern shoppers expect.
+    const handleCartInc = () => {
+        if (cartQty >= MAX_QTY) return
+        dispatch(increaseQuantity(cartKey))
+    }
+    const handleCartDec = () => {
+        if (cartQty <= 1) {
+            dispatch(removeFromCart(cartKey))
+            showToast('success', 'Removed from cart.')
+            return
+        }
+        dispatch(decreaseQuantity(cartKey))
     }
 
     // ── Variant availability matrix ───────────────────────────────────────
@@ -413,31 +436,41 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                         )}
 
                         {/* Quantity + Add to cart */}
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-                            <div className="inline-flex h-12 shrink-0 items-center rounded-[var(--radius-sm)] border border-border/70">
-                                <button
-                                    type="button"
-                                    aria-label="Decrease quantity"
-                                    disabled={qty <= 1}
-                                    className="flex h-full w-11 items-center justify-center text-foreground/80 transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
-                                    onClick={() => handleQty('desc')}
-                                >
-                                    <Minus className="size-4" />
-                                </button>
-                                <span className="w-10 select-none text-center text-sm font-semibold tabular-nums">{qty}</span>
-                                <button
-                                    type="button"
-                                    aria-label="Increase quantity"
-                                    disabled={qty >= MAX_QTY}
-                                    className="flex h-full w-11 items-center justify-center text-foreground/80 transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
-                                    onClick={() => handleQty('inc')}
-                                >
-                                    <Plus className="size-4" />
-                                </button>
-                            </div>
+                        {!variant?._id ? (
+                            <Button
+                                type="button"
+                                variant="brand"
+                                disabled
+                                className="h-12 w-full rounded-[var(--radius-sm)] text-[12px] font-semibold uppercase tracking-[0.2em]"
+                            >
+                                Unavailable
+                            </Button>
+                        ) : !inCart ? (
+                            /* ── Not in cart: pick a quantity, then add ──────────── */
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+                                <div className="inline-flex h-12 shrink-0 items-center rounded-[var(--radius-sm)] border border-border/70">
+                                    <button
+                                        type="button"
+                                        aria-label="Decrease quantity"
+                                        disabled={qty <= 1}
+                                        className="flex h-full w-11 items-center justify-center text-foreground/80 transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                                        onClick={() => handleQty('desc')}
+                                    >
+                                        <Minus className="size-4" />
+                                    </button>
+                                    <span className="w-10 select-none text-center text-sm font-semibold tabular-nums">{qty}</span>
+                                    <button
+                                        type="button"
+                                        aria-label="Increase quantity"
+                                        disabled={qty >= MAX_QTY}
+                                        className="flex h-full w-11 items-center justify-center text-foreground/80 transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                                        onClick={() => handleQty('inc')}
+                                    >
+                                        <Plus className="size-4" />
+                                    </button>
+                                </div>
 
-                            <div className="flex-1">
-                                {!isAddedIntoCart ? (
+                                <div className="flex-1">
                                     <ButtonLoading
                                         type="button"
                                         text="Add To Cart"
@@ -445,7 +478,33 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                         className="h-12 w-full rounded-[var(--radius-sm)] text-[12px] font-semibold uppercase tracking-[0.2em]"
                                         onClick={handleAddToCart}
                                     />
-                                ) : (
+                                </div>
+                            </div>
+                        ) : (
+                            /* ── In cart: live stepper bound to the cart line ────── */
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+                                <div className="inline-flex h-12 shrink-0 items-center rounded-[var(--radius-sm)] border border-[var(--dark-red)]/40 bg-[var(--brand-cream)]/30">
+                                    <button
+                                        type="button"
+                                        aria-label={cartQty <= 1 ? 'Remove from cart' : 'Decrease quantity'}
+                                        className="flex h-full w-11 items-center justify-center text-[var(--dark-red)] transition hover:text-[var(--dark-red-2)]"
+                                        onClick={handleCartDec}
+                                    >
+                                        <Minus className="size-4" />
+                                    </button>
+                                    <span className="w-10 select-none text-center text-sm font-semibold tabular-nums text-[var(--dark-red)]">{cartQty}</span>
+                                    <button
+                                        type="button"
+                                        aria-label="Increase quantity"
+                                        disabled={cartQty >= MAX_QTY}
+                                        className="flex h-full w-11 items-center justify-center text-[var(--dark-red)] transition hover:text-[var(--dark-red-2)] disabled:cursor-not-allowed disabled:opacity-40"
+                                        onClick={handleCartInc}
+                                    >
+                                        <Plus className="size-4" />
+                                    </button>
+                                </div>
+
+                                <div className="flex-1">
                                     <Button
                                         variant="brand"
                                         className="h-12 w-full rounded-[var(--radius-sm)] text-[12px] font-semibold uppercase tracking-[0.2em]"
@@ -454,13 +513,17 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                     >
                                         <Link href={WEBSITE_CART}>Go To Cart</Link>
                                     </Button>
-                                )}
+                                </div>
                             </div>
-                        </div>
-
-                        {qty >= MAX_QTY && (
-                            <p className="mt-2 text-xs text-muted-foreground">Maximum {MAX_QTY} units per order.</p>
                         )}
+
+                        {inCart ? (
+                            <p className="mt-2 text-xs text-muted-foreground">
+                                {cartQty} in your cart{cartQty >= MAX_QTY ? ` · max ${MAX_QTY} per order` : ' · use − / + to adjust'}
+                            </p>
+                        ) : qty >= MAX_QTY ? (
+                            <p className="mt-2 text-xs text-muted-foreground">Maximum {MAX_QTY} units per order.</p>
+                        ) : null}
 
                         {/* Trust badges */}
                         <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-3">

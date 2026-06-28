@@ -11,6 +11,7 @@ import { showToast } from '@/lib/showToast'
 import { zSchema } from '@/lib/zodSchema'
 import { WEBSITE_CART, WEBSITE_ORDER_DETAILS, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import { addIntoCart, clearCart, decreaseQuantity, increaseQuantity, removeFromCart } from '@/store/reducer/cartReducer'
+import { MAX_CART_QTY } from '@/lib/cartConstants'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import Image from 'next/image'
@@ -727,6 +728,7 @@ const Checkout = () => {
                                                                     variant='ghost'
                                                                     size='icon-xs'
                                                                     className='rounded-full'
+                                                                    disabled={product.qty >= MAX_CART_QTY}
                                                                     onClick={() => dispatch(increaseQuantity({ productId: product.productId, variantId: product.variantId }))}
                                                                     aria-label='Increase quantity'
                                                                 >

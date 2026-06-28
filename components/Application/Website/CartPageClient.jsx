@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import { LogIn, Minus, Plus, XCircle } from 'lucide-react'
 import { decreaseQuantity, increaseQuantity, removeFromCart } from '@/store/reducer/cartReducer'
+import { MAX_CART_QTY } from '@/lib/cartConstants'
 import useFetch from '@/hooks/useFetch'
 
 const CartPageClient = () => {
@@ -208,6 +209,7 @@ const CartPageClient = () => {
                                                                     variant="ghost"
                                                                     size="icon-sm"
                                                                     className="rounded-full"
+                                                                    disabled={product.qty >= MAX_CART_QTY}
                                                                     onClick={() => dispatch(increaseQuantity({ productId: product.productId, variantId: product.variantId }))}
                                                                 >
                                                                     <Plus className="size-4" />

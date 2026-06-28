@@ -6,6 +6,7 @@ import { zSchema } from "@/lib/zodSchema";
 import { isAuthenticated } from "@/lib/authentication";
 import OrderModel from "@/models/Order.model";
 import UserModel from "@/models/User.model";
+import { MAX_CART_QTY } from "@/lib/cartConstants";
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils";
 import { z } from "zod";
 
@@ -18,7 +19,7 @@ export async function POST(request) {
             productId: z.string().length(24, 'Invalid product id format'),
             variantId: z.string().length(24, 'Invalid variant id format'),
             name: z.string().min(1),
-            qty: z.number().min(1),
+            qty: z.number().int().min(1).max(MAX_CART_QTY, `Maximum ${MAX_CART_QTY} units per item.`),
             mrp: z.number().nonnegative(),
             sellingPrice: z.number().nonnegative()
         })
