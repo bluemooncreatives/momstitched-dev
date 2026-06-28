@@ -18,6 +18,7 @@ import { showToast } from '@/lib/showToast'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import ReviewList from './ReviewList'
 import useFetch from '@/hooks/useFetch'
+import { BrandButton } from './BrandButton'
 
 const StarRatingField = ({ value = 0, onChange }) => {
     return (
@@ -48,7 +49,7 @@ const ProductReveiw = ({ productId }) => {
     const [isReview, setIsReview] = useState(false)
     const [reviewCount, setReviewCount] = useState()
 
-    const { data: reviewDetails } = useFetch(`/api/review/details?productId=${productId}`)
+    const { data: reviewDetails, refetch: refetchReviewSummary } = useFetch(`/api/review/details?productId=${productId}`)
 
     useEffect(() => {
         if (reviewDetails && reviewDetails.success) {
@@ -96,8 +97,12 @@ const ProductReveiw = ({ productId }) => {
             }
 
             form.reset()
+            setIsReview(false)
             showToast('success', response.message)
             queryClient.invalidateQueries({ queryKey: ['product-review', productId] })
+            // Refresh the rating summary (average + distribution bars) so the
+            // shopper's freshly-posted review is reflected immediately.
+            refetchReviewSummary()
         } catch (error) {
             showToast('error', error.message)
         } finally {
@@ -129,22 +134,30 @@ const ProductReveiw = ({ productId }) => {
 
     return (
         <div className="mb-20 rounded-[var(--admin-shell-radius)] border border-border/60 bg-background shadow-sm">
-            <div className="border-b border-border/60 px-5 py-4">
-                <h2 className="text-xl font-semibold uppercase tracking-[0.04em]">Rating & Reviews</h2>
+            <div className="border-b border-border/60 px-5 py-4 lg:px-6 lg:py-5">
+                <p className="text-[0.95rem] font-semibold uppercase text-[var(--dark-red)]/60">
+                    What Shoppers Say
+                </p>
+                <h2 className="mt-1 font-neue text-[clamp(1.4rem,2.6vw,2rem)] font-medium uppercase leading-[1.1] text-[var(--dark-red-2)]">
+                    Rating &amp; Reviews
+                </h2>
             </div>
             <div className="p-5 lg:p-6">
                 <div className='flex justify-between flex-wrap items-center'>
                     <div className='md:w-1/2 w-full md:flex md:gap-10 md:mb-0 mb-5'>
                         <div className='md:w-[200px] w-full md:mb-0 mb-5'>
-                            <h4 className='text-center text-8xl font-semibold'>{reviewCount?.averageRating}</h4>
-                            <div className='flex justify-center gap-2 text-amber-500'>
+                            <h4 className='text-center text-8xl font-semibold'>{reviewCount?.averageRating ?? '0.0'}</h4>
+                            <div className='flex justify-center gap-1 text-[var(--dark-red)]'>
                                 {Array.from({ length: 5 }).map((_, index) => (
-                                    <Star key={index} className="size-4 fill-amber-500 text-amber-500" />
+                                    <Star
+                                        key={index}
+                                        className={`size-4 ${index < Math.round(Number(reviewCount?.averageRating || 0)) ? 'fill-[var(--dark-red)] text-[var(--dark-red)]' : 'text-foreground/25'}`}
+                                    />
                                 ))}
                             </div>
 
-                            <p className='text-center mt-3'>
-                                ({reviewCount?.totalReview} Rating & Reviews)
+                            <p className='text-center mt-3 text-sm text-muted-foreground'>
+                                ({reviewCount?.totalReview || 0} Rating &amp; Reviews)
                             </p>
                         </div>
 
@@ -153,12 +166,12 @@ const ProductReveiw = ({ productId }) => {
 
                                 {[5, 4, 3, 2, 1].map(rating => (
                                     <div key={rating} className='flex items-center gap-2 mb-2'>
-                                        <div className='flex items-center gap-1 text-amber-500'>
+                                        <div className='flex items-center gap-1 text-[var(--dark-red)]'>
                                             <p className='w-3 text-foreground'>{rating}</p>
-                                            <Star className="size-3 fill-amber-500 text-amber-500" />
+                                            <Star className="size-3 fill-[var(--dark-red)] text-[var(--dark-red)]" />
                                         </div>
-                                        <Progress value={reviewCount?.percentage[rating]} />
-                                        <span className='text-sm'>{reviewCount?.rating[rating]}</span>
+                                        <Progress value={reviewCount?.percentage?.[rating] || 0} />
+                                        <span className='w-6 text-sm text-muted-foreground'>{reviewCount?.rating?.[rating] || 0}</span>
                                     </div>
                                 ))}
 
@@ -177,21 +190,20 @@ const ProductReveiw = ({ productId }) => {
                 </div>
 
                 {isReview &&
+                    <div className='my-6 rounded-[var(--radius)] border border-border/60 bg-muted/20 p-5 lg:p-6'>
+                        <h4 className='mb-1 font-neue text-[clamp(1.2rem,2.2vw,1.6rem)] font-medium uppercase leading-[1.1] text-[var(--dark-red-2)]'>Write A Review</h4>
 
-
-                    <div className='my-5 rounded-md border border-border/70 bg-muted/20 p-4'>
-                        <hr className='mb-5' />
-                        <h4 className='mb-3 text-lg font-semibold uppercase tracking-[0.06em]'>Write A Review</h4>
                         {!auth
                             ?
                             <>
-                                <p className='mb-2'>Login to submit review.</p>
-                                <Button type="button" asChild variant="brand">
+                                <p className='mb-4 text-sm text-muted-foreground'>You need to be logged in to share your experience with this product.</p>
+                                <BrandButton asChild className='w-full sm:w-fit sm:px-10'>
                                     <Link href={`${WEBSITE_LOGIN}?callback=${currentUrl}`}>Login</Link>
-                                </Button>
+                                </BrandButton>
                             </>
                             :
                             <>
+                                <p className='mb-5 text-sm text-muted-foreground'>Share your thoughts to help other shoppers.</p>
 
                                 <Form {...form}>
                                     <form onSubmit={form.handleSubmit(handleReviewSubmit)} >
@@ -202,6 +214,7 @@ const ProductReveiw = ({ productId }) => {
                                                 name="rating"
                                                 render={({ field }) => (
                                                     <FormItem>
+                                                        <FormLabel className='mb-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-muted-foreground'>Your Rating</FormLabel>
                                                         <FormControl>
                                                             <StarRatingField value={field.value} onChange={field.onChange} />
                                                         </FormControl>
@@ -216,24 +229,24 @@ const ProductReveiw = ({ productId }) => {
                                                 name="title"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Title</FormLabel>
+                                                        <FormLabel className='mb-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-muted-foreground'>Title</FormLabel>
                                                         <FormControl>
-                                                            <Input type="text" placeholder="Review title" {...field} />
+                                                            <Input type="text" placeholder="Sum up your review" {...field} />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
                                             />
                                         </div>
-                                        <div className='mb-5'>
+                                        <div className='mb-6'>
                                             <FormField
                                                 control={form.control}
                                                 name="review"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Review</FormLabel>
+                                                        <FormLabel className='mb-1 text-[12px] font-semibold uppercase tracking-[0.18em] text-muted-foreground'>Review</FormLabel>
                                                         <FormControl>
-                                                            <Textarea placeholder="Write your comment here..." {...field} />
+                                                            <Textarea placeholder="Write your comment here..." className='min-h-28' {...field} />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -241,25 +254,28 @@ const ProductReveiw = ({ productId }) => {
                                             />
                                         </div>
 
-                                        <div className='mb-3'>
-                                            <ButtonLoading loading={loading} type="submit" text="Submit Review" variant="brand" className="h-10 cursor-pointer text-[11px] font-semibold uppercase tracking-[0.2em]" />
-                                        </div>
+                                        <ButtonLoading loading={loading} type="submit" text="Submit Review" variant="brand" className="h-11 w-full cursor-pointer text-[11px] font-semibold uppercase tracking-[0.2em] sm:w-fit sm:px-10" />
 
                                     </form>
                                 </Form>
                             </>
                         }
-
-
                     </div>
-
                 }
 
 
                 <div className='mt-10 border-t border-border/60 pt-5'>
-                    <h5 className='text-lg font-semibold uppercase tracking-[0.05em]'>{data?.pages[0]?.totalReview || 0} Reviews</h5>
+                    <h5 className='font-neue text-[clamp(1.1rem,2vw,1.4rem)] font-medium uppercase leading-[1.1] text-[var(--dark-red-2)]'>{data?.pages[0]?.totalReview || 0} Reviews</h5>
 
                     <div className='mt-10'>
+                        {(data?.pages?.[0]?.totalReview ?? 0) === 0 && !isFetching && (
+                            <div className='rounded-md border border-dashed border-border/70 bg-muted/20 px-5 py-10 text-center'>
+                                <Star className='mx-auto mb-3 size-7 text-foreground/25' />
+                                <p className='font-semibold text-foreground'>No reviews yet</p>
+                                <p className='mt-1 text-sm text-muted-foreground'>Be the first to share your thoughts on this product.</p>
+                            </div>
+                        )}
+
                         {data && data.pages.map(page => (
                             page.reviews.map(review => (
                                 <div className='mb-5' key={review._id}>

@@ -1,6 +1,28 @@
 import { notFound } from 'next/navigation'
 import ProductDetails from './ProductDetails'
-import { getProductDetailsBySlug } from '@/lib/services/productService'
+import { getProductDetailsBySlug, getRelatedProducts } from '@/lib/services/productService'
+import { htmlToText } from '@/lib/utils'
+
+export async function generateMetadata({ params }) {
+    const { slug } = await params
+    const productData = await getProductDetailsBySlug(slug)
+    if (!productData) return { title: 'Product not found' }
+
+    const { product } = productData
+    const description = htmlToText(product?.description).slice(0, 160)
+    const image = product?.media?.[0]?.secure_url
+
+    return {
+        title: product?.name,
+        description,
+        openGraph: {
+            title: product?.name,
+            description,
+            images: image ? [{ url: image }] : [],
+            type: 'website',
+        },
+    }
+}
 
 const ProductPage = async ({ params, searchParams }) => {
     const { slug } = await params
@@ -10,13 +32,22 @@ const ProductPage = async ({ params, searchParams }) => {
 
     if (!productData) notFound()
 
+    const relatedProducts = await getRelatedProducts(
+        productData.product._id,
+        productData.product.category?._id
+    )
+
     return (
         <ProductDetails
             product={productData.product}
             variant={productData.variant}
             colors={productData.colors}
+            colorEntries={productData.colorEntries}
             sizes={productData.sizes}
+            variantOptions={productData.variantOptions}
             reviewCount={productData.reviewCount}
+            ratingAvg={productData.ratingAvg}
+            relatedProducts={relatedProducts}
         />
     )
 }

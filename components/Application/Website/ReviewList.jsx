@@ -17,16 +17,23 @@ const ReviewList = ({ review }) => {
                     className='rounded-md border border-border/60'
                 />
             </div>
-            <div className='w-[calc(100%-80px)]'>
+            <div className='min-w-0 flex-1'>
                 <div>
-                    <h4 className='text-lg font-semibold'>{review?.title}</h4>
+                    <div className='flex items-center gap-1'>
+                        {Array.from({ length: 5 }).map((_, index) => (
+                            <Star
+                                key={index}
+                                className={`size-3.5 ${index < Number(review?.rating || 0) ? 'fill-[var(--dark-red)] text-[var(--dark-red)]' : 'text-foreground/20'}`}
+                            />
+                        ))}
+                    </div>
+                    <h4 className='mt-2 text-lg font-semibold'>{review?.title}</h4>
                     <p className='flex flex-wrap gap-2 items-center text-sm'>
-                        <span className='font-medium'>{review?.reviewedBy}</span>
-                        -
+                        <span className='font-medium'>{review?.reviewedBy || 'Anonymous'}</span>
+                        <span className='text-muted-foreground'>·</span>
                         <span className='text-muted-foreground'>{dayjs(review?.createdAt).fromNow()}</span>
-                        <span className='flex items-center text-xs gap-1'>( {review.rating} <Star className='text-yellow-500 mb-1 size-3.5 fill-yellow-500' />)</span>
                     </p>
-                    <p className='mt-3 text-foreground/85'>{review?.review}</p>
+                    <p className='mt-3 break-words text-foreground/85'>{review?.review}</p>
                 </div>
             </div>
         </div>
