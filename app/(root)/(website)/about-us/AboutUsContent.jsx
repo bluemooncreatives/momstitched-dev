@@ -260,7 +260,7 @@ const AboutUsContent = ({ products = [] }) => {
       }
 
       // Recompute trigger positions once everything is laid out.
-      ScrollTrigger.refresh();
+      setTimeout(() => ScrollTrigger.refresh(), 100);
     };
 
     // Split only after fonts are ready so line breaks (and therefore the

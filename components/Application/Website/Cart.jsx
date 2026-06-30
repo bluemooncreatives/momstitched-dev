@@ -38,7 +38,7 @@ const Cart = () => {
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             {/* ── Trigger ── */}
-            <SheetTrigger className="relative flex items-center justify-center rounded-md px-2.5 py-2 transition hover:bg-muted/40">
+            <SheetTrigger aria-label="Open cart" className="relative flex items-center justify-center rounded-md px-2.5 py-2 transition hover:bg-muted/40">
                 <ShoppingCart className="h-5 w-5 text-foreground" strokeWidth={1.75} />
                 {cartCount > 0 && (
                     <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[10px] font-semibold text-white tabular-nums">

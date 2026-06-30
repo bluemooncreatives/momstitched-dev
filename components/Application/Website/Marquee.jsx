@@ -91,12 +91,18 @@ const Marquee = ({ text = 'freshly arrived', repeatCount = 12, speed = 1 }) => {
             itemWidth = getBounds()
         }
         ScrollTrigger.addEventListener('refreshInit', handleRefresh)
-        ScrollTrigger.refresh()
+        
+        // Defer refresh to avoid synchronous forced reflow during hydration
+        const refreshTimeout = setTimeout(() => {
+            ScrollTrigger.refresh()
+        }, 100)
+        
         if (trigger.isActive) {
             startTicker()
         }
 
         return () => {
+            clearTimeout(refreshTimeout)
             stopTicker()
             ScrollTrigger.removeEventListener('refreshInit', handleRefresh)
             trigger.kill()
