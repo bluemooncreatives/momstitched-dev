@@ -8,231 +8,434 @@ import CustomEase from "gsap/CustomEase";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import SplitType from "@/lib/SplitType/index";
 import styles from "./about-us.module.css";
-import { cvItems } from "./cvItems";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(CustomEase, ScrollTrigger);
-  CustomEase.create(
-    "hop",
-    "M0,0 C0.354,0 0.464,0.133 0.498,0.502 0.532,0.872 0.651,1 1,1"
-  );
+  if (!CustomEase.get("hop")) {
+    CustomEase.create(
+      "hop",
+      "M0,0 C0.354,0 0.464,0.133 0.498,0.502 0.532,0.872 0.651,1 1,1"
+    );
+  }
 }
 
+// ── Scroll-controlled middle image ──────────────────────────────────
+const SCROLL_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781947528/qcbfdwai0pmvv97khlcw.jpg";
+
+// Hero images (left thumb · center · right thumb)
+const HERO_LEFT_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781947528/qcbfdwai0pmvv97khlcw.jpg";
+const HERO_CENTER_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781945835/einxusjo1pubrtkgfddc.jpg";
+const HERO_RIGHT_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781938294/upvpbt6rrkkojddwsniu.jpg";
+
+// Brand-story paragraphs shown beneath the statement.
+const STORY = [
+  "Momstitched was born in May 2021, in the heart of India's hardest COVID days. What started as one small idea, carried through so much uncertainty, slowly grew into something far greater - a quiet symbol of hope. And it began with my mom: her creativity, her strength, and her endless love became the spirit behind every thread we stitch, and the reason this journey ever started.",
+  "What makes us different is simple - we're not backed by big corporations, we're powered by family. My sister keeps everything running seamlessly online, my father handles logistics like a pro, and together, by hand, we build every part of this brand. Every design, every package, every decision travels straight from our home to yours.",
+  "Rooted in India and driven by passion, we make clothing that feels real, personal, and meaningful - because it truly is. This isn't fast fashion. It's family fashion. This is Momstitched.",
+];
+
+// The two people behind the brand. `reverse` flips the image/text order.
+const PEOPLE = [
+  {
+    name: "Aditi Dhakate",
+    role: "Founder · Face Behind the brand",
+    image: HERO_CENTER_IMAGE,
+    bio: [
+      "I started out in IT engineering - a world of code, systems, and logic. But creativity had other plans for me.",
+      "Taking a leap from tech into fashion wasn't random - it was inspired by the strongest influence in my life: my mom. Her creativity and passion became the soul of Momstitched, and the reason I dared to turn this idea into reality.",
+      "Today I'm the face behind the brand, bringing together creativity, clarity, and a fresh perspective. I still carry my technical mindset - but now I use it to build something more expressive and personal.",
+      "Bubbly, driven, and real - professional when it matters, cool always. For me, fashion is about confidence, identity, and owning your story. And I'm just getting started.",
+    ],
+  },
+  {
+    name: "Sandhya Dhakate",
+    role: "Mom · Heart of Momstitched",
+    image: HERO_RIGHT_IMAGE,
+    reverse: true,
+    bio: [
+      "She is the heart, the strength, and the soul behind Momstitched. A homemaker by role but a creator by passion, she has always expressed her love through every stitch she made for her daughters.",
+      "What began as simple, thoughtful creations at home has grown into something much bigger - today she stitches not just for us, but for daughters everywhere.",
+      "Her strength lies in her warmth, her creativity, and the way she brings life into everything she touches - graceful, vibrant, and endlessly inspiring.",
+      "Beyond the brand she's full of life — kitty parties, picnics, community work, and peace in her bhajan groups. Momstitched exists because of her: her love, her vision, and her magic in every stitch.",
+    ],
+  },
+];
+
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 const AboutUsContent = () => {
-  const container = useRef();
-  const aboutCopyRef = useRef(null);
-  const cvWrapperRef = useRef(null);
-  const cvHeaderRef = useRef(null);
-  const cvListRef = useRef(null);
-  const heroImgRef = useRef(null);
+  const container = useRef(null);
+  const headlineRef = useRef(null);
+  const statementRef = useRef(null);
+  const supportRef = useRef(null);
+  const peopleRef = useRef(null);
+  const scrollImgRef = useRef(null);
+  const heroRef = useRef(null);
+  const flankLeftRef = useRef(null);
+  const flankRightRef = useRef(null);
+  const centerImgRef = useRef(null);
 
+  // ── SplitType line reveals + scroll-scrub image ──────────────────
   useEffect(() => {
+    const reduced = prefersReducedMotion();
     const splitInstances = [];
-    const pageTriggers = [];
+    const triggers = [];
+    const tweens = [];
+    let cancelled = false;
 
-    const applySplitType = (element) => {
-      const splitTexts = element.querySelectorAll("h1, h2, h3");
-
-      splitTexts.forEach((text) => {
-        const split = new SplitType(text, {
-          types: "lines",
-          tagName: "span",
-        });
-
+    // Wrap each split line in an overflow-hidden mask so the slide-up reads
+    // as a clean "popup from bottom" reveal.
+    const splitToMaskedLines = (root) => {
+      const targets = root.querySelectorAll("h1, h2, h3, p");
+      const spans = [];
+      targets.forEach((el) => {
+        const split = new SplitType(el, { types: "lines", tagName: "span" });
         splitInstances.push(split);
-
         split.lines.forEach((line) => {
           const wrapper = document.createElement("div");
           wrapper.className = styles.lineWrapper;
           line.parentNode.insertBefore(wrapper, line);
           wrapper.appendChild(line);
+          spans.push(line);
         });
       });
+      return spans;
     };
 
-    if (aboutCopyRef.current) {
-      applySplitType(aboutCopyRef.current);
+    const run = () => {
+      if (cancelled || !container.current) return;
 
-      gsap.to(
-        aboutCopyRef.current.querySelectorAll(`.${styles.lineWrapper} > span`),
-        {
-          y: 0,
-          stagger: 0.05,
-          delay: 1.5,
-          duration: 1.5,
-          ease: "power4.out",
+      // Statement + supporting copy: reveal when scrolled into view.
+      [statementRef.current, supportRef.current].forEach((root) => {
+        if (!root) return;
+        const spans = splitToMaskedLines(root);
+        if (reduced) {
+          gsap.set(spans, { y: 0 });
+          return;
         }
-      );
-    }
-
-    if (cvHeaderRef.current) {
-      applySplitType(cvHeaderRef.current);
-    }
-
-    if (cvListRef.current) {
-      applySplitType(cvListRef.current);
-    }
-
-    if (cvWrapperRef.current) {
-      const cvHeaderSpans = cvHeaderRef.current.querySelectorAll(
-        `.${styles.lineWrapper} > span`
-      );
-      const cvListSpans = cvListRef.current.querySelectorAll(
-        `.${styles.lineWrapper} > span`
-      );
-
-      gsap.set([cvHeaderSpans, cvListSpans], { y: "100%" });
-
-      const cvTrigger = ScrollTrigger.create({
-        trigger: cvWrapperRef.current,
-        start: "top 50%",
-        onEnter: () => {
-          gsap.to(cvHeaderSpans, {
-            y: 0,
-            stagger: 0.05,
-            duration: 1.5,
-            ease: "power4.out",
-          });
-
-          gsap.to(cvListSpans, {
-            y: 0,
-            stagger: 0.02,
-            duration: 1.5,
-            ease: "power4.out",
-          });
-        },
+        gsap.set(spans, { y: "115%" });
+        const t = ScrollTrigger.create({
+          trigger: root,
+          start: "top 82%",
+          once: true,
+          onEnter: () =>
+            tweens.push(
+              gsap.to(spans, {
+                y: 0,
+                stagger: 0.05,
+                duration: 1.2,
+                ease: "power4.out",
+              })
+            ),
+        });
+        triggers.push(t);
       });
 
-      pageTriggers.push(cvTrigger);
-    }
+      // Profile blocks: editorial reveal — the image clips up from the bottom
+      // while its photo settles from a soft zoom, and the text lines stagger in.
+      // Each photo also gets a gentle scroll-scrub Ken-Burns drift for depth.
+      if (peopleRef.current) {
+        const profiles = peopleRef.current.querySelectorAll(`.${styles.profile}`);
+        profiles.forEach((profile) => {
+          const imgWrap = profile.querySelector(`.${styles.profileImg}`);
+          const photo = imgWrap?.querySelector("img");
+          const textEls = profile.querySelectorAll(`.${styles.profileBody} > *`);
 
-    if (heroImgRef.current) {
-      const heroImg = heroImgRef.current.querySelector("img");
-      if (heroImg) {
-        const heroTween = gsap.fromTo(
-          heroImg,
+          if (reduced) {
+            if (imgWrap) gsap.set(imgWrap, { clipPath: "none" });
+            if (photo) gsap.set(photo, { scale: 1 });
+            gsap.set(textEls, { autoAlpha: 1, y: 0 });
+            return;
+          }
+
+          // Initial hidden states
+          if (imgWrap)
+            gsap.set(imgWrap, { clipPath: "inset(100% 0% 0% 0% round 6px)" });
+          if (photo) gsap.set(photo, { scale: 1.3 });
+          gsap.set(textEls, { autoAlpha: 0, y: 28 });
+
+          const tl = gsap.timeline({
+            scrollTrigger: { trigger: profile, start: "top 75%", once: true },
+          });
+          if (imgWrap)
+            tl.to(
+              imgWrap,
+              {
+                clipPath: "inset(0% 0% 0% 0% round 6px)",
+                duration: 1.1,
+                ease: "power4.out",
+              },
+              0
+            );
+          if (photo)
+            tl.to(photo, { scale: 1.04, duration: 1.3, ease: "power3.out" }, 0);
+          tl.to(
+            textEls,
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.9,
+              ease: "power3.out",
+              stagger: 0.08,
+            },
+            0.25
+          );
+
+          tweens.push(tl);
+          if (tl.scrollTrigger) triggers.push(tl.scrollTrigger);
+
+          // Ongoing Ken-Burns drift (scale 1.04 baseline gives headroom so no edge gap)
+          if (photo) {
+            const kb = gsap.fromTo(
+              photo,
+              { yPercent: -2.5 },
+              {
+                yPercent: 2.5,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: profile,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: true,
+                },
+              }
+            );
+            tweens.push(kb);
+            if (kb.scrollTrigger) triggers.push(kb.scrollTrigger);
+          }
+        });
+      }
+
+      // Hero images: layered parallax — each moves at a different rate as the
+      // page scrolls, giving depth. Side thumbs drift the most, center least.
+      if (heroRef.current && !reduced) {
+        const parallax = [
+          { el: flankLeftRef.current, y: -180 },
+          { el: flankRightRef.current, y: -260 },
+          { el: centerImgRef.current, y: -90 },
+        ];
+        parallax.forEach(({ el, y }) => {
+          if (!el) return;
+          const tween = gsap.fromTo(
+            el,
+            { yPercent: 0 },
+            {
+              y,
+              ease: "none",
+              scrollTrigger: {
+                trigger: heroRef.current,
+                start: "top top",
+                end: "bottom top",
+                scrub: true,
+              },
+            }
+          );
+          tweens.push(tween);
+          if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
+        });
+      }
+
+      // Middle image: scrub-scale on scroll (skipped under reduced motion).
+      if (scrollImgRef.current && !reduced) {
+        const tween = gsap.fromTo(
+          scrollImgRef.current,
           { scale: 1 },
           {
-            scale: 1.5,
+            scale: 1.4,
             ease: "none",
             scrollTrigger: {
-              trigger: heroImgRef.current,
+              trigger: scrollImgRef.current.parentElement,
               start: "top bottom",
               end: "bottom top",
               scrub: true,
             },
           }
         );
-        if (heroTween.scrollTrigger) {
-          pageTriggers.push(heroTween.scrollTrigger);
-        }
+        tweens.push(tween);
+        if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
       }
-    }
+
+      // Recompute trigger positions once everything is laid out.
+      ScrollTrigger.refresh();
+    };
+
+    // Split only after fonts are ready so line breaks (and therefore the
+    // masks) match the rendered text instead of the fallback font.
+    const fontsReady = document.fonts?.ready ?? Promise.resolve();
+    fontsReady.then(run);
+
+    // A late refresh covers async image loads shifting layout.
+    const onLoad = () => ScrollTrigger.refresh();
+    window.addEventListener("load", onLoad);
 
     return () => {
-      splitInstances.forEach((split) => split.revert());
-      pageTriggers.forEach((trigger) => trigger.kill());
+      cancelled = true;
+      window.removeEventListener("load", onLoad);
+      tweens.forEach((t) => t.kill());
+      triggers.forEach((t) => t.kill());
+      splitInstances.forEach((s) => s.revert());
     };
   }, []);
 
+  // ── Intro reveal: headline slides up after mount ─────────────────
   useGSAP(
     () => {
-      gsap.to(`.${styles.aboutPortrait}`, {
-        clipPath: "polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)",
-        delay: 0.8,
-        duration: 1,
-        ease: "hop",
-      });
-
-      gsap.to(`.${styles.aboutCopyTitle} h1`, {
+      if (prefersReducedMotion()) {
+        gsap.set(headlineRef.current, { y: 0 });
+        return;
+      }
+      gsap.to(headlineRef.current, {
         y: 0,
-        delay: 1,
-        duration: 1.5,
-        ease: "power4.out",
+        delay: 0.35,
+        duration: 1.3,
+        ease: "hop",
       });
     },
     { scope: container }
   );
 
   return (
-    <div className={styles.aboutPage} ref={container}>
-      <div className={styles.container}>
-        <div className={styles.aboutIntro}>
-          <div className={styles.aboutPortraitImg}>
-            <div className={styles.aboutPortrait}>
-              <Image
-                src="/about/portrait-min.jpg"
-                alt="Portrait"
-                width={960}
-                height={1280}
-                priority
-                sizes="(max-width: 900px) 100vw, 40vw"
-                className={styles.portraitImage}
-              />
-            </div>
+    <div className={styles.page} ref={container}>
+      <div className={styles.inner}>
+        {/* Hero: centered image, flanking thumbs, giant headline */}
+        <div className={styles.hero} ref={heroRef}>
+          <div className={`${styles.flankImage} ${styles.flankLeft}`} ref={flankLeftRef}>
+            <Image
+              src={HERO_LEFT_IMAGE}
+              alt="MomStitched detail"
+              fill
+              sizes="130px"
+              className="object-cover"
+            />
+          </div>
+          <div className={`${styles.flankImage} ${styles.flankRight}`} ref={flankRightRef}>
+            <Image
+              src={HERO_RIGHT_IMAGE}
+              alt="MomStitched detail"
+              fill
+              sizes="110px"
+              className="object-cover"
+            />
           </div>
 
-          <div className={styles.aboutCopyWrapper}>
-            <div className={styles.aboutCopyTitle}>
-              <h1>About Us</h1>
-            </div>
+          <div className={styles.centerImage} ref={centerImgRef}>
+            <Image
+              src={HERO_CENTER_IMAGE}
+              alt="MomStitched atelier"
+              fill
+              priority
+              sizes="(max-width: 900px) 70vw, 360px"
+              className="object-cover"
+            />
+          </div>
 
-            <div className={styles.aboutCopy} ref={aboutCopyRef}>
-              <h3>
-                Passionate about crafting immersive digital experiences, Stefan
-                Markovic blends design and code to push the boundaries of
-                what&apos;s possible on the web. His approach focuses on creating
-                seamless, responsive, and engaging interfaces that leave a
-                lasting impact.
-              </h3>
-              <br />
-              <h3>
-                With a strong foundation in JavaScript, React, and modern web
-                technologies, Stefan excels at turning complex ideas into
-                interactive realities. Whether it&apos;s a sleek portfolio site, a
-                dynamic web app, or a mesmerizing animation, he approaches each
-                project with creativity and technical precision.
-              </h3>
-              <br />
-              <h3>
-                Driven by curiosity and innovation, Stefan constantly explores
-                new tools, techniques, and frameworks. He&apos;s not just a
-                developer - he&apos;s a problem solver, ready to bring your vision
-                to
-                life with a unique and modern touch.
-              </h3>
-            </div>
+          <div className={styles.headlineMask}>
+            <h1 className={styles.headline} ref={headlineRef}>
+              about us
+            </h1>
+          </div>
+        </div>
+
+        {/* Plus marker + caption */}
+        <div className={styles.marker}>
+          <span className={styles.plus}>+</span>
+          <span className={styles.rule} />
+          <span className={styles.caption}>
+            Born May 2021 · made by family,
+            <br />
+            rooted in India
+          </span>
+        </div>
+
+        {/* Big statement + brand story */}
+        <div className={styles.statementWrap}>
+          <div ref={statementRef}>
+            <h2 className={styles.statement}>
+              Momstitched isn&apos;t just a clothing brand - it&apos;s a story
+              stitched with love, resilience, and family.
+            </h2>
+          </div>
+          <div className={styles.story} ref={supportRef}>
+            {STORY.map((para, i) => (
+              <p className={styles.storyText} key={i}>
+                {para}
+              </p>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className={styles.aboutHeroImg} ref={heroImgRef}>
-        <Image
-          src="/about/portrait-2-min.jpg"
-          alt="Portrait"
-          fill
-          sizes="100vw"
-          className={styles.heroImage}
+      {/* Full-width scroll-scaled middle image (Image 2) */}
+      <div className={styles.scrollImageWrap}>
+        <img
+          ref={scrollImgRef}
+          src={SCROLL_IMAGE}
+          alt="MomStitched craftsmanship"
+          className={styles.scrollImage}
+          loading="lazy"
+          decoding="async"
         />
       </div>
 
-      <div className={styles.container}>
-        <div className={styles.cvWrapper} ref={cvWrapperRef}>
-          <div className={styles.cvHeader} ref={cvHeaderRef}>
-            <h2>CV</h2>
+      <div className={styles.inner}>
+        {/* The family behind the brand */}
+        <div className={styles.people} ref={peopleRef}>
+          <div className={styles.peopleHead}>
+            <span className={styles.peopleEyebrow}>THE FAMILY</span>
+            <h2 className={styles.peopleHeadline}>
+              Not built by a corporation - built by a family, by hand.
+            </h2>
+            <p className={styles.peopleIntro}>
+              Behind every Momstitched piece is one small family doing every
+              part themselves - designing, stitching, packing, and shipping
+              straight from our home in India to yours. These are the two women
+              at the very heart of it.
+            </p>
           </div>
 
-          <div ref={cvListRef}>
-            {cvItems.map((item, index) => (
-              <div className={styles.cvItem} key={index}>
-                <div className={styles.cvName}>
-                  <h3>{item.name}</h3>
-                </div>
-                <div className={styles.cvYear}>
-                  <h3>{item.year}</h3>
-                </div>
+          {PEOPLE.map((person) => (
+            <article
+              key={person.name}
+              className={`${styles.profile} ${
+                person.reverse ? styles.profileReverse : ""
+              }`}
+            >
+              <div className={styles.profileImg}>
+                <Image
+                  src={person.image}
+                  alt={person.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 45vw"
+                  className="object-cover"
+                />
               </div>
-            ))}
+              <div className={styles.profileBody}>
+                <span className={styles.profileRole}>{person.role}</span>
+                <h3 className={styles.profileName}>{person.name}</h3>
+                {person.bio.map((para, i) => (
+                  <p className={styles.profileBio} key={i}>
+                    {para}
+                  </p>
+                ))}
+              </div>
+            </article>
+          ))}
+
+          {/* CTA */}
+          <div className={styles.ctaWrap}>
+            <a className={styles.rollBtn} href="/contact">
+              <span className={styles.rollText}>
+                <span className={styles.rollOut}>get in touch</span>
+                <span className={styles.rollIn} aria-hidden="true">
+                  get in touch
+                </span>
+              </span>
+              <span className={styles.rollArrow} aria-hidden="true">
+                ↗
+              </span>
+            </a>
           </div>
         </div>
       </div>
