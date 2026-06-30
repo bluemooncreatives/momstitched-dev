@@ -56,9 +56,13 @@ const nextConfig = {
                 headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
             },
             {
-                // Cache hero and other static images for 1 week
+                // Cache hero and other static images for 1 year. The /_next/image
+                // optimizer inherits this max-age for its output, so a short TTL here
+                // is what made Lighthouse flag "inefficient cache lifetimes" on the
+                // optimized hero/thumbnail URLs. stale-while-revalidate lets a renamed
+                // asset refresh in the background without blocking the response.
                 source: '/assets/images/:path*',
-                headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }],
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, stale-while-revalidate=86400' }],
             },
         ]
     },

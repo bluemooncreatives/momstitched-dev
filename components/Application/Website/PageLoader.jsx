@@ -8,10 +8,21 @@ gsap.registerPlugin(CustomEase)
 
 const PageLoader = ({ onReady, onComplete }) => {
     const loaderRef = useRef(null)
-    const [count, setCount] = useState(0)
     const [isLoaded, setIsLoaded] = useState(false)
     const countRef = useRef(0)
+    const countTextRef = useRef(null)
     const tlRef = useRef(null)
+
+    // Write the counter straight to the DOM instead of through React state.
+    // GSAP fires onUpdate ~60x/s during the most load-sensitive window; routing
+    // each tick through setState would queue ~90 renders/reconciliations and an
+    // equal number of forced reflows on a 12rem element, inflating Total Blocking
+    // Time. A direct textContent write keeps the same visual with none of that cost.
+    const paintCount = (value) => {
+        if (countTextRef.current) {
+            countTextRef.current.textContent = value.toString().padStart(2, '0')
+        }
+    }
 
     // Track actual page load
     useEffect(() => {
@@ -42,7 +53,7 @@ const PageLoader = ({ onReady, onComplete }) => {
             duration: 1.5,
             ease: "power2.out",
             onUpdate: () => {
-                setCount(Math.round(countRef.current))
+                paintCount(Math.round(countRef.current))
             }
         })
 
@@ -79,7 +90,7 @@ const PageLoader = ({ onReady, onComplete }) => {
             duration: duration,
             ease: "power2.out",
             onUpdate: () => {
-                setCount(Math.round(countRef.current))
+                paintCount(Math.round(countRef.current))
             }
         })
 
@@ -179,8 +190,8 @@ const PageLoader = ({ onReady, onComplete }) => {
             <div className="divider absolute top-0 left-1/2 origin-top w-px h-full bg-white -translate-x-1/2 scale-y-0 will-change-transform"></div>
 
             <div className="counter absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2]">
-                <h1 className="font-header text-[12rem] max-md:text-[8rem] max-sm:text-[5rem] font-normal text-white will-change-transform">
-                    {count.toString().padStart(2, '0')}
+                <h1 ref={countTextRef} className="font-header text-[12rem] max-md:text-[8rem] max-sm:text-[5rem] font-normal text-white will-change-transform">
+                    00
                 </h1>
             </div>
         </div>
