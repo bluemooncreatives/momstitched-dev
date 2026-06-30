@@ -137,7 +137,7 @@ const EditorialCardsSection = () => {
                             src={card.image}
                             alt={card.heading}
                             fill
-                            quality={90}
+                            quality={82}
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                             className="object-cover will-change-transform"
                         />
