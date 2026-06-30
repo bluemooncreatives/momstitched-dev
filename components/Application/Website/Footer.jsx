@@ -45,15 +45,17 @@ const socialLinks = [
 const LinkColumn = ({ title, links }) => (
     <div className='footer-col'>
         <h3 className='text-2xl font-semibold text-white mb-6'>{title}</h3>
-        <ul className='space-y-2'>
-            {links.map(({ label, href }) => (
-                <li key={`${title}-${label}`}>
-                    <Link href={href} className='text-white/70 hover:text-[var(--brand-cream)] transition-colors'>
-                        {label}
-                    </Link>
-                </li>
-            ))}
-        </ul>
+        <nav aria-label={`${title} links`}>
+            <ul className='space-y-2'>
+                {links.map(({ label, href }) => (
+                    <li key={`${title}-${label}`}>
+                        <Link href={href} className='text-white/70 hover:text-[var(--brand-cream)] transition-colors'>
+                            {label}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </nav>
     </div>
 )
 
@@ -89,7 +91,7 @@ const Footer = ({ categoryLinks = [] }) => {
     }, { scope: rootRef })
 
     return (
-        <footer ref={rootRef} className='sticky z-0 bottom-0 left-0 w-full bg-[var(--brand-primary)] text-white overflow-hidden'>
+        <footer ref={rootRef} className='sticky z-0 bottom-0 left-0 w-full bg-[var(--brand-primary)] text-white overflow-hidden' aria-label='Site footer'>
             <div className='website-gutter pt-14 pb-8'>
 
                 {/* ───── Top row: caption + big email + CTA card ───── */}

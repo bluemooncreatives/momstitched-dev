@@ -24,7 +24,7 @@ const Header = () => {
         <Navbar
           logo={{
             url: WEBSITE_HOME,
-            src: '/assets/images/logo-black.png',
+            src: '/assets/images/logo-black.webp',
             alt: 'MomStitched logo',
             title: 'MomStitched',
           }}

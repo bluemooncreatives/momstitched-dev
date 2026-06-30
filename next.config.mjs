@@ -30,10 +30,13 @@ const securityHeaders = [
     { key: 'X-Content-Type-Options', value: 'nosniff' },
     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
     { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
 ]
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    compress: true,
+    poweredByHeader: false,
     // react-pdf relies on native-ish deps (fontkit, yoga-layout wasm) that must not
     // be bundled — keep it external so it runs correctly in the Node server runtime.
     serverExternalPackages: ['@react-pdf/renderer'],

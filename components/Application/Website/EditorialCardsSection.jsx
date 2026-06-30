@@ -18,7 +18,7 @@ const CARDS = [
         description: "Crafted with a mother's love — each piece carries the warmth, care, and attention that defines who we are.",
         cta: 'Discover More',
         href: '/about-us',
-        image: '/assets/images/hero/03.png',
+        image: '/assets/images/hero/03.webp',
         overlay: 'bg-gradient-to-t from-black/80 via-black/30 to-black/10',
     },
     {
@@ -27,7 +27,7 @@ const CARDS = [
         description: 'From everyday essentials to statement pieces — explore our full range of thoughtfully designed clothing.',
         cta: 'Shop Collection',
         href: WEBSITE_SHOP,
-        image: '/assets/images/hero/01.png',
+        image: '/assets/images/hero/01.webp',
         overlay: 'bg-gradient-to-t from-[var(--dark-red)]/90 via-[var(--dark-red)]/25 to-transparent',
     },
     {
@@ -36,7 +36,7 @@ const CARDS = [
         description: "Have a question or need help finding the right fit? We're always here to help you.",
         cta: 'Get In Touch',
         href: '/contact',
-        image: '/assets/images/hero/04.png',
+        image: '/assets/images/hero/04.webp',
         overlay: 'bg-gradient-to-t from-black/85 via-black/35 to-black/10',
     },
 ]

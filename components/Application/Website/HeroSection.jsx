@@ -22,7 +22,7 @@ const SLIDES = [
     headline: "Mother's Love",
     title: "The Revival Ensemble",
     writeup: "Where tradition meets modern femininity — handcrafted women's wear stitched with a mother's devotion and an artist's eye.",
-    src: "/assets/images/hero/01.png",
+    src: "/assets/images/hero/01.webp",
     alt: "MomStitched festive ethnic wear collection for women",
   },
   {
@@ -30,7 +30,7 @@ const SLIDES = [
     headline: "Timeless",
     title: "Heritage in Every Thread",
     writeup: "Festive ethnic wear and everyday elegance, curated for the woman who carries grace in every step she takes.",
-    src: "/assets/images/hero/02.png",
+    src: "/assets/images/hero/02.webp",
     alt: "MomStitched timeless women's ethnic wear collection",
   },
   {
@@ -38,7 +38,7 @@ const SLIDES = [
     headline: "Elegance",
     title: "The Art of Refined Dressing",
     writeup: "Premium fabrics, thoughtful silhouettes, and meticulous detailing — women's fashion that speaks before you say a word.",
-    src: "/assets/images/hero/03.png",
+    src: "/assets/images/hero/03.webp",
     alt: "MomStitched elegant designer women's wear",
   },
   {
@@ -46,7 +46,7 @@ const SLIDES = [
     headline: "Eternelle",
     title: "Crafted to Be Cherished",
     writeup: "Timeless Indian women's fashion that transcends seasons — pieces made to accompany every celebration, big and small.",
-    src: "/assets/images/hero/04.png",
+    src: "/assets/images/hero/04.webp",
     alt: "MomStitched eternal women's fashion collection",
   },
 ];
@@ -148,7 +148,7 @@ const HeroSection = () => {
         const textureImage = document.createElement("img");
         textureImage.src = slide.src;
         textureImage.alt = slide.alt;
-        textureImage.loading = "lazy";
+        textureImage.loading = "eager";
         textureImage.decoding = "async";
         textureImage.className = "slide-visual h-full w-full object-cover will-change-transform";
         textureImage.style.transformOrigin = "center center";
@@ -481,7 +481,7 @@ const HeroSection = () => {
   return (
     <>
       {showLoader && <PageLoader onReady={handleLoaderReady} onComplete={handleLoaderDone} />}
-      <div ref={sliderRef} className="relative h-svh w-full overflow-hidden bg-black text-white">
+      <div ref={sliderRef} className="relative h-svh w-full overflow-hidden bg-black text-white" role="region" aria-label="Hero image carousel" aria-roledescription="carousel">
         <div ref={sliderImagesRef} className="absolute inset-0 h-full w-full">
           <div className="img absolute inset-0 h-full w-full">
             <Image
@@ -535,7 +535,7 @@ const HeroSection = () => {
         </div>
 
         {/* Counter */}
-        <div className="absolute bottom-8 left-1/2 z-20 flex h-6 -translate-x-1/2 gap-2 overflow-hidden max-lg:bottom-40">
+        <div className="absolute bottom-8 left-1/2 z-20 flex h-6 -translate-x-1/2 gap-2 overflow-hidden max-lg:bottom-40" aria-live="polite" aria-atomic="true">
           <div className="flex-1">
             <div ref={counterRef} className="relative top-0 will-change-transform">
               {SLIDES.map((slide) => (
@@ -554,7 +554,7 @@ const HeroSection = () => {
         </div>
 
         {/* Preview thumbnails with progress bars */}
-        <div className="slider-preview absolute bottom-8 right-8 z-20 flex h-[64px] w-[34%] gap-2.5 max-lg:right-1/2 max-lg:h-[58px] max-lg:w-[92%] max-lg:translate-x-1/2 max-lg:gap-1.5">
+        <div className="slider-preview absolute bottom-8 right-8 z-20 flex h-[64px] w-[34%] gap-2.5 max-lg:right-1/2 max-lg:h-[58px] max-lg:w-[92%] max-lg:translate-x-1/2 max-lg:gap-1.5" role="tablist" aria-label="Slide thumbnails">
           {SLIDES.map((slide, index) => (
             <div
               key={slide.id}

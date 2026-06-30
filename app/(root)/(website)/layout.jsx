@@ -8,7 +8,7 @@ const Layout = async ({ children }) => {
     return (
         <div className='font-neue overflow-x-hidden'>
             <Header />
-            <main className='relative min-h-screen bg-background'>
+            <main id="main-content" className='relative min-h-screen bg-background'>
                 {children}
             </main>
             <Footer categoryLinks={footerCategories} />

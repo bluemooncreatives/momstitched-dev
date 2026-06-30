@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import logoWhite from '@/public/assets/images/logo-white.png'
+import logoWhite from '@/public/assets/images/logo-white.webp'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 
 const TeamSwitcher = ({ teams = [] }) => {

@@ -68,7 +68,7 @@ export default function Navbar({
   return (
     <section className="py-4">
       <div className="w-full px-4 lg:px-10">
-        <nav className="hidden grid-cols-[1fr_auto_1fr] items-center lg:grid">
+        <nav className="hidden grid-cols-[1fr_auto_1fr] items-center lg:grid" aria-label="Main navigation">
           <div className="flex items-center gap-8">
             {menu.map((item) => (
               <Link
@@ -128,7 +128,7 @@ export default function Navbar({
           </div>
         </nav>
 
-        <div className="flex items-center justify-between lg:hidden">
+        <div className="flex items-center justify-between lg:hidden" role="navigation" aria-label="Mobile navigation">
           <Link
             href={logo.url}
             className="font-header text-2xl leading-none tracking-wide text-[var(--brand-primary)]"

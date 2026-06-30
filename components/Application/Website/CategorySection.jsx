@@ -12,7 +12,7 @@ const CATEGORIES = [
     { 
         label: 'mens', 
         name: 'MENS',
-        image: '/assets/images/hero/01.png',
+        image: '/assets/images/hero/01.webp',
         href: `${WEBSITE_SHOP}?category=mens`
     },
     { 
