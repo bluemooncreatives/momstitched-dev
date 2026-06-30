@@ -276,6 +276,11 @@
   margin-top: var(--about-gap);
 }
 
+/* ── Curated For You · You May Also Like ─────────────────────────── */
+.related {
+  margin-top: var(--about-gap);
+}
+
 /* ── Shared masked line-reveal helpers (SplitType) ──────────────── */
 .lineWrapper {
   display: block;

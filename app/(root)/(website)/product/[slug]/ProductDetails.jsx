@@ -11,6 +11,7 @@ import {
 import {
     ChevronLeft,
     ChevronRight,
+    Loader2,
     Minus,
     Plus,
     RefreshCw,
@@ -21,7 +22,7 @@ import {
 } from 'lucide-react'
 import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute"
 import Image from "next/image"
-import Link from "next/link"
+import Link, { useLinkStatus } from "next/link"
 import { useEffect, useMemo, useState } from "react"
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import ButtonLoading from "@/components/Application/ButtonLoading"
@@ -29,7 +30,6 @@ import { useDispatch, useSelector } from "react-redux"
 import { addIntoCart, increaseQuantity, decreaseQuantity, removeFromCart } from "@/store/reducer/cartReducer"
 import { showToast } from "@/lib/showToast"
 import { Button } from "@/components/ui/button"
-import loadingSvg from '@/public/assets/images/loading.svg'
 import ProductReveiw from "@/components/Application/Website/ProductReveiw"
 import ProductBox from "@/components/Application/Website/ProductBox"
 import SizeGuideModal from "@/components/Application/Website/SizeGuideModal"
@@ -38,6 +38,20 @@ import { resolveColorStyle } from "@/lib/colorMap"
 import { MAX_CART_QTY } from "@/lib/cartConstants"
 
 const MAX_QTY = MAX_CART_QTY
+
+// Non-blocking pending indicator for variant <Link>s. Rendered as a child of a
+// Link, it reads that link's navigation status and overlays a small spinner on
+// just the clicked swatch/size while the new variant loads — so the rest of the
+// page stays interactive instead of being hidden behind a fullscreen loader.
+const NavSpinner = () => {
+    const { pending } = useLinkStatus()
+    if (!pending) return null
+    return (
+        <span className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[inherit] bg-background/70 backdrop-blur-[1px]">
+            <Loader2 className="size-4 animate-spin text-[var(--dark-red)]" />
+        </span>
+    )
+}
 
 // Renders 5 stars reflecting a real average (full / half / empty) instead of
 // a hard-coded 5-star row, so an unrated product shows empty stars.
@@ -63,7 +77,6 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
     const media = variant?.media?.length ? variant.media : []
     const [activeIndex, setActiveIndex] = useState(0)
     const [qty, setQty] = useState(1)
-    const [isProductLoading, setIsProductLoading] = useState(false)
     const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false)
     // Color swatch resolution uses CSS.supports (browser-only). Gate the
     // resolved fill behind a mount flag to avoid an SSR/client hydration
@@ -78,7 +91,6 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
     useEffect(() => {
         setActiveIndex(0)
         setQty(1)
-        setIsProductLoading(false)
     }, [variant?._id])
 
     // The live cart line for the *currently selected* variant (or null). Derived
@@ -174,12 +186,6 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
     return (
         <section className="website-gutter bg-[linear-gradient(180deg,rgba(62,0,13,0.03),transparent_18%)] py-8 lg:py-12">
             <div className="w-full font-neue">
-
-                {isProductLoading && (
-                    <div className="fixed inset-0 z-[var(--z-overlay)] flex items-center justify-center bg-background/40 backdrop-blur-[1px]">
-                        <Image src={loadingSvg} width={72} height={72} alt="Loading" />
-                    </div>
-                )}
 
                 <div className="mb-6 lg:mb-8">
                     <Breadcrumb>
@@ -356,7 +362,6 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                             <Link
                                                 key={name}
                                                 href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${encodeURIComponent(name)}&size=${encodeURIComponent(sizeForColor(name))}`}
-                                                onClick={() => !isSelected && setIsProductLoading(true)}
                                                 title={name}
                                                 aria-label={`Color ${name}`}
                                                 aria-pressed={isSelected}
@@ -377,6 +382,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                                         </span>
                                                     )}
                                                 </span>
+                                                {!isSelected && <NavSpinner />}
                                             </Link>
                                         )
                                     })}
@@ -418,16 +424,16 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                             <Link
                                                 key={size}
                                                 href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${encodeURIComponent(variant.color)}&size=${encodeURIComponent(size)}`}
-                                                onClick={() => !isSelected && setIsProductLoading(true)}
                                                 aria-pressed={isSelected}
                                                 className={cn(
-                                                    'min-w-[44px] rounded-[var(--radius-sm)] border px-3.5 py-2 text-center text-sm font-medium transition',
+                                                    'relative min-w-[44px] rounded-[var(--radius-sm)] border px-3.5 py-2 text-center text-sm font-medium transition',
                                                     isSelected
                                                         ? 'border-[var(--dark-red)] bg-[var(--dark-red)] text-white'
                                                         : 'border-border/70 hover:border-foreground/50 hover:bg-muted/40'
                                                 )}
                                             >
                                                 {size}
+                                                {!isSelected && <NavSpinner />}
                                             </Link>
                                         )
                                     })}

@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 const CONTENT = {
     leftImage: {
-        src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1773413317/ybacm7phf5v1rwmh2brn.jpg',
+        src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1781938294/f1rs5jiyvniqa7s9r15p.jpg',
         alt: 'MomStitched — handcrafted women\'s fashion',
     },
     smallImage: {
@@ -22,7 +22,7 @@ const CONTENT = {
         alt: 'A detail from the MomStitched collection',
     },
     bottomImage: {
-        src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1768029766/njlqt8ppnjuxjklvdst5.jpg',
+        src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1781947914/wbbpf3ivaxy7f8geenmb.jpg',
         alt: 'MomStitched atelier at work',
     },
     paragraphs: [

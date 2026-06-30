@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import ProductDetails from './ProductDetails'
 import { getProductDetailsBySlug, getRelatedProducts } from '@/lib/services/productService'
-import { htmlToText } from '@/lib/utils'
+import { htmlToText, pickRandom } from '@/lib/utils'
 
 export async function generateMetadata({ params }) {
     const { slug } = await params
@@ -32,10 +32,12 @@ const ProductPage = async ({ params, searchParams }) => {
 
     if (!productData) notFound()
 
-    const relatedProducts = await getRelatedProducts(
+    // Fetch the cached pool, then randomly pick 4 so the rail varies each visit.
+    const relatedPool = await getRelatedProducts(
         productData.product._id,
         productData.product.category?._id
     )
+    const relatedProducts = pickRandom(relatedPool, 4)
 
     return (
         <ProductDetails

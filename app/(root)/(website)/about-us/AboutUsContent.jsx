@@ -8,6 +8,7 @@ import CustomEase from "gsap/CustomEase";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import SplitType from "@/lib/SplitType/index";
 import ShopAllButton from "@/components/Application/Website/ShopAllButton";
+import ProductBox from "@/components/Application/Website/ProductBox";
 import styles from "./about-us.module.css";
 
 if (typeof window !== "undefined") {
@@ -66,7 +67,7 @@ const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const AboutUsContent = () => {
+const AboutUsContent = ({ products = [] }) => {
   const container = useRef(null);
   const headlineRef = useRef(null);
   const statementRef = useRef(null);
@@ -435,6 +436,28 @@ const AboutUsContent = () => {
           </div>
         </div>
       </div>
+
+      {/* ── Curated For You · You May Also Like (centered) ───────────── */}
+      {products.length > 0 && (
+        <div className={styles.inner}>
+          <section className={styles.related}>
+            <div className="mb-8 text-center lg:mb-10">
+              <p className="text-[1rem] font-semibold uppercase text-[var(--dark-red)]/60">
+                Curated For You
+              </p>
+              <h2 className="mt-1.5 font-neue text-[clamp(1.6rem,3.4vw,2.6rem)] font-medium uppercase leading-[1.1] text-[var(--dark-red-2)]">
+                You May Also Like
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
+              {products.map((item) => (
+                <ProductBox key={item._id} product={item} />
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 };
