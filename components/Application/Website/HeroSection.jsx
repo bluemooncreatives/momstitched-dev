@@ -569,7 +569,6 @@ const HeroSection = () => {
                 src={slide.src}
                 alt={slide.alt}
                 fill
-                priority
                 sizes="(max-width: 1024px) 24vw, 12vw"
                 className="h-full w-full object-cover"
               />

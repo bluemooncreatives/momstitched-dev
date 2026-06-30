@@ -2,16 +2,6 @@ import GlobalProvider from "@/components/Application/GlobalProvider";
 import LenisProvider from '@/components/Application/LenisProvider'
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-import { Assistant, Geist } from 'next/font/google'
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const assistantFont = Assistant({
-  weight: ['400', '500', '600', '700', '800'],
-  subsets: ['latin'],
-  display: 'swap'
-})
 
 export const metadata = {
   metadataBase: new URL('https://www.momstitched.com'),
@@ -66,7 +56,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en" className="font-sans">
       <head>
         {/* Preconnect to Cloudinary — product images, hero thumbnails, and Instagram
             videos all resolve from this origin. dns-prefetch is the fallback for
@@ -81,9 +71,7 @@ export default function RootLayout({ children }) {
         <link rel="preload" href="/assets/font/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/assets/font/PPNeueMontreal-Book.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
-      <body
-        className={`${assistantFont.className} antialiased`}
-      >
+      <body className="antialiased">
         <GlobalProvider>
           <Toaster />
           <LenisProvider>
