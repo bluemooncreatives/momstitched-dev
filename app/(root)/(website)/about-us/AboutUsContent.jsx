@@ -7,6 +7,7 @@ import { useGSAP } from "@gsap/react";
 import CustomEase from "gsap/CustomEase";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import SplitType from "@/lib/SplitType/index";
+import ShopAllButton from "@/components/Application/Website/ShopAllButton";
 import styles from "./about-us.module.css";
 
 if (typeof window !== "undefined") {
@@ -423,19 +424,14 @@ const AboutUsContent = () => {
             </article>
           ))}
 
-          {/* CTA */}
+          {/* CTA — shared website button for consistent styling */}
           <div className={styles.ctaWrap}>
-            <a className={styles.rollBtn} href="/contact">
-              <span className={styles.rollText}>
-                <span className={styles.rollOut}>get in touch</span>
-                <span className={styles.rollIn} aria-hidden="true">
-                  get in touch
-                </span>
-              </span>
-              <span className={styles.rollArrow} aria-hidden="true">
-                ↗
-              </span>
-            </a>
+            <ShopAllButton
+              label="Get in touch"
+              href="/contact"
+              colorScheme="dark-red"
+              radius="sm"
+            />
           </div>
         </div>
       </div>

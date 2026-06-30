@@ -276,62 +276,6 @@
   margin-top: var(--about-gap);
 }
 
-/* Roll-up letter button */
-.rollBtn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  height: 3.25rem;
-  padding: 0 2.25rem;
-  border: 1px solid var(--about-fg);
-  border-radius: 9999px;
-  background: transparent;
-  color: var(--about-fg);
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-  overflow: hidden;
-  transition: background-color 0.4s var(--ease-out), color 0.4s var(--ease-out),
-    border-color 0.4s var(--ease-out);
-}
-.rollBtn:hover {
-  background: var(--about-accent);
-  border-color: var(--about-accent);
-  color: var(--brand-white);
-}
-.rollBtn:focus-visible {
-  outline: 2px solid var(--about-accent);
-  outline-offset: 3px;
-}
-
-/* Two stacked label layers that roll on hover */
-.rollText {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-  height: 1.2em;
-  line-height: 1.2em;
-}
-.rollText span {
-  display: block;
-  transition: transform 0.45s var(--ease-out-circ);
-}
-.rollText .rollIn {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: translateY(110%);
-}
-.rollBtn:hover .rollText .rollOut { transform: translateY(-110%); }
-.rollBtn:hover .rollText .rollIn  { transform: translateY(0); }
-
-.rollArrow {
-  transition: transform 0.45s var(--ease-out-circ);
-}
-.rollBtn:hover .rollArrow { transform: translate(3px, -3px); }
-
 /* ── Shared masked line-reveal helpers (SplitType) ──────────────── */
 .lineWrapper {
   display: block;
