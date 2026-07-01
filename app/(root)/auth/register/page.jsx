@@ -105,7 +105,7 @@ const RegisterPage = () => {
                                         <FormItem>
                                             <FormLabel className="text-sm text-foreground">Full Name</FormLabel>
                                             <FormControl>
-                                                <Input type="text" placeholder="Your Full Name" className="h-11 rounded-lg bg-background px-3" {...field} />
+                                                <Input type="text" placeholder="Your Full Name" className="form-field" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -120,7 +120,7 @@ const RegisterPage = () => {
                                         <FormItem>
                                             <FormLabel className="text-sm text-foreground">Email</FormLabel>
                                             <FormControl>
-                                                <Input type="email" placeholder="example@gmail.com" className="h-11 rounded-lg bg-background px-3" {...field} />
+                                                <Input type="email" placeholder="example@gmail.com" className="form-field" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -135,7 +135,7 @@ const RegisterPage = () => {
                                         <FormItem className="relative">
                                             <FormLabel className="text-sm text-foreground">Password</FormLabel>
                                             <FormControl>
-                                                <Input type="password" placeholder="***********" className="h-11 rounded-lg bg-background px-3" {...field} />
+                                                <Input type="password" placeholder="***********" className="form-field" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -150,9 +150,9 @@ const RegisterPage = () => {
                                         <FormItem className="relative">
                                             <FormLabel className="text-sm text-foreground">Confirm Password</FormLabel>
                                             <FormControl>
-                                                <Input type={isTypePassword ? 'password' : 'text'} placeholder="***********" className="h-11 rounded-lg bg-background px-3 pr-10" {...field} />
+                                                <Input type={isTypePassword ? 'password' : 'text'} placeholder="***********" className="form-field !pr-10" {...field} />
                                             </FormControl>
-                                            <button className='absolute right-3 top-[36px] cursor-pointer text-muted-foreground hover:text-foreground' type='button' onClick={() => setIsTypePassword(!isTypePassword)}>
+                                            <button className='absolute right-3 top-[32px] cursor-pointer text-muted-foreground hover:text-foreground' type='button' onClick={() => setIsTypePassword(!isTypePassword)}>
                                                 {isTypePassword ? (
                                                     <EyeOff className='size-4' />
                                                 ) : (
@@ -166,7 +166,7 @@ const RegisterPage = () => {
                             </div>
 
                             <div className='pt-1'>
-                                <ButtonLoading loading={loading} type="submit" text="Create Account" className="h-10 w-full cursor-pointer rounded-lg" />
+                                <ButtonLoading loading={loading} type="submit" text="Create Account" variant="brand" className="h-9 w-full rounded-sm text-base font-semibold uppercase cursor-pointer" />
                             </div>
 
                             <div className='text-center text-sm'>

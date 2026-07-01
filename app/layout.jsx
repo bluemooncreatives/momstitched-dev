@@ -6,11 +6,11 @@ import "./globals.css";
 export const metadata = {
   metadataBase: new URL('https://www.momstitched.com'),
   title: {
-    default: 'MomStitched — Handcrafted Women\'s Ethnic Wear',
+    default: 'MomStitched - Handcrafted Women\'s Ethnic Wear',
     template: '%s | MomStitched',
   },
   description:
-    "From everyday comfort to festive charm, MomStitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
+    "From everyday comfort to festive charm, Momstitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
   robots: {
     index: true,
     follow: true,
@@ -26,24 +26,24 @@ export const metadata = {
     type: 'website',
     locale: 'en_IN',
     siteName: 'MomStitched',
-    title: 'MomStitched — Handcrafted Women\'s Ethnic Wear',
+    title: 'MomStitched - Handcrafted Women\'s Ethnic Wear',
     description:
-      "From everyday comfort to festive charm, MomStitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
+      "From everyday comfort to festive charm, Momstitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
     url: 'https://www.momstitched.com',
     images: [
       {
         url: '/assets/images/hero/01.webp',
         width: 1200,
         height: 630,
-        alt: 'MomStitched — Handcrafted Women\'s Ethnic Wear',
+        alt: 'MomStitched - Handcrafted Women\'s Ethnic Wear',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MomStitched — Handcrafted Women\'s Ethnic Wear',
+    title: 'Momstitched - Handcrafted Women\'s Ethnic Wear',
     description:
-      "From everyday comfort to festive charm, MomStitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
+      "From everyday comfort to festive charm, Momstitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
     images: ['/assets/images/hero/01.webp'],
   },
   icons: {

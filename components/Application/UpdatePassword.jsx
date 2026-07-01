@@ -80,7 +80,7 @@ const UpdatePassword = ({ email }) => {
                                     <FormItem className="relative">
                                         <FormLabel>Password</FormLabel>
                                         <FormControl>
-                                            <Input type="password" placeholder="***********" {...field} />
+                                            <Input type="password" placeholder="***********" className="form-field" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -95,9 +95,9 @@ const UpdatePassword = ({ email }) => {
                                     <FormItem className="relative">
                                         <FormLabel>Confirm Password</FormLabel>
                                         <FormControl>
-                                            <Input type={isTypePassword ? 'password' : 'text'} placeholder="***********" {...field} />
+                                            <Input type={isTypePassword ? 'password' : 'text'} placeholder="***********" className="form-field !pr-10" {...field} />
                                         </FormControl>
-                                        <button className='absolute top-1/2 right-2 cursor-pointer' type='button' onClick={() => setIsTypePassword(!isTypePassword)}>
+                                        <button className='absolute top-[32px] right-3 cursor-pointer text-muted-foreground hover:text-foreground' type='button' onClick={() => setIsTypePassword(!isTypePassword)}>
                                             {isTypePassword ?
                                                 <EyeOff className='size-4' />
                                                 :
@@ -110,7 +110,7 @@ const UpdatePassword = ({ email }) => {
                             />
                         </div>
                         <div className='mb-3'>
-                            <ButtonLoading loading={loading} type="submit" text="Update Password" className="w-full cursor-pointer" />
+                            <ButtonLoading loading={loading} type="submit" text="Update Password" variant="brand" className="h-9 w-full rounded-sm text-base font-semibold uppercase cursor-pointer" />
                         </div>
                     </form>
                 </Form>

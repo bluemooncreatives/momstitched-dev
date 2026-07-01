@@ -91,7 +91,7 @@ const ChangePasswordSection = ({ hasPassword = false, onPasswordSet }) => {
                                     <FormItem>
                                         <FormLabel className="text-[13px] text-foreground/60">Current Password</FormLabel>
                                         <FormControl>
-                                            <Input type="password" autoComplete="current-password" placeholder="Enter current password" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                            <Input type="password" autoComplete="current-password" placeholder="Enter current password" className="form-field" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -106,9 +106,9 @@ const ChangePasswordSection = ({ hasPassword = false, onPasswordSet }) => {
                                 <FormItem className="relative">
                                     <FormLabel className="text-[13px] text-foreground/60">New Password</FormLabel>
                                     <FormControl>
-                                        <Input type={showPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="Enter new password" className="h-11 pr-10 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                        <Input type={showPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="Enter new password" className="form-field !pr-10" {...field} />
                                     </FormControl>
-                                    <button type="button" onClick={() => setShowPassword((p) => !p)} className="absolute right-3 top-[34px] cursor-pointer text-muted-foreground hover:text-foreground">
+                                    <button type="button" onClick={() => setShowPassword((p) => !p)} className="absolute right-3 top-[31px] cursor-pointer text-muted-foreground hover:text-foreground">
                                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                                     </button>
                                     <FormMessage />
@@ -123,7 +123,7 @@ const ChangePasswordSection = ({ hasPassword = false, onPasswordSet }) => {
                                 <FormItem>
                                     <FormLabel className="text-[13px] text-foreground/60">Confirm New Password</FormLabel>
                                     <FormControl>
-                                        <Input type={showPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="Re-enter new password" className="h-11 text-base font-semibold text-[var(--brand-primary)]" {...field} />
+                                        <Input type={showPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="Re-enter new password" className="form-field" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

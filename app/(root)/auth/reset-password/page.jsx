@@ -106,14 +106,14 @@ const ResetPassword = () => {
                                             <FormItem>
                                                 <FormLabel className="text-sm text-foreground">Email</FormLabel>
                                                 <FormControl>
-                                                    <Input type="email" placeholder="example@gmail.com" className="h-11 rounded-lg bg-background px-3" {...field} />
+                                                    <Input type="email" placeholder="example@gmail.com" className="form-field" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
                                     <div className='pt-1'>
-                                        <ButtonLoading loading={emailVerificationLoading} type="submit" text="Send OTP" className="h-10 w-full cursor-pointer rounded-lg" />
+                                        <ButtonLoading loading={emailVerificationLoading} type="submit" text="Send OTP" variant="brand" className="h-9 w-full rounded-sm text-base font-semibold uppercase cursor-pointer" />
                                     </div>
                                     <div className='text-center text-sm'>
                                         <div className='flex justify-center items-center gap-1'>
