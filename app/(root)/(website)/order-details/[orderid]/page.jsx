@@ -121,12 +121,12 @@ const OrderDetails = async ({ params }) => {
                     {/* ── Header card ── */}
                     <div className='overflow-hidden rounded-2xl border border-border/60 bg-background shadow-sm'>
                         <div className='flex flex-col gap-4 border-b border-border/60 bg-[var(--brand-warm-bg)]/40 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6'>
-                            <div className='flex items-start gap-3'>
+                            <div className='flex min-w-0 items-start gap-3'>
                                 <div className='flex size-11 flex-shrink-0 items-center justify-center rounded-full bg-[var(--dark-red)] text-white'>
                                     <ShoppingBag className='size-5' />
                                 </div>
-                                <div>
-                                    <h1 className='text-lg font-semibold uppercase tracking-[0.02em] text-foreground'>
+                                <div className='min-w-0'>
+                                    <h1 className='break-all text-base font-semibold uppercase tracking-[0.02em] text-foreground sm:text-lg'>
                                         Order #{orderData?.order_id}
                                     </h1>
                                     {placedOn && (
