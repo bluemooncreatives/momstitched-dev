@@ -33,6 +33,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# JVM crash logs (e.g. from the VS Code Red Hat Java / JDT language server)
+hs_err_pid*.log
+replay_pid*.log
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
