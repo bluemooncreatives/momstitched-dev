@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Minus, Plus, Crown, Sparkles } from 'lucide-react'
 import { resolveColorStyle } from '@/lib/colorMap'
-const Filter = ({ filters }) => {
+const Filter = ({ filters, showClearLink = true }) => {
     const instanceId = useId()
     const searchParams = useSearchParams()
 
@@ -152,7 +152,7 @@ const Filter = ({ filters }) => {
 
     return (
         <div className="space-y-6 text-sm font-neue">
-            {hasFilters && (
+            {hasFilters && showClearLink && (
                 <Button type="button" variant="link" className="h-auto w-fit p-0 text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground" asChild>
                     <Link href={WEBSITE_SHOP}>
                         Clear Filters
