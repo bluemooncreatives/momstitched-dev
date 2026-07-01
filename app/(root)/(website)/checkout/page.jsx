@@ -309,13 +309,19 @@ const Checkout = () => {
 
             const order_id = generateOrderId.order_id
 
+            if (typeof window === 'undefined' || !window.Razorpay) {
+                throw new Error('Payment gateway is not ready. Please refresh and try again.')
+            }
+
+            const razorpayLogoUrl = new URL('/assets/images/logo-white.webp', window.location.origin).toString()
+
             const razOption = {
                 "key": process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 "amount": payableAmount * 100,
                 "currency": "INR",
-                "name": "E-store",
-                "description": 'Full Payment for order',
-                "image": "https://res.cloudinary.com/dg7efdu9o/image/upload/v1750052410/logo-black_mb1rve.webp",
+                "name": "MomStitched",
+                "description": "Handcrafted Women's Fashion",
+                "image": razorpayLogoUrl,
                 "order_id": order_id,
                 "handler": async function (response) {
                     setSavingOrder(true)
@@ -354,10 +360,6 @@ const Checkout = () => {
                 "theme": {
                     "color": "#3E000D"
                 }
-            }
-
-            if (typeof window === 'undefined' || !window.Razorpay) {
-                throw new Error('Payment gateway is not ready. Please refresh and try again.')
             }
 
             const rzp = new window.Razorpay(razOption)
