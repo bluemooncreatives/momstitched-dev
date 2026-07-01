@@ -56,9 +56,9 @@ const CartPageClient = () => {
 
     return (
         <div>
-            <section className="relative isolate h-[280px] overflow-hidden sm:h-[220px] lg:h-[280px]">
+            <section className="relative isolate h-[172px] overflow-hidden sm:h-[220px] lg:h-[280px]">
                 <div className="absolute inset-0 bg-[var(--dark-red-2)]" />
-                <div className="absolute inset-x-0 top-3 z-10 flex justify-center sm:top-5 lg:top-6">
+                <div className="absolute inset-x-0 top-14 z-10 flex justify-center sm:top-5 lg:top-6">
                     <div
                         className="pointer-events-none select-none font-neue font-semibold uppercase tracking-[0.02em] text-white/90"
                         style={{
@@ -73,10 +73,10 @@ const CartPageClient = () => {
                         Cart
                     </div>
                 </div>
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-36 bg-gradient-to-b from-transparent via-white/50 to-white" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-16 bg-gradient-to-b from-transparent via-white/50 to-white sm:h-36" />
             </section>
 
-            <section className="website-gutter bg-background py-10 lg:py-14">
+            <section className="website-gutter bg-background pt-4 pb-10 sm:py-10 lg:py-14">
                 <div className="grid w-full gap-6 lg:grid-cols-[290px_1fr] lg:gap-8">
                     {isEmpty ? (
                         <div className="lg:col-span-2">

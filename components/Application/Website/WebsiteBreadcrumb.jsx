@@ -2,12 +2,13 @@
 
 const WebsiteBreadcrumb = ({ props }) => {
     return (
-        <section className="relative isolate h-[160px] overflow-hidden lg:h-[200px]">
+        <section className="relative isolate h-[180px] overflow-hidden sm:h-[160px] lg:h-[200px]">
             {/* Brand background */}
             <div className="absolute inset-0 bg-[var(--dark-red-2)]" />
 
-            {/* Watermark title text — same pattern as /shop hero */}
-            <div className="absolute inset-x-0 top-4 z-10 flex justify-center sm:top-6 lg:top-0">
+            {/* Watermark title text — same pattern as /shop hero. On mobile the
+                title is pushed below the fixed header so it isn't clipped. */}
+            <div className="absolute inset-x-0 top-16 z-10 flex justify-center sm:top-6 lg:top-0">
                 <div
                     className="pointer-events-none select-none font-neue font-semibold uppercase tracking-tighter text-white"
                     style={{
@@ -23,7 +24,7 @@ const WebsiteBreadcrumb = ({ props }) => {
             </div>
 
             {/* Gradient fade to background */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-36 bg-gradient-to-b from-transparent via-background/50 to-background" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-16 bg-gradient-to-b from-transparent via-background/50 to-background sm:h-36" />
 
 
         </section>

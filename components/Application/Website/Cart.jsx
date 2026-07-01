@@ -53,14 +53,9 @@ const Cart = () => {
                 {/* Header */}
                 <SheetHeader className="flex-shrink-0 border-b border-border/50 px-5 py-4 sm:px-6 sm:py-5">
                     <div className="flex items-center justify-between pr-8">
-                        <div className="flex items-center gap-2.5 sm:gap-0">
-                            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--brand-cream)]/60 text-[var(--brand-primary)] sm:hidden">
-                                <ShoppingCart className="size-4" strokeWidth={1.75} />
-                            </span>
-                            <SheetTitle className="font-header text-2xl leading-none tracking-wide text-[var(--brand-primary)] sm:font-neue sm:text-xl sm:font-semibold sm:leading-normal sm:tracking-[0.01em] sm:text-foreground">
-                                My Cart
-                            </SheetTitle>
-                        </div>
+                        <SheetTitle className="font-header text-2xl leading-none tracking-wide text-[var(--brand-primary)] sm:font-neue sm:text-xl sm:font-semibold sm:leading-normal sm:tracking-[0.01em] sm:text-foreground">
+                            My Cart
+                        </SheetTitle>
                         {cartCount > 0 && (
                             <span className="rounded-full bg-[var(--brand-cream)]/60 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--brand-primary)] sm:bg-muted/60 sm:text-muted-foreground">
                                 {cartCount} {cartCount === 1 ? 'item' : 'items'}

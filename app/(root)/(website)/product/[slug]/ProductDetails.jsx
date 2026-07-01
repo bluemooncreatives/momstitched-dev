@@ -453,7 +453,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                             </Button>
                         ) : !inCart ? (
                             /* ── Not in cart: pick a quantity, then add ──────────── */
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+                            <div className="flex flex-row items-stretch gap-3">
                                 <div className="inline-flex h-12 shrink-0 items-center rounded-[var(--radius-sm)] border border-border/70">
                                     <button
                                         type="button"
@@ -488,7 +488,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                             </div>
                         ) : (
                             /* ── In cart: live stepper bound to the cart line ────── */
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+                            <div className="flex flex-row items-stretch gap-3">
                                 <div className="inline-flex h-12 shrink-0 items-center rounded-[var(--radius-sm)] border border-[var(--dark-red)]/40 bg-[var(--brand-cream)]/30">
                                     <button
                                         type="button"
