@@ -95,7 +95,7 @@
   letter-spacing: -0.04em;
   line-height: 0.8;
   font-size: clamp(4.5rem, 21vw, 17rem);
-  color: var(--about-fg);
+  color: var(--brand-primary);   /* #3E000D oxblood */
   /* sits below the mask until revealed */
   transform: translateY(110%);
   will-change: transform;

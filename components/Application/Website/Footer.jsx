@@ -164,7 +164,22 @@ const Footer = ({ categoryLinks = [] }) => {
             {/* ───── Bottom bar (purple) ───── */}
             <div className='bg-[var(--brand-ink-soft)] text-[var(--brand-cream)]'>
                 <div className='website-gutter py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm'>
-                    <p>Copyright © {new Date().getFullYear()} MomStitched. All Rights Reserved.</p>
+                    <div className='flex flex-col items-center gap-1 sm:flex-row sm:items-center sm:gap-3'>
+                        <p>Copyright © {new Date().getFullYear()} MomStitched. All Rights Reserved.</p>
+                        <span className='hidden text-[var(--brand-cream)]/40 sm:inline' aria-hidden='true'>•</span>
+                        <p className='text-[var(--brand-cream)]/70'>
+                            Designed, built &amp; engineered end-to-end by{' '}
+                            <Link
+                                href='https://www.instagram.com/bluemoon.creatives/'
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                aria-label='Blue Moon Creatives on Instagram'
+                                className='font-semibold text-[var(--brand-cream)] underline decoration-[var(--brand-cream)]/40 underline-offset-2 transition-colors hover:text-[var(--brand-white)] hover:decoration-[var(--brand-white)]'
+                            >
+                                Blue Moon Creatives
+                            </Link>
+                        </p>
+                    </div>
                     <div className='flex items-center flex-wrap justify-center gap-x-8 gap-y-2'>
                         <span className='flex items-center gap-1.5'>
                             <Globe className='size-4' /> Lucknow, India
