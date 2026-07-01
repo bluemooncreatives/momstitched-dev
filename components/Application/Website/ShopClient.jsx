@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sheet"
 import axios from 'axios'
 import { useSearchParams } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import ProductBox from '@/components/Application/Website/ProductBox'
 import ProductBoxSkeleton from '@/components/Application/Website/ProductBoxSkeleton'
 import ShopPagination from '@/components/Application/Website/ShopPagination'
@@ -24,7 +24,11 @@ import { BrandButton } from '@/components/Application/Website/BrandButton'
 import Link from 'next/link'
 import { PackageSearch, RotateCcw, Store } from 'lucide-react'
 
-const LIMIT = 9
+// Storefront shows a denser 5-row (2-col) grid on phones and a 3×3 grid on
+// larger screens. The server pre-renders the first page at the desktop size,
+// so any mobile-only size difference is resolved client-side after mount.
+const DESKTOP_PAGE_SIZE = 9
+const MOBILE_PAGE_SIZE = 10
 
 const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages = 0, initialFilters, initialSearchParamsString = '' }) => {
     const searchParams = useSearchParams()
@@ -33,7 +37,12 @@ const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages 
     const [page, setPage] = useState(0)
     const [isMobileFilter, setIsMobileFilter] = useState(false)
     const [isDesktop, setIsDesktop] = useState(false)
+    // Mobile (< sm) shows 10 cards/page; everything else keeps the server's 9.
+    // Starts false so SSR + first client render match; corrected after mount.
+    const [isMobile, setIsMobile] = useState(false)
     const gridTopRef = useRef(null)
+
+    const pageSize = isMobile ? MOBILE_PAGE_SIZE : DESKTOP_PAGE_SIZE
 
     useEffect(() => {
         const mediaQuery = window.matchMedia('(min-width: 1025px)')
@@ -50,17 +59,33 @@ const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages 
         }
     }, [])
 
-    // Filters or sort changed → always restart at the first page, otherwise the
-    // user could be stranded on a page index that no longer exists.
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(max-width: 639px)')
+
+        const onChange = (event) => {
+            setIsMobile(event.matches)
+        }
+
+        setIsMobile(mediaQuery.matches)
+        mediaQuery.addEventListener('change', onChange)
+
+        return () => {
+            mediaQuery.removeEventListener('change', onChange)
+        }
+    }, [])
+
+    // Filters, sort, or page size changed → always restart at the first page,
+    // otherwise the user could be stranded on a page index that no longer exists
+    // (e.g. switching from 9- to 10-per-page shrinks the total page count).
     useEffect(() => {
         setPage(0)
-    }, [searchParamString, sorting])
+    }, [searchParamString, sorting, pageSize])
 
     const fetchProduct = useCallback(async (pageParam) => {
         const { data: getProduct } = await axios.get('/api/shop', {
             params: {
                 page: pageParam,
-                limit: LIMIT,
+                limit: pageSize,
                 sort: sorting,
                 ...(searchParamString ? Object.fromEntries(new URLSearchParams(searchParamString)) : {}),
             }
@@ -69,18 +94,23 @@ const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages 
             throw new Error(getProduct.message || 'Failed to load products.')
         }
         return getProduct.data
-    }, [sorting, searchParamString])
+    }, [sorting, searchParamString, pageSize])
 
     const isInitialQuery = searchParamString === initialSearchParamsString
         && sorting === 'default_sorting'
 
     const { error, data, isFetching, isPending, refetch } = useQuery({
-        queryKey: ['products', sorting, searchParamString, page],
+        queryKey: ['products', sorting, searchParamString, page, pageSize],
         queryFn: () => fetchProduct(page),
-        // Reuse the server-rendered first page so the initial paint needs no refetch.
-        initialData: (page === 0 && isInitialQuery)
+        // Reuse the server-rendered first page so the initial paint needs no
+        // refetch — but only when the client wants the same size the server
+        // rendered (desktop 9). Mobile (10) fetches its own first page.
+        initialData: (page === 0 && isInitialQuery && pageSize === DESKTOP_PAGE_SIZE)
             ? { products: initialProducts, total: initialTotal, totalPages: initialTotalPages, page: 0 }
             : undefined,
+        // Keep the current cards visible while the next page (or the mobile
+        // page-size swap) loads, so pagination doesn't flash a skeleton.
+        placeholderData: keepPreviousData,
         staleTime: 60 * 1000,
         gcTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false,
@@ -115,9 +145,9 @@ const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages 
 
     return (
         <div>
-            <section className="relative isolate h-[280px] overflow-hidden sm:h-[220px] lg:h-[280px]">
+            <section className="relative isolate h-[172px] overflow-hidden sm:h-[180px] lg:h-[280px]">
                 <div className="absolute inset-0 bg-[var(--dark-red-2)]" />
-                <div className="absolute inset-x-0 top-3 z-10 flex justify-center sm:top-5 lg:top-6">
+                <div className="absolute inset-x-0 top-14 z-10 flex justify-center sm:top-5 lg:top-6">
                     <div
                         className="pointer-events-none select-none font-neue font-semibold uppercase tracking-[0.02em] text-white/90"
                         style={{
@@ -132,10 +162,10 @@ const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages 
                         Shop
                     </div>
                 </div>
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-36 bg-gradient-to-b from-transparent via-background/50 to-background" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-16 bg-gradient-to-b from-transparent via-background/50 to-background sm:h-36" />
             </section>
 
-            <section className='website-gutter bg-background py-10 lg:py-14'>
+            <section className='website-gutter bg-background pt-4 pb-10 sm:py-10 lg:py-14'>
                 <div className="grid w-full gap-6 lg:grid-cols-[290px_1fr] lg:gap-8">
                     {isDesktop ? (
                         <aside className='w-full'>
@@ -185,7 +215,7 @@ const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages 
                             </div>
                         ) : showSkeleton ? (
                             <div className='grid grid-cols-2 gap-4 pt-7 md:grid-cols-3 md:gap-5 lg:gap-6'>
-                                {Array.from({ length: LIMIT }).map((_, index) => (
+                                {Array.from({ length: pageSize }).map((_, index) => (
                                     <ProductBoxSkeleton key={index} />
                                 ))}
                             </div>
@@ -227,6 +257,7 @@ const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages 
                                     totalPages={totalPages}
                                     onPageChange={handlePageChange}
                                     disabled={isFetching}
+                                    siblings={isMobile ? 0 : 1}
                                 />
                                 {total > 0 && (
                                     <p className="font-neue text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">

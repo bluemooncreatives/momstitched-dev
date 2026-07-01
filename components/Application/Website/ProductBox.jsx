@@ -95,7 +95,7 @@ const ProductBox = ({ product, priority = false }) => {
                             type="button"
                             aria-label="Previous image"
                             onClick={(e) => slideImage(e, -1)}
-                            className="absolute left-2 top-1/2 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/40 bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground group-hover:opacity-100"
+                            className="absolute left-2 top-1/2 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/40 bg-background/85 text-foreground/70 opacity-100 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
                         >
                             <ChevronLeft className="size-4" />
                         </button>
@@ -103,12 +103,12 @@ const ProductBox = ({ product, priority = false }) => {
                             type="button"
                             aria-label="Next image"
                             onClick={(e) => slideImage(e, 1)}
-                            className="absolute right-2 top-1/2 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/40 bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground group-hover:opacity-100"
+                            className="absolute right-2 top-1/2 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-border/40 bg-background/85 text-foreground/70 opacity-100 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
                         >
                             <ChevronRight className="size-4" />
                         </button>
 
-                        <div className="absolute inset-x-0 bottom-2 z-20 flex justify-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                        <div className="absolute inset-x-0 bottom-2 z-20 flex justify-center gap-1.5 opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100">
                             {images.map((_, index) => (
                                 <span
                                     key={index}
@@ -120,14 +120,14 @@ const ProductBox = ({ product, priority = false }) => {
                 )}
             </div>
 
-            <div className="flex flex-1 flex-col items-center gap-2 border-t border-border/60 px-4 py-5 text-center font-neue">
+            <div className="flex flex-1 flex-col items-center gap-2 border-t border-border/60 px-3 py-3.5 text-center font-neue sm:gap-2 sm:px-4 sm:py-5">
                 <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} className="block w-full">
-                    <h4 title={product?.name} className="w-full truncate text-left text-base font-semibold leading-[1.2] text-foreground transition-colors group-hover:text-[var(--dark-red)]">
+                    <h4 title={product?.name} className="w-full truncate text-left text-[15px] font-semibold leading-[1.2] text-foreground transition-colors group-hover:text-[var(--dark-red)] sm:text-base">
                         {product?.name}
                     </h4>
                 </Link>
 
-                <div className='flex w-full items-center justify-between gap-2'>
+                <div className='flex w-full flex-col items-center gap-1 sm:flex-row sm:justify-between sm:gap-2'>
                     <div className="flex items-center gap-1">
                         <div className="flex items-center gap-0.5">
                             {Array.from({ length: 5 }).map((_, index) => (
@@ -140,8 +140,8 @@ const ProductBox = ({ product, priority = false }) => {
                         <span className='text-[11px] text-muted-foreground'>({ratingCount})</span>
                     </div>
 
-                    <div className='flex items-center gap-2'>
-                        <span className='text-[18px] font-semibold text-foreground'>
+                    <div className='flex items-baseline gap-1.5 sm:gap-2'>
+                        <span className='text-base font-semibold text-foreground sm:text-[18px]'>
                             {product?.sellingPrice?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                         </span>
                         {hasDiscount && (
@@ -152,9 +152,9 @@ const ProductBox = ({ product, priority = false }) => {
                     </div>
                 </div>
 
-                <div className="grid w-full grid-cols-2 gap-2">
+                <div className="mt-1 grid w-full grid-cols-1 gap-2 sm:mt-0 sm:grid-cols-2">
                     {isInCart ? (
-                        <BrandOutlineButton asChild>
+                        <BrandOutlineButton asChild className="text-[13px] tracking-normal sm:text-base">
                             <Link href={WEBSITE_CART}>Go To Cart</Link>
                         </BrandOutlineButton>
                     ) : (
@@ -162,13 +162,14 @@ const ProductBox = ({ product, priority = false }) => {
                             type="button"
                             disabled={!variant || isAdding}
                             onClick={handleAddToCart}
+                            className="text-[13px] tracking-normal sm:text-base"
                         >
                             <ShoppingBag className="size-3.5" />
                             Add To Cart
                         </BrandOutlineButton>
                     )}
 
-                    <BrandButton asChild>
+                    <BrandButton asChild className="text-[13px] tracking-normal sm:text-base">
                         <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} aria-label={`Buy Product: ${product?.name}`}>
                             Buy Product
                         </Link>

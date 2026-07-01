@@ -10,13 +10,6 @@ const menu = [
   { title: 'Contact', url: '/contact' },
 ]
 
-const mobileExtraLinks = [
-  { name: 'Home', url: WEBSITE_HOME },
-  { name: 'Shop', url: WEBSITE_SHOP },
-  { name: 'About Us', url: '/about-us' },
-  { name: 'Contact', url: '/contact' },
-]
-
 const Header = () => {
   return (
     <div className="fixed inset-x-0 top-0 z-50 website-gutter pt-3 sm:pt-4">
@@ -29,7 +22,6 @@ const Header = () => {
             title: 'MomStitched',
           }}
           menu={menu}
-          mobileExtraLinks={mobileExtraLinks}
           auth={{
             login: { text: 'Sign in', url: WEBSITE_LOGIN },
             signup: { text: 'Create account', url: WEBSITE_REGISTER },

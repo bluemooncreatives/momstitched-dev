@@ -33,12 +33,14 @@ const getPageItems = (current, total, siblings = 1) => {
     return [1, DOTS, ...range(leftSibling, rightSibling), DOTS, total]
 }
 
-const ShopPagination = ({ page, totalPages, onPageChange, disabled = false }) => {
+const ShopPagination = ({ page, totalPages, onPageChange, disabled = false, siblings = 1 }) => {
     // Nothing to paginate through.
     if (!totalPages || totalPages <= 1) return null
 
     const current = page + 1 // component works in 1-based pages
-    const items = getPageItems(current, totalPages)
+    // Fewer siblings (0) on mobile keeps the row from overflowing a phone width;
+    // desktop passes 1 for a wider window of page numbers.
+    const items = getPageItems(current, totalPages, siblings)
 
     const goTo = (target) => {
         if (disabled) return
@@ -47,12 +49,12 @@ const ShopPagination = ({ page, totalPages, onPageChange, disabled = false }) =>
     }
 
     const cell =
-        'inline-flex h-9 min-w-9 items-center justify-center rounded-sm border px-2 font-neue text-[13px] font-semibold transition-colors disabled:pointer-events-none disabled:opacity-40'
+        'inline-flex h-8 min-w-8 items-center justify-center rounded-sm border px-1.5 font-neue text-xs font-semibold transition-colors disabled:pointer-events-none disabled:opacity-40 sm:h-9 sm:min-w-9 sm:px-2 sm:text-[13px]'
     const idle =
         'border-border/70 bg-background text-foreground hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]'
 
     return (
-        <nav role="navigation" aria-label="Pagination" className="flex items-center justify-center gap-1.5">
+        <nav role="navigation" aria-label="Pagination" className="flex items-center justify-center gap-1 sm:gap-1.5">
             <button
                 type="button"
                 aria-label="Go to previous page"
@@ -69,7 +71,7 @@ const ShopPagination = ({ page, totalPages, onPageChange, disabled = false }) =>
                         <span
                             key={`dots-${index}`}
                             aria-hidden
-                            className="inline-flex h-9 min-w-9 items-center justify-center text-[13px] text-muted-foreground"
+                            className="inline-flex h-8 min-w-6 items-center justify-center text-xs text-muted-foreground sm:h-9 sm:min-w-9 sm:text-[13px]"
                         >
                             …
                         </span>

@@ -38,10 +38,10 @@ const Cart = () => {
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             {/* ── Trigger ── */}
-            <SheetTrigger aria-label="Open cart" className="relative flex items-center justify-center rounded-md px-2.5 py-2 transition hover:bg-muted/40">
-                <ShoppingCart className="h-5 w-5 text-foreground" strokeWidth={1.75} />
+            <SheetTrigger aria-label="Open cart" className="relative flex items-center justify-center rounded-md px-1.5 py-1.5 transition hover:bg-muted/40 sm:px-2.5 sm:py-2">
+                <ShoppingCart className="h-4 w-4 text-foreground sm:h-5 sm:w-5" strokeWidth={1.75} />
                 {cartCount > 0 && (
-                    <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[10px] font-semibold text-white tabular-nums">
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--dark-red)] px-1 text-[9px] font-semibold text-white tabular-nums sm:-right-2 sm:-top-2 sm:h-5 sm:min-w-5 sm:text-[10px]">
                         {cartCount}
                     </span>
                 )}
@@ -51,13 +51,18 @@ const Cart = () => {
             <SheetContent className="w-full gap-0 border-l border-border/40 bg-background p-0 shadow-xl sm:max-w-[440px]">
 
                 {/* Header */}
-                <SheetHeader className="flex-shrink-0 border-b border-border/50 px-6 py-5">
+                <SheetHeader className="flex-shrink-0 border-b border-border/50 px-5 py-4 sm:px-6 sm:py-5">
                     <div className="flex items-center justify-between pr-8">
-                        <SheetTitle className="font-neue text-xl font-semibold tracking-[0.01em]">
-                            My Cart
-                        </SheetTitle>
+                        <div className="flex items-center gap-2.5 sm:gap-0">
+                            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--brand-cream)]/60 text-[var(--brand-primary)] sm:hidden">
+                                <ShoppingCart className="size-4" strokeWidth={1.75} />
+                            </span>
+                            <SheetTitle className="font-header text-2xl leading-none tracking-wide text-[var(--brand-primary)] sm:font-neue sm:text-xl sm:font-semibold sm:leading-normal sm:tracking-[0.01em] sm:text-foreground">
+                                My Cart
+                            </SheetTitle>
+                        </div>
                         {cartCount > 0 && (
-                            <span className="rounded-full bg-muted/60 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            <span className="rounded-full bg-[var(--brand-cream)]/60 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--brand-primary)] sm:bg-muted/60 sm:text-muted-foreground">
                                 {cartCount} {cartCount === 1 ? 'item' : 'items'}
                             </span>
                         )}
@@ -68,12 +73,14 @@ const Cart = () => {
                 {/* Scrollable product list */}
                 <div className="no-scrollbar flex-1 overflow-y-auto px-5 py-5">
                     {cart.count === 0 ? (
-                        <div className="flex flex-col items-center rounded-lg border border-border/60 bg-background px-6 py-14 text-center shadow-sm">
+                        <div className="flex flex-col items-center rounded-lg border border-border/60 bg-background px-6 py-12 text-center shadow-sm sm:py-14">
                             <div className="flex size-16 items-center justify-center rounded-full bg-[var(--brand-cream)]/50 text-[var(--brand-primary)]">
                                 <ShoppingCartIcon className="size-8" strokeWidth={1.5} />
                             </div>
-                            <h3 className="font-neue mt-5 text-xl font-semibold">Your cart is empty</h3>
-                            <p className="font-neue mt-2 max-w-[200px] text-sm text-muted-foreground">
+                            <h3 className="font-header mt-5 text-2xl leading-none tracking-wide text-[var(--brand-primary)] sm:font-neue sm:text-xl sm:font-semibold sm:leading-normal sm:tracking-normal sm:text-foreground">
+                                Your cart is empty
+                            </h3>
+                            <p className="font-neue mt-2.5 max-w-[220px] text-sm text-muted-foreground">
                                 Add pieces you love to see them here with pricing and quick checkout.
                             </p>
                             <div className="mt-6 w-full">
@@ -170,6 +177,7 @@ const Cart = () => {
                         <BrandOutlineButton
                             type="button"
                             asChild
+                            className="text-[13px] tracking-wide sm:text-base sm:tracking-normal"
                             onClick={() => setOpen(false)}
                         >
                             <Link href={WEBSITE_CART}>View Cart</Link>
@@ -177,6 +185,7 @@ const Cart = () => {
                         <BrandButton
                             type="button"
                             asChild
+                            className="text-[13px] tracking-wide sm:text-base sm:tracking-normal"
                             onClick={() => setOpen(false)}
                         >
                             {cart.count ? (

@@ -8,6 +8,7 @@ import { useSelector } from "react-redux"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -16,19 +17,13 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import Cart from "@/components/Application/Website/Cart"
 import GlobalSearch from "@/components/Application/Website/GlobalSearch"
+import { BrandButton, BrandOutlineButton } from "@/components/Application/Website/BrandButton"
 import userIcon from "@/public/assets/images/user.png"
 
 const defaultMenu = [
   { title: "Shop", url: "/shop" },
   { title: "About Us", url: "/about-us" },
   { title: "Contact", url: "/contact" },
-]
-
-const defaultMobileLinks = [
-  { name: "Home", url: "/" },
-  { name: "Shop", url: "/shop" },
-  { name: "About Us", url: "/about-us" },
-  { name: "Contact", url: "/contact" },
 ]
 
 const defaultAuth = {
@@ -44,7 +39,6 @@ export default function Navbar({
     title: "MomStitched",
   },
   menu = defaultMenu,
-  mobileExtraLinks = defaultMobileLinks,
   auth = defaultAuth,
 }) {
   const [openSearch, setOpenSearch] = React.useState(false)
@@ -137,15 +131,15 @@ export default function Navbar({
             {logo.title}
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0.5">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setOpenSearch(true)}
-              className="text-stone-700 hover:text-[var(--brand-primary-hover)]"
+              className="size-8 text-stone-700 hover:text-[var(--brand-primary-hover)]"
               aria-label="Open search"
             >
-              <SearchIcon className="size-5" strokeWidth={1.75} />
+              <SearchIcon className="size-4" strokeWidth={1.75} />
             </Button>
 
             <div>
@@ -157,50 +151,72 @@ export default function Navbar({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-stone-700 hover:text-[var(--brand-primary-hover)]"
+                  className="size-8 text-stone-700 hover:text-[var(--brand-primary-hover)]"
                   aria-label="Open menu"
                 >
-                  <Menu className="size-5" strokeWidth={1.75} />
+                  <Menu className="size-4" strokeWidth={1.75} />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle className="font-header text-2xl text-[var(--brand-primary)]">{logo.title}</SheetTitle>
+              <SheetContent className="flex w-[85%] max-w-sm gap-0 border-l border-black/[0.08] bg-background p-0 sm:max-w-sm">
+                <SheetHeader className="flex-shrink-0 border-b border-black/[0.08] px-5 py-5">
+                  <SheetTitle className="font-header text-2xl leading-none tracking-wide text-[var(--brand-primary)]">
+                    {logo.title}
+                  </SheetTitle>
                 </SheetHeader>
 
-                <div className="my-8 flex flex-col gap-3">
+                <nav className="flex flex-1 flex-col overflow-y-auto px-3 py-3" aria-label="Mobile menu">
                   {menu.map((item) => (
-                    <Link
-                      key={item.title}
-                      href={item.url}
-                      className="rounded-md px-3 py-2 text-base font-medium text-[var(--brand-primary)] transition-colors hover:bg-stone-100 hover:text-[var(--brand-primary-hover)]"
-                    >
-                      {item.title}
-                    </Link>
-                  ))}
-                </div>
-
-                <div className="border-t border-stone-200 py-5">
-                  <div className="grid grid-cols-2 gap-2">
-                    {mobileExtraLinks.map((link) => (
+                    <SheetClose asChild key={item.title}>
                       <Link
-                        key={`${link.name}-${link.url}`}
-                        href={link.url}
-                        className="rounded-md px-3 py-2 text-sm text-stone-600 transition-colors hover:bg-stone-100 hover:text-[var(--brand-primary-hover)]"
+                        href={item.url}
+                        className="rounded-md px-3 py-3.5 font-neue text-base font-semibold text-[var(--brand-primary)] transition-colors hover:bg-[var(--brand-cream)]/50 hover:text-[var(--brand-primary-hover)] active:bg-[var(--brand-cream)]/70"
                       >
-                        {link.name}
+                        {item.title}
                       </Link>
-                    ))}
-                  </div>
-                </div>
+                    </SheetClose>
+                  ))}
+                </nav>
 
-                <div className="flex flex-col gap-3">
-                  <Button asChild variant="outline" className="rounded-full">
-                    <Link href={auth.login.url}>{auth.login.text}</Link>
-                  </Button>
-                  <Button asChild className="rounded-full bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]">
-                    <Link href={auth.signup.url}>{auth.signup.text}</Link>
-                  </Button>
+                <div className="flex-shrink-0 border-t border-black/[0.08] px-5 py-5">
+                  {!hydrated ? (
+                    <div className="flex items-center gap-3">
+                      <span className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-stone-200/70" aria-hidden />
+                      <span className="h-4 w-24 animate-pulse rounded bg-stone-200/70" aria-hidden />
+                    </div>
+                  ) : !user ? (
+                    <div className="flex flex-col gap-2.5">
+                      <SheetClose asChild>
+                        <BrandOutlineButton asChild>
+                          <Link href={auth.login.url}>{auth.login.text}</Link>
+                        </BrandOutlineButton>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <BrandButton asChild>
+                          <Link href={auth.signup.url}>{auth.signup.text}</Link>
+                        </BrandButton>
+                      </SheetClose>
+                    </div>
+                  ) : (
+                    <SheetClose asChild>
+                      <Link
+                        href={accountUrl}
+                        className="flex items-center gap-3 rounded-md px-2 py-2 -mx-2 transition-colors hover:bg-[var(--brand-cream)]/50"
+                      >
+                        <Avatar className="h-9 w-9 shrink-0">
+                          <AvatarImage src={user?.avatar?.url || userIcon.src} />
+                          <AvatarFallback className="bg-[var(--dark-red)] text-xs font-semibold uppercase text-white">
+                            {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex min-w-0 flex-col">
+                          <span className="truncate font-neue text-sm font-semibold text-[var(--brand-primary)]">
+                            {user?.name || 'My account'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">View account</span>
+                        </div>
+                      </Link>
+                    </SheetClose>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>
