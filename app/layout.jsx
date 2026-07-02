@@ -66,9 +66,13 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
 
         {/* Preload only fonts on the LCP critical path.
+            Felixti is the display font (.font-header) used by LCP headings
+            on auth/checkout and other hero-text pages; it's 20 KB and swaps
+            late without a preload, which tanks Speed Index.
             Medium (weight 600) is used by the LCP "Shop" heading.
             Book (weight 400) is the primary body font — preloaded so it's
             ready before below-the-fold content renders. */}
+        <link rel="preload" href="/assets/font/Felixti.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/assets/font/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/assets/font/PPNeueMontreal-Book.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>

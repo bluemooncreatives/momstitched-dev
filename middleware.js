@@ -15,7 +15,15 @@ export async function middleware(request) {
             pathname.startsWith('/order-details') ||
             pathname.startsWith('/checkout')
         const hasToken = request.cookies.has('access_token')
-        const nextAuthToken = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+        // getToken() does JWT decryption on every call — skip it entirely when the
+        // browser didn't send a next-auth session cookie (e.g. logged-out visitors
+        // being redirected to login), so the redirect response isn't delayed by it.
+        const hasNextAuthCookie =
+            request.cookies.has('__Secure-next-auth.session-token') ||
+            request.cookies.has('next-auth.session-token')
+        const nextAuthToken = hasNextAuthCookie
+            ? await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+            : null
 
         let role = null
         let invalidCustomToken = false
