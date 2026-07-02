@@ -23,16 +23,24 @@ import {
 import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute"
 import Image from "next/image"
 import Link, { useLinkStatus } from "next/link"
+import dynamic from "next/dynamic"
 import { useEffect, useMemo, useState } from "react"
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
+import cloudinaryLoader from '@/lib/cloudinaryLoader'
 import ButtonLoading from "@/components/Application/ButtonLoading"
 import { useDispatch, useSelector } from "react-redux"
 import { addIntoCart, increaseQuantity, decreaseQuantity, removeFromCart } from "@/store/reducer/cartReducer"
 import { showToast } from "@/lib/showToast"
 import { Button } from "@/components/ui/button"
-import ProductReveiw from "@/components/Application/Website/ProductReveiw"
 import ProductBox from "@/components/Application/Website/ProductBox"
-import SizeGuideModal from "@/components/Application/Website/SizeGuideModal"
+import LazyHydrate from "@/components/Application/LazyHydrate"
+
+// Split the heavy client-only islands out of the page's hydration chunk.
+// ProductReveiw drags in react-hook-form, zod, tanstack-query and axios but
+// renders nothing until its own client fetches resolve, so there is no SSR
+// markup to lose. SizeGuideModal is invisible until the shopper asks for it.
+const ProductReveiw = dynamic(() => import("@/components/Application/Website/ProductReveiw"), { ssr: false })
+const SizeGuideModal = dynamic(() => import("@/components/Application/Website/SizeGuideModal"), { ssr: false })
 import { cn, decodeHTMLDeep, htmlToText, normalizeColor } from "@/lib/utils"
 import { resolveColorStyle } from "@/lib/colorMap"
 import { MAX_CART_QTY } from "@/lib/cartConstants"
@@ -78,6 +86,9 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
     const [activeIndex, setActiveIndex] = useState(0)
     const [qty, setQty] = useState(1)
     const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false)
+    // Latches true on first open and stays true so the dynamic chunk only
+    // downloads on demand, but the dialog stays mounted to animate closed.
+    const [sizeGuideRequested, setSizeGuideRequested] = useState(false)
     // Color swatch resolution uses CSS.supports (browser-only). Gate the
     // resolved fill behind a mount flag to avoid an SSR/client hydration
     // mismatch for CSS-named colors. The same flag gates the cart-state UI so
@@ -239,6 +250,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                             alt={thumb?.alt || `${product?.name} thumbnail ${index + 1}`}
                                             fill
                                             sizes="84px"
+                                            loader={cloudinaryLoader}
                                             className="object-cover object-center"
                                         />
                                     </button>
@@ -247,12 +259,18 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
 
                             <div className="group relative flex-1">
                                 <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[var(--radius-lg)] border border-border/60 bg-[var(--product-card-bg)]">
+                                    {/* fetchPriority must be passed explicitly — in Next 15
+                                        `priority` alone emits the preload but not
+                                        fetchpriority="high", so the LCP request still queued
+                                        behind fonts/JS on throttled connections. */}
                                     <Image
                                         key={activeImage}
                                         src={activeImage}
                                         alt={media[activeIndex]?.alt || product?.name}
                                         fill
                                         priority
+                                        fetchPriority="high"
+                                        loader={cloudinaryLoader}
                                         sizes="(max-width: 1024px) 100vw, 55vw"
                                         className="object-cover object-center"
                                     />
@@ -399,7 +417,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                     </p>
                                     <button
                                         type="button"
-                                        onClick={() => setIsSizeGuideOpen(true)}
+                                        onClick={() => { setSizeGuideRequested(true); setIsSizeGuideOpen(true) }}
                                         className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--dark-red)] underline-offset-4 hover:underline"
                                     >
                                         Size Guide
@@ -596,14 +614,18 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                     </dl>
                 </section>
 
-                <SizeGuideModal
-                    open={isSizeGuideOpen}
-                    onOpenChange={setIsSizeGuideOpen}
-                    sizeGuide={product?.sizeGuide}
-                />
+                {sizeGuideRequested && (
+                    <SizeGuideModal
+                        open={isSizeGuideOpen}
+                        onOpenChange={setIsSizeGuideOpen}
+                        sizeGuide={product?.sizeGuide}
+                    />
+                )}
 
                 <div id="reviews" className="mt-14 scroll-mt-24">
-                    <ProductReveiw productId={product._id} />
+                    <LazyHydrate>
+                        <ProductReveiw productId={product._id} />
+                    </LazyHydrate>
                 </div>
 
                 {/* ── You May Also Like ────────────────────────────────── */}
@@ -618,11 +640,13 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                             </h2>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
-                            {relatedProducts.map((item) => (
-                                <ProductBox key={item._id} product={item} />
-                            ))}
-                        </div>
+                        <LazyHydrate>
+                            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
+                                {relatedProducts.map((item) => (
+                                    <ProductBox key={item._id} product={item} />
+                                ))}
+                            </div>
+                        </LazyHydrate>
                     </section>
                 )}
             </div>

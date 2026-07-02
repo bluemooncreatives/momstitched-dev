@@ -167,13 +167,19 @@ const ShopClient = ({ initialProducts = [], initialTotal = 0, initialTotalPages 
 
             <section className='website-gutter bg-background pt-4 pb-10 sm:py-10 lg:py-14'>
                 <div className="grid w-full gap-6 lg:grid-cols-[290px_1fr] lg:gap-8">
-                    {isDesktop ? (
-                        <aside className='w-full'>
-                            <div className='sticky top-6'>
-                                <Filter filters={initialFilters} />
-                            </div>
-                        </aside>
-                    ) : (
+                    {/* The aside shell always renders (CSS-hidden below lg) so the
+                        sidebar column is occupied from the server-rendered first
+                        paint — if it only mounted after hydration (isDesktop flips
+                        in an effect), the product grid would start in the 290px
+                        column and jump right when the aside appeared, a large CLS.
+                        Filter itself still mounts only on desktop so mobile never
+                        downloads its chunk. */}
+                    <aside className='hidden w-full lg:block'>
+                        <div className='sticky top-6'>
+                            {isDesktop && <Filter filters={initialFilters} />}
+                        </div>
+                    </aside>
+                    {!isDesktop && (
                         <Sheet open={isMobileFilter} onOpenChange={setIsMobileFilter}>
                             <SheetContent side='left' className="flex w-[86%] max-w-sm flex-col gap-0 bg-background p-0">
                                 {/* Header — matches the branded sheet chrome used across the site */}

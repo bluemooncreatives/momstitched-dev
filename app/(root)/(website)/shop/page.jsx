@@ -1,5 +1,5 @@
 import ShopClient from '@/components/Application/Website/ShopClient'
-import { getShopFilters, getShopProducts } from '@/lib/services/shopService'
+import { getDefaultShopProducts, getShopFilters, getShopProducts } from '@/lib/services/shopService'
 
 const buildSearchParamString = (searchParams) => {
     if (!searchParams) return ''
@@ -19,19 +19,23 @@ const Shop = async ({ searchParams }) => {
     const initialSearchParamsString = buildSearchParamString(resolvedSearchParams)
     const [filters, { products, total, totalPages }] = await Promise.all([
         getShopFilters(),
-        getShopProducts({
-            size: resolvedSearchParams?.size,
-            color: resolvedSearchParams?.color,
-            minPrice: resolvedSearchParams?.minPrice,
-            maxPrice: resolvedSearchParams?.maxPrice,
-            category: resolvedSearchParams?.category,
-            bestseller: resolvedSearchParams?.bestseller,
-            freshlyArrived: resolvedSearchParams?.freshlyArrived,
-            q: resolvedSearchParams?.q,
-            sort: resolvedSearchParams?.sort,
-            limit: resolvedSearchParams?.limit,
-            page: resolvedSearchParams?.page,
-        })
+        // Bare /shop (no filters/search/sort) serves the cached default page;
+        // any query param falls through to the fully dynamic aggregation.
+        initialSearchParamsString === ''
+            ? getDefaultShopProducts()
+            : getShopProducts({
+                size: resolvedSearchParams?.size,
+                color: resolvedSearchParams?.color,
+                minPrice: resolvedSearchParams?.minPrice,
+                maxPrice: resolvedSearchParams?.maxPrice,
+                category: resolvedSearchParams?.category,
+                bestseller: resolvedSearchParams?.bestseller,
+                freshlyArrived: resolvedSearchParams?.freshlyArrived,
+                q: resolvedSearchParams?.q,
+                sort: resolvedSearchParams?.sort,
+                limit: resolvedSearchParams?.limit,
+                page: resolvedSearchParams?.page,
+            })
     ])
 
     return (
