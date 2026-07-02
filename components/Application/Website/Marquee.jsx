@@ -19,93 +19,114 @@ const Marquee = ({ text = 'freshly arrived', repeatCount = 12, speed = 1 }) => {
     useEffect(() => {
         if (!containerRef.current || !innerRef.current) return
 
-        const inner = innerRef.current
+        // Defer all GSAP/ScrollTrigger setup until the browser is idle so the
+        // marquee never competes with hydration for the main thread (same
+        // pattern as LenisProvider). The static server-rendered strip is
+        // visible in the meantime; only the movement starts late.
+        const requestIdle = window.requestIdleCallback?.bind(window)
+            || ((cb) => setTimeout(cb, 200))
+        const cancelIdle = window.cancelIdleCallback?.bind(window)
+            || ((id) => clearTimeout(id))
 
-        // Get the width of one complete marquee set
-        const getBounds = () => {
-            const allItems = inner.querySelectorAll('.marquee__part')
-            let totalWidth = 0
-            allItems.forEach((item) => {
-                totalWidth += item.offsetWidth
-            })
-            return totalWidth / 2 // Half because we duplicate
-        }
-
-        let itemWidth = getBounds()
-
-        // Ticker: continuous movement in direction
-        const tick = () => {
-            const dt = gsap.ticker.deltaRatio()
-            xRef.current += directionRef.current * speed * dt
-            
-            // Seamless wrap: when we exceed half-width, wrap back
-            if (xRef.current > 0) {
-                xRef.current -= itemWidth
-            } else if (xRef.current < -itemWidth) {
-                xRef.current += itemWidth
-            }
-
-            gsap.set(inner, { x: xRef.current })
-        }
-
-        const updateArrowDirection = (direction) => {
-            arrowsRef.current.forEach((arrow) => {
-                if (!arrow) return
-                if (direction === 1) {
-                    arrow.classList.remove('active')
-                } else {
-                    arrow.classList.add('active')
-                }
-            })
-        }
-
-        const startTicker = () => {
-            if (tickingRef.current) return
-            gsap.ticker.add(tick)
-            tickingRef.current = true
-        }
-
-        const stopTicker = () => {
-            if (!tickingRef.current) return
-            gsap.ticker.remove(tick)
-            tickingRef.current = false
-        }
-
-        const trigger = ScrollTrigger.create({
-            trigger: containerRef.current,
-            start: 'top bottom',
-            end: 'bottom top',
-            onEnter: startTicker,
-            onEnterBack: startTicker,
-            onLeave: stopTicker,
-            onLeaveBack: stopTicker,
-            onUpdate: (self) => {
-                const nextDirection = self.direction === 1 ? 1 : -1
-                if (nextDirection === directionRef.current) return
-                directionRef.current = nextDirection
-                updateArrowDirection(nextDirection)
-            }
+        let cleanup = null
+        const idleId = requestIdle(() => {
+            cleanup = init()
         })
 
-        const handleRefresh = () => {
-            itemWidth = getBounds()
-        }
-        ScrollTrigger.addEventListener('refreshInit', handleRefresh)
-        
-        // Defer refresh to avoid synchronous forced reflow during hydration
-        const refreshTimeout = setTimeout(() => {
-            ScrollTrigger.refresh()
-        }, 100)
-        
-        if (trigger.isActive) {
-            startTicker()
+        return () => {
+            cancelIdle(idleId)
+            if (cleanup) cleanup()
         }
 
-        return () => {
-            clearTimeout(refreshTimeout)
-            stopTicker()
-            ScrollTrigger.removeEventListener('refreshInit', handleRefresh)
-            trigger.kill()
+        function init() {
+            const inner = innerRef.current
+
+            // Get the width of one complete marquee set
+            const getBounds = () => {
+                const allItems = inner.querySelectorAll('.marquee__part')
+                let totalWidth = 0
+                allItems.forEach((item) => {
+                    totalWidth += item.offsetWidth
+                })
+                return totalWidth / 2 // Half because we duplicate
+            }
+
+            let itemWidth = getBounds()
+
+            // Ticker: continuous movement in direction
+            const tick = () => {
+                const dt = gsap.ticker.deltaRatio()
+                xRef.current += directionRef.current * speed * dt
+                
+                // Seamless wrap: when we exceed half-width, wrap back
+                if (xRef.current > 0) {
+                    xRef.current -= itemWidth
+                } else if (xRef.current < -itemWidth) {
+                    xRef.current += itemWidth
+                }
+
+                gsap.set(inner, { x: xRef.current })
+            }
+
+            const updateArrowDirection = (direction) => {
+                arrowsRef.current.forEach((arrow) => {
+                    if (!arrow) return
+                    if (direction === 1) {
+                        arrow.classList.remove('active')
+                    } else {
+                        arrow.classList.add('active')
+                    }
+                })
+            }
+
+            const startTicker = () => {
+                if (tickingRef.current) return
+                gsap.ticker.add(tick)
+                tickingRef.current = true
+            }
+
+            const stopTicker = () => {
+                if (!tickingRef.current) return
+                gsap.ticker.remove(tick)
+                tickingRef.current = false
+            }
+
+            const trigger = ScrollTrigger.create({
+                trigger: containerRef.current,
+                start: 'top bottom',
+                end: 'bottom top',
+                onEnter: startTicker,
+                onEnterBack: startTicker,
+                onLeave: stopTicker,
+                onLeaveBack: stopTicker,
+                onUpdate: (self) => {
+                    const nextDirection = self.direction === 1 ? 1 : -1
+                    if (nextDirection === directionRef.current) return
+                    directionRef.current = nextDirection
+                    updateArrowDirection(nextDirection)
+                }
+            })
+
+            const handleRefresh = () => {
+                itemWidth = getBounds()
+            }
+            ScrollTrigger.addEventListener('refreshInit', handleRefresh)
+            
+            // Defer refresh to avoid synchronous forced reflow during hydration
+            const refreshTimeout = setTimeout(() => {
+                ScrollTrigger.refresh()
+            }, 100)
+            
+            if (trigger.isActive) {
+                startTicker()
+            }
+
+            return () => {
+                clearTimeout(refreshTimeout)
+                stopTicker()
+                ScrollTrigger.removeEventListener('refreshInit', handleRefresh)
+                trigger.kill()
+            }
         }
     }, [speed])
 

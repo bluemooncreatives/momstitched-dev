@@ -24,23 +24,32 @@ const PageLoader = ({ onReady, onComplete }) => {
         }
     }
 
-    // Track actual page load
+    // Reveal as soon as the hero (LCP) image is ready. Waiting for the full
+    // window `load` event holds the overlay hostage to every below-fold asset,
+    // which is what pushed Speed Index to ~7s. A 2.5s timeout is the safety
+    // net so the loader can never trap the page behind a stalled image.
     useEffect(() => {
-        const checkLoaded = () => {
-            if (document.readyState === 'complete') {
-                setIsLoaded(true)
-            }
+        let done = false
+        const markLoaded = () => {
+            if (done) return
+            done = true
+            setIsLoaded(true)
         }
 
-        checkLoaded()
+        const heroImage = document.querySelector('.slide-visual')
+        if (!heroImage || heroImage.complete || document.readyState === 'complete') {
+            markLoaded()
+            return
+        }
 
-        const onLoad = () => setIsLoaded(true)
-        window.addEventListener('load', onLoad)
-        document.addEventListener('readystatechange', checkLoaded)
+        heroImage.addEventListener('load', markLoaded)
+        heroImage.addEventListener('error', markLoaded)
+        const timeoutId = window.setTimeout(markLoaded, 2500)
 
         return () => {
-            window.removeEventListener('load', onLoad)
-            document.removeEventListener('readystatechange', checkLoaded)
+            heroImage.removeEventListener('load', markLoaded)
+            heroImage.removeEventListener('error', markLoaded)
+            window.clearTimeout(timeoutId)
         }
     }, [])
 
@@ -75,7 +84,7 @@ const PageLoader = ({ onReady, onComplete }) => {
 
         const currentCount = countRef.current
         const remainingProgress = 100 - currentCount
-        const duration = Math.max(0.3, remainingProgress / 100) // Min 0.3s to finish
+        const duration = Math.max(0.25, Math.min(0.5, remainingProgress / 150))
 
         // Create the ease right before the timeline that uses it
         CustomEase.create("hop", "0.9, 0, 0.1, 1")
@@ -104,42 +113,50 @@ const PageLoader = ({ onReady, onComplete }) => {
         const word2H1 = loader.querySelector("#word-2 h1")
         const blockEls = loader.querySelectorAll(".block")
 
+        // The choreography below overlaps aggressively: the original sequential
+        // timeline held the page behind the overlay for ~4s after load, which
+        // dominated Speed Index. Same beats, ~1.5s total.
+
         // Hide counter
         completeTl.to(counterEl, {
             opacity: 0,
-            duration: 0.4,
+            duration: 0.3,
             ease: "power2.out"
         })
 
-        // Show logo words
+        // Show logo words + divider together
         completeTl.to(
             wordEls,
             {
                 y: "0%",
-                duration: 0.8,
-            }
+                duration: 0.5,
+            },
+            "<0.1"
         )
 
-        // Divider animation
-        completeTl.to(dividerEl, {
-            scaleY: 1,
-            duration: 0.8,
-            onComplete: () =>
-                gsap.to(dividerEl, { opacity: 0, duration: 0.2, delay: 0.2 }),
-        })
+        completeTl.to(
+            dividerEl,
+            {
+                scaleY: 1,
+                duration: 0.5,
+                onComplete: () =>
+                    gsap.to(dividerEl, { opacity: 0, duration: 0.15 }),
+            },
+            "<"
+        )
 
         // Hide words
         completeTl.to(word1H1, {
             y: "100%",
-            duration: 0.8,
-            delay: 0.2,
+            duration: 0.5,
+            delay: 0.15,
         })
 
         completeTl.to(
             word2H1,
             {
                 y: "-100%",
-                duration: 0.8,
+                duration: 0.5,
             },
             "<"
         )
@@ -147,14 +164,14 @@ const PageLoader = ({ onReady, onComplete }) => {
         // Signal hero section to start while blocks still cover the screen
         completeTl.call(() => { if (onReady) onReady() })
 
-        // Reveal hero - blocks slide away
+        // Reveal hero - blocks slide away, overlapping the words' exit
         completeTl.to(
             blockEls,
             {
                 clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
-                duration: 1,
-                stagger: 0.1,
-                delay: 0.5,
+                duration: 0.7,
+                stagger: 0.08,
+                delay: 0.15,
             },
             "<"
         )

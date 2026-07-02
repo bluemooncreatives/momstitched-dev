@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic'
 import HeroSection from '@/components/Application/Website/HeroSection'
+import LazyHydrate from '@/components/Application/LazyHydrate'
 import FeaturedProduct from '@/components/Application/Website/FeaturedProduct'
 import BestsellersSection from '@/components/Application/Website/BestsellersSection'
 // Async server components (fetch their own data): imported directly so they run
@@ -33,25 +34,51 @@ const Home = () => {
             <section>
                 <HeroSection />
             </section>
+            {/* The hero is 100svh, so everything below is below the fold.
+                LazyHydrate keeps each section's server HTML in the document but
+                defers its hydration until the user scrolls near it, so the
+                initial load only hydrates the hero + header. */}
             <Marquee text="freshly arrived" repeatCount={12} />
 
-            <FeaturedProduct />
+            <LazyHydrate>
+                <FeaturedProduct />
+            </LazyHydrate>
 
-            <CategoryArchiveSection />
+            <LazyHydrate>
+                <CategoryArchiveSection />
+            </LazyHydrate>
 
-            <AboutUsSection />
+            <LazyHydrate>
+                <AboutUsSection />
+            </LazyHydrate>
 
-            <BestsellersSection />
+            <LazyHydrate>
+                <BestsellersSection />
+            </LazyHydrate>
 
-            <InstagramReelsMarquee />
+            {/* The gallery's styled-jsx CSS is client-only (no SSR registry), so
+                its server HTML is unstyled and ~1600px taller until hydration
+                reflows it. Hydrate it extra early so that reflow always happens
+                while the section is still far below the viewport. */}
+            <LazyHydrate rootMargin='1500px'>
+                <InstagramReelsMarquee />
+            </LazyHydrate>
 
-            <Testimonial />
+            <LazyHydrate>
+                <Testimonial />
+            </LazyHydrate>
 
-            <EditorialCardsSection />
+            <LazyHydrate>
+                <EditorialCardsSection />
+            </LazyHydrate>
 
-            <BenefitsSection />
+            <LazyHydrate>
+                <BenefitsSection />
+            </LazyHydrate>
 
-            <FAQSection />
+            <LazyHydrate>
+                <FAQSection />
+            </LazyHydrate>
         </>
     )
 }
