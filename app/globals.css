@@ -65,6 +65,43 @@
   font-display: optional;
 }
 
+/* Metrics-adjusted fallback for the swap-loaded body weights (400/500/600).
+   With plain `font-display: swap`, text paints in Arial and reflows when
+   PP Neue Montreal arrives — on slow connections that swap lands after the
+   page is painted and shifts every text block (the intermittent CLS ~0.25
+   Lighthouse flags on /shop). These faces render Arial scaled to PP Neue
+   Montreal's exact proportions (values computed from the woff2 metrics, the
+   same technique next/font uses), so the swap no longer moves layout. */
+@font-face {
+  font-family: 'PP Neue Fallback';
+  src: local('Arial');
+  font-weight: 400;
+  size-adjust: 100.91%;
+  ascent-override: 94.94%;
+  descent-override: 23.98%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'PP Neue Fallback';
+  src: local('Arial');
+  font-weight: 500;
+  size-adjust: 102.54%;
+  ascent-override: 93.43%;
+  descent-override: 23.60%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'PP Neue Fallback';
+  src: local('Arial');
+  font-weight: 600;
+  size-adjust: 104.61%;
+  ascent-override: 91.58%;
+  descent-override: 23.13%;
+  line-gap-override: 0%;
+}
+
 /* ────────────────────────────────────────────────────────────────
    TAILWIND DARK MODE VARIANT
    ──────────────────────────────────────────────────────────────── */
