@@ -20,11 +20,11 @@ const FAQSection = dynamic(() => import('@/components/Application/Website/FAQSec
 export const metadata = {
     title: 'MOMSTITCHED - Handcrafted Women\'s Ethnic Wear | Shop Online',
     description:
-        'Discover handcrafted women\'s ethnic wear at MomStitched. From festive ensembles to everyday elegance — premium fabrics, thoughtful silhouettes, and meticulous detailing.',
+        'Discover handcrafted women\'s ethnic wear at MomStitched. From festive ensembles to everyday elegance - premium fabrics, thoughtful silhouettes, and meticulous detailing.',
     openGraph: {
         title: 'MOMSTITCHED - Handcrafted Women\'s Ethnic Wear | Shop Online',
         description:
-            'Discover handcrafted women\'s ethnic wear at MomStitched. From festive ensembles to everyday elegance — premium fabrics, thoughtful silhouettes, and meticulous detailing.',
+            'Discover handcrafted women\'s ethnic wear at MomStitched. From festive ensembles to everyday elegance - premium fabrics, thoughtful silhouettes, and meticulous detailing.',
     },
 }
 
