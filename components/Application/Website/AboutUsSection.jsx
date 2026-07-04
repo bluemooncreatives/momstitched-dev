@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 const CONTENT = {
     leftImage: {
-        src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1781938294/f1rs5jiyvniqa7s9r15p.jpg',
+        src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1783146225/DSCF5008_1_r7uftx.jpg',
         alt: 'Momstitched - handcrafted women\'s fashion',
     },
     smallImage: {

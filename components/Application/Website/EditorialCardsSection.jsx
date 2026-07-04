@@ -18,7 +18,7 @@ const CARDS = [
         description: "Crafted with a mother's love — each piece carries the warmth, care, and attention that defines who we are.",
         cta: 'Discover More',
         href: '/about-us',
-        image: '/assets/images/hero/03.webp',
+        image: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1783145809/mom.stitched_1770484683_3827423237227958318_47423868805_yw1u6u.png',
         overlay: 'bg-gradient-to-t from-black/80 via-black/30 to-black/10',
     },
     {
@@ -36,7 +36,7 @@ const CARDS = [
         description: "Have a question or need help finding the right fit? We're always here to help you.",
         cta: 'Get In Touch',
         href: '/contact',
-        image: '/assets/images/hero/04.webp',
+        image: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1783145808/medha111_1744463187_3609141260625880268_2034285964_kpfguy.jpg',
         overlay: 'bg-gradient-to-t from-black/85 via-black/35 to-black/10',
     },
 ]
