@@ -71,7 +71,7 @@ const InstagramReelsMarquee = () => {
                         <InstagramIcon className="size-8" />
                     </Link>
                     <Link
-                        href="https://www.facebook.com/people/momstitched/100087738263074/#"
+                        href="https://www.facebook.com/profile.php?id=100087738263074"
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Open MomStitched on Facebook"

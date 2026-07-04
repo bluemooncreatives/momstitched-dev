@@ -278,7 +278,7 @@ const ContactPage = () => {
                 <a href="https://www.instagram.com/mom.stitched" target="_blank" rel="noreferrer">Instagram</a>
               </div>
               <div className={styles.item}>
-                <a href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a>
+                <a href="https://www.facebook.com/profile.php?id=100087738263074" target="_blank" rel="noreferrer">Facebook</a>
               </div>
               <div className={styles.item}>
                 <a href="https://youtube.com" target="_blank" rel="noreferrer">YouTube</a>

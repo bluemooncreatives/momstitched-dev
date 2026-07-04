@@ -38,7 +38,7 @@ const helpLinks = [
 const socialLinks = [
     { label: 'Instagram', href: 'https://www.instagram.com/mom.stitched', Icon: Instagram },
     { label: 'WhatsApp', href: 'https://wa.me/918237284906', Icon: MessageCircle },
-    { label: 'Facebook', href: 'https://www.facebook.com/people/momstitched/100087738263074/', Icon: Facebook },
+    { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=100087738263074', Icon: Facebook },
     { label: 'X (Twitter)', href: 'https://twitter.com/momstitched', Icon: Twitter },
 ]
 
