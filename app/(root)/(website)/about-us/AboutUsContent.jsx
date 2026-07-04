@@ -29,6 +29,10 @@ const HERO_LEFT_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1783
 const HERO_CENTER_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1783063101/WhatsApp_Image_2026-07-03_at_12.46.03_PM_uqte4t.jpg";
 const HERO_RIGHT_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781942605/x98cddrvoz82losytye7.jpg";
 
+// Profile photos — kept separate from the hero images above so each can change independently.
+const ADITI_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781945835/einxusjo1pubrtkgfddc.jpg";
+const SANDHYA_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781938294/upvpbt6rrkkojddwsniu.jpg";
+
 // Brand-story paragraphs shown beneath the statement.
 const STORY = [
   "Momstitched was born in May 2021, in the heart of India's hardest COVID days. What started as one small idea, carried through so much uncertainty, slowly grew into something far greater - a quiet symbol of hope. And it began with my mom: her creativity, her strength, and her endless love became the spirit behind every thread we stitch, and the reason this journey ever started.",
@@ -41,7 +45,7 @@ const PEOPLE = [
   {
     name: "Aditi Dhakate",
     role: "Founder · Face Behind the brand",
-    image: HERO_CENTER_IMAGE,
+    image: ADITI_IMAGE,
     bio: [
       "I started out in IT engineering - a world of code, systems, and logic. But creativity had other plans for me.",
       "Taking a leap from tech into fashion wasn't random - it was inspired by the strongest influence in my life: my mom. Her creativity and passion became the soul of Momstitched, and the reason I dared to turn this idea into reality.",
@@ -52,7 +56,7 @@ const PEOPLE = [
   {
     name: "Sandhya Dhakate",
     role: "Mom · Heart of Momstitched",
-    image: HERO_RIGHT_IMAGE,
+    image: SANDHYA_IMAGE,
     reverse: true,
     bio: [
       "She is the heart, the strength, and the soul behind Momstitched. A homemaker by role but a creator by passion, she has always expressed her love through every stitch she made for her daughters.",
