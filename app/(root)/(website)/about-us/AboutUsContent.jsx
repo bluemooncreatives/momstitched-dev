@@ -31,7 +31,7 @@ const HERO_RIGHT_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v178
 
 // Profile photos — kept separate from the hero images above so each can change independently.
 const ADITI_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781945835/einxusjo1pubrtkgfddc.jpg";
-const SANDHYA_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781938294/upvpbt6rrkkojddwsniu.jpg";
+const SANDHYA_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1783063101/WhatsApp_Image_2026-07-03_at_12.46.03_PM_uqte4t.jpg";
 
 // Brand-story paragraphs shown beneath the statement.
 const STORY = [
