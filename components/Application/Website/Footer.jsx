@@ -88,6 +88,20 @@ const Footer = ({ categoryLinks = [] }) => {
             stagger: 0.12,
             scrollTrigger: { trigger: '.footer-cols', start: 'top 85%', once: true },
         })
+
+        // The footer sits below several lazily-hydrated sections whose real
+        // height isn't known yet when these triggers are first measured, so
+        // their start positions go stale once that content mounts/loads —
+        // leaving the footer stuck at its hidden (autoAlpha: 0) starting
+        // state. Recompute once everything above has settled.
+        const lateRefresh = () => ScrollTrigger.refresh()
+        const timer = setTimeout(lateRefresh, 300)
+        window.addEventListener('load', lateRefresh)
+
+        return () => {
+            clearTimeout(timer)
+            window.removeEventListener('load', lateRefresh)
+        }
     }, { scope: rootRef })
 
     return (
