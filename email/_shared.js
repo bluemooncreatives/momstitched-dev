@@ -36,7 +36,7 @@ export const LOGO_URL =
 
 // The only real social account we own.
 export const INSTAGRAM_URL =
-    "https://www.instagram.com/mom.stitched?igsh=MW84azk0ZG14dzlncw==";
+    "https://www.instagram.com/mom.stitched";
 
 export const BRAND_NAME = "MomStitched";
 

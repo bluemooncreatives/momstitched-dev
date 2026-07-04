@@ -36,8 +36,8 @@ const helpLinks = [
 ]
 
 const socialLinks = [
-    { label: 'Instagram', href: 'https://www.instagram.com/mom.stitched/', Icon: Instagram },
-    { label: 'WhatsApp', href: 'https://wa.me/918569874589', Icon: MessageCircle },
+    { label: 'Instagram', href: 'https://www.instagram.com/mom.stitched', Icon: Instagram },
+    { label: 'WhatsApp', href: 'https://wa.me/918237284906', Icon: MessageCircle },
     { label: 'Facebook', href: 'https://www.facebook.com/people/momstitched/100087738263074/', Icon: Facebook },
     { label: 'X (Twitter)', href: 'https://twitter.com/momstitched', Icon: Twitter },
 ]
@@ -136,11 +136,11 @@ const Footer = ({ categoryLinks = [] }) => {
                         <ul className='space-y-2 text-white/70'>
                             <li className='flex lg:justify-end items-center gap-2'>
                                 <MapPin className='size-5 shrink-0 lg:order-2' />
-                                <span>Lucknow, India 256320</span>
+                                <span>Pune, Maharashtra 411047</span>
                             </li>
                             <li className='flex lg:justify-end items-center gap-2'>
                                 <Phone className='size-5 shrink-0 lg:order-2' />
-                                <Link href='tel:+91-8569874589' className='hover:text-[var(--brand-cream)] transition-colors'>+91-8569874589</Link>
+                                <Link href='tel:+91-8237284906' className='hover:text-[var(--brand-cream)] transition-colors'>+91-8237284906</Link>
                             </li>
                             <li className='flex lg:justify-end items-center gap-2'>
                                 <Mail className='size-5 shrink-0 lg:order-2' />
@@ -168,7 +168,7 @@ const Footer = ({ categoryLinks = [] }) => {
                         <p>Copyright © {new Date().getFullYear()} MomStitched. All Rights Reserved.</p>
                         <span className='hidden text-[var(--brand-cream)]/40 sm:inline' aria-hidden='true'>•</span>
                         <p className='text-[var(--brand-cream)]/70'>
-                            Designed, built &amp; engineered end-to-end by{' '}
+                            Designed &amp; built by{' '}
                             <Link
                                 href='https://www.instagram.com/bluemoon.creatives/'
                                 target='_blank'
@@ -182,7 +182,7 @@ const Footer = ({ categoryLinks = [] }) => {
                     </div>
                     <div className='flex items-center flex-wrap justify-center gap-x-8 gap-y-2'>
                         <span className='flex items-center gap-1.5'>
-                            <Globe className='size-4' /> Lucknow, India
+                            <Globe className='size-4' /> Pune, India
                         </span>
                         {socialLinks.map(({ label, href }) => (
                             <Link key={`bar-${label}`} href={href} target='_blank' rel='noopener noreferrer' className='hover:text-[var(--brand-white)] transition-colors'>

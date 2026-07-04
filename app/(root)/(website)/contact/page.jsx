@@ -256,15 +256,15 @@ const ContactPage = () => {
               <div className={styles.sectionLabel}><p>Where</p></div>
               <div className={styles.divider} />
               <div className={styles.item}><p>MomStitched</p></div>
-              <div className={styles.item}><p>Market, Lucknow</p></div>
-              <div className={styles.item}><p>India - 256320</p></div>
+              <div className={styles.item}><p>Pune, Maharashtra</p></div>
+              <div className={styles.item}><p>411047</p></div>
             </div>
 
             <div>
               <div className={styles.sectionLabel}><p>Phone</p></div>
               <div className={styles.divider} />
               <div className={styles.item}>
-                <a href="tel:+918569874589">+91 85698 74589</a>
+                <a href="tel:+918237284906">+91 82372 84906</a>
               </div>
             </div>
           </div>
@@ -275,7 +275,7 @@ const ContactPage = () => {
               <div className={styles.sectionLabel}><p>Socials</p></div>
               <div className={styles.divider} />
               <div className={styles.item}>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>
+                <a href="https://www.instagram.com/mom.stitched" target="_blank" rel="noreferrer">Instagram</a>
               </div>
               <div className={styles.item}>
                 <a href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a>

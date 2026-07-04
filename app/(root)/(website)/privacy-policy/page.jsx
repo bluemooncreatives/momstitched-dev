@@ -50,14 +50,14 @@ const PrivacyPolicy = () => {
                     <p>
                         The data controller responsible for your personal information is:<br /><br />
                         <strong>Business Name:</strong> MomStitched<br />
-                        <strong>Registered Address:</strong> Market, Lucknow, Uttar Pradesh, India – 256320<br />
+                        <strong>Registered Address:</strong> Pune, Maharashtra 411047<br />
                         <strong>Email:</strong>{' '}
                         <a href="mailto:momstitched.official@gmail.com" className='text-[var(--dark-red-2)] underline underline-offset-2'>
                             momstitched.official@gmail.com
                         </a><br />
                         <strong>Phone:</strong>{' '}
-                        <a href="tel:+918569874589" className='text-[var(--dark-red-2)] underline underline-offset-2'>
-                            +91 85698 74589
+                        <a href="tel:+918237284906" className='text-[var(--dark-red-2)] underline underline-offset-2'>
+                            +91 82372 84906
                         </a>
                     </p>
                     <p>
@@ -277,11 +277,11 @@ const PrivacyPolicy = () => {
                             </a>
                         </li>
                         <li><strong>Phone:</strong>{' '}
-                            <a href="tel:+918569874589" className='text-[var(--dark-red-2)] underline underline-offset-2'>
-                                +91 85698 74589
+                            <a href="tel:+918237284906" className='text-[var(--dark-red-2)] underline underline-offset-2'>
+                                +91 82372 84906
                             </a>
                         </li>
-                        <li><strong>Address:</strong> MomStitched, Market, Lucknow, Uttar Pradesh, India – 256320</li>
+                        <li><strong>Address:</strong> MomStitched, Pune, Maharashtra 411047</li>
                     </ul>
                     <p className='mt-4 text-base lg:text-[17px] leading-relaxed text-gray-700'>
                         You may also review our{' '}

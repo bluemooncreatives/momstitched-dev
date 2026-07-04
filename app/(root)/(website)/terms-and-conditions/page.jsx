@@ -44,14 +44,14 @@ const TermsAndConditions = () => {
                 <Section number="1" title="Company Information">
                     <p>
                         <strong>Business Name:</strong> MomStitched<br />
-                        <strong>Registered Address:</strong> Market, Lucknow, Uttar Pradesh, India – 256320<br />
+                        <strong>Registered Address:</strong> Pune, Maharashtra 411047<br />
                         <strong>Email:</strong>{' '}
                         <a href="mailto:momstitched.official@gmail.com" className='text-[var(--dark-red-2)] underline underline-offset-2'>
                             momstitched.official@gmail.com
                         </a><br />
                         <strong>Phone:</strong>{' '}
-                        <a href="tel:+918569874589" className='text-[var(--dark-red-2)] underline underline-offset-2'>
-                            +91 85698 74589
+                        <a href="tel:+918237284906" className='text-[var(--dark-red-2)] underline underline-offset-2'>
+                            +91 82372 84906
                         </a>
                     </p>
                 </Section>
@@ -216,7 +216,7 @@ const TermsAndConditions = () => {
                 <Section number="15" title="Governing Law & Jurisdiction">
                     <ul className='list-disc ps-6 space-y-2'>
                         <li>These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions.</li>
-                        <li>Any disputes arising in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of Lucknow, Uttar Pradesh, India.</li>
+                        <li>Any disputes arising in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of Pune, Maharashtra, India.</li>
                         <li>If you are a consumer based in the EU, UK, or Australia, mandatory local consumer protection laws of your country may also apply and are not overridden by this clause.</li>
                     </ul>
                 </Section>
@@ -269,11 +269,11 @@ const TermsAndConditions = () => {
                             </a>
                         </li>
                         <li><strong>Phone:</strong>{' '}
-                            <a href="tel:+918569874589" className='text-[var(--dark-red-2)] underline underline-offset-2'>
-                                +91 85698 74589
+                            <a href="tel:+918237284906" className='text-[var(--dark-red-2)] underline underline-offset-2'>
+                                +91 82372 84906
                             </a>
                         </li>
-                        <li><strong>Address:</strong> MomStitched, Market, Lucknow, Uttar Pradesh, India – 256320</li>
+                        <li><strong>Address:</strong> MomStitched, Pune, Maharashtra 411047</li>
                     </ul>
                     <p className='mt-6 text-sm text-gray-500'>
                         Thank you for choosing MomStitched. We are committed to providing you with a safe, reliable, and enjoyable shopping experience.

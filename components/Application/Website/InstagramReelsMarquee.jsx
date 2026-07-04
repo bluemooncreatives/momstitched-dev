@@ -58,7 +58,7 @@ const InstagramReelsMarquee = () => {
                 </h2>
                 <div className="flex shrink-0 items-center gap-4 text-[var(--dark-red-2)]">
                     <Link
-                        href="https://www.instagram.com/mom.stitched/"
+                        href="https://www.instagram.com/mom.stitched"
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Open MomStitched on Instagram"
