@@ -15,19 +15,24 @@ const FacebookIcon = ({ className }) => (
     </svg>
 )
 
-const instagramVideos = [
-    "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260204-WA0385_bzffp6.mp4",
-    "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260223-WA0435_unfxuc.mp4",
-    "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260125-WA0610_nfqkfc.mp4",
-    "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260217-WA0033_nufjor.mp4",
-    "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586808/VID-20260224-WA0146_iy2bkc.mp4",
-    "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260216-WA0140_c7yy8m.mp4",
-    "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586809/VID-20260224-WA0147_tgwjvu.mp4",
+const instagramMedia = [
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260204-WA0385_bzffp6.mp4" },
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260223-WA0435_unfxuc.mp4" },
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260125-WA0610_nfqkfc.mp4" },
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260217-WA0033_nufjor.mp4" },
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586808/VID-20260224-WA0146_iy2bkc.mp4" },
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586807/VID-20260216-WA0140_c7yy8m.mp4" },
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1773586809/VID-20260224-WA0147_tgwjvu.mp4" },
+    { type: 'image', src: "https://res.cloudinary.com/darrsi9y2/image/upload/v1783145809/mom.stitched_1770484683_3827423237227958318_47423868805_yw1u6u.png" },
+    { type: 'image', src: "https://res.cloudinary.com/darrsi9y2/image/upload/v1781949038/wshhp1zggdyifk5dr9cr.jpg" },
+    { type: 'image', src: "https://res.cloudinary.com/darrsi9y2/image/upload/v1781947528/qcbfdwai0pmvv97khlcw.jpg" },
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1783150376/mom.stitched_1772633598_3843762905699627297_47423868805_ukgg1i.mp4" },
+    { type: 'video', src: "https://res.cloudinary.com/darrsi9y2/video/upload/v1783150426/mom.stitched_1747282614_3632379012031112385_47423868805_b4cbag.mp4" },
 ]
 
 const InstagramReelsMarquee = () => {
     const trackRef = useRef(null)
-    const reels = [...instagramVideos, ...instagramVideos]
+    const reels = [...instagramMedia, ...instagramMedia]
 
     useEffect(() => {
         if (!trackRef.current) return
@@ -80,19 +85,29 @@ const InstagramReelsMarquee = () => {
 
             <div className="instagram-marquee">
                 <div className="instagram-track" ref={trackRef}>
-                    {reels.map((video, index) => (
-                        <div key={`${video}-${index}`} className="instagram-card">
-                            <video
-                                src={video}
-                                muted
-                                playsInline
-                                loop
-                                preload="none"
-                                aria-hidden="true"
-                                className="h-full w-full object-cover"
-                            >
-                                <track kind="captions" src="/assets/captions/empty.vtt" srcLang="en" label="No captions — decorative video" />
-                            </video>
+                    {reels.map((item, index) => (
+                        <div key={`${item.src}-${index}`} className="instagram-card">
+                            {item.type === 'image' ? (
+                                <img
+                                    src={item.src}
+                                    alt=""
+                                    aria-hidden="true"
+                                    loading="lazy"
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                <video
+                                    src={item.src}
+                                    muted
+                                    playsInline
+                                    loop
+                                    preload="none"
+                                    aria-hidden="true"
+                                    className="h-full w-full object-cover"
+                                >
+                                    <track kind="captions" src="/assets/captions/empty.vtt" srcLang="en" label="No captions — decorative video" />
+                                </video>
+                            )}
                         </div>
                     ))}
                 </div>
