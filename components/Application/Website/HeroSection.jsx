@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { CustomEase } from "gsap/CustomEase";
 
 import PageLoader from "./PageLoader";
+import { WEBSITE_SHOP } from "@/routes/WebsiteRoute";
 
 gsap.registerPlugin(useGSAP, CustomEase);
 
@@ -496,40 +498,51 @@ const HeroSection = () => {
         </div>
 
         {/* Mobile title */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-40 w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden px-8 lg:hidden">
+        <div className="absolute left-1/2 top-1/2 z-20 h-40 w-full -translate-x-1/2 -translate-y-1/2 overflow-hidden px-8 lg:hidden">
           <div ref={mobileTitleTrackRef} className="relative top-0 w-full will-change-transform">
             {SLIDES.map((slide) => (
               <div key={slide.id} className="flex h-40 flex-col items-center justify-center">
-                <p className="text-center text-[38px] font-medium leading-tight text-white">
+                <Link
+                  href={WEBSITE_SHOP}
+                  className="pointer-events-auto text-center text-[38px] font-medium leading-tight text-white transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   {textSplit ? splitToChars(slide.title) : slide.title}
-                </p>
+                </Link>
               </div>
             ))}
           </div>
         </div>
 
         {/* Desktop headline */}
-        <div className="pointer-events-none absolute bottom-24 left-18 z-20 hidden h-[172px] w-[68%] overflow-hidden lg:block">
+        <div className="absolute bottom-24 left-18 z-20 hidden h-[172px] w-[68%] overflow-hidden lg:block">
           <div ref={headlineTrackRef} className="relative top-0 will-change-transform">
             {SLIDES.map((slide) => (
-              <h2
+              <Link
                 key={slide.id}
-                className="flex h-[172px] items-end pb-2 text-[clamp(4.5rem,10vw,8.5rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-white"
+                href={WEBSITE_SHOP}
+                className="pointer-events-auto flex h-[172px] items-end pb-2 text-[clamp(4.5rem,10vw,8.5rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-white transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                onClick={(event) => event.stopPropagation()}
               >
                 {textSplit ? splitToChars(slide.headline) : slide.headline}
-              </h2>
+              </Link>
             ))}
           </div>
         </div>
 
         {/* Desktop writeup */}
-        <div className="pointer-events-none absolute right-8 top-28 z-20 hidden h-[176px] w-[440px] overflow-hidden lg:block">
+        <div className="absolute right-8 top-28 z-20 hidden h-[176px] w-[440px] overflow-hidden lg:block">
           <div ref={writeupTrackRef} className="relative top-0 will-change-transform">
             {SLIDES.map((slide) => (
-              <div key={slide.id} className="flex h-[176px] flex-col gap-3">
+              <Link
+                key={slide.id}
+                href={WEBSITE_SHOP}
+                className="pointer-events-auto flex h-[176px] flex-col gap-3 rounded-sm transition-opacity duration-200 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dark-red)]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                onClick={(event) => event.stopPropagation()}
+              >
                 <p className="writeup-title text-[44px] font-medium leading-[46px] text-[var(--dark-red-2)]">{slide.title}</p>
                 <p className="writeup-desc max-w-[380px] text-base font-medium leading-6 text-[var(--dark-red)]">{slide.writeup}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
