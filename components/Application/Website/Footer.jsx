@@ -5,7 +5,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
 import Link from 'next/link'
-import { MapPin, Phone, Mail, Instagram, MessageCircle, Facebook, Twitter, Globe, ArrowRight } from 'lucide-react'
+import { MapPin, Mail, Instagram, Facebook, Twitter, Globe, ArrowRight } from 'lucide-react'
 
 import { USER_DASHBOARD, WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import FooterWordmark from '@/components/Application/Website/FooterWordmark'
@@ -37,7 +37,6 @@ const helpLinks = [
 
 const socialLinks = [
     { label: 'Instagram', href: 'https://www.instagram.com/mom.stitched', Icon: Instagram },
-    { label: 'WhatsApp', href: 'https://wa.me/918237284906', Icon: MessageCircle },
     { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=100087738263074', Icon: Facebook },
     { label: 'X (Twitter)', href: 'https://twitter.com/momstitched', Icon: Twitter },
 ]
@@ -151,10 +150,6 @@ const Footer = ({ categoryLinks = [] }) => {
                             <li className='flex lg:justify-end items-center gap-2'>
                                 <MapPin className='size-5 shrink-0 lg:order-2' />
                                 <span>Pune, Maharashtra 411047</span>
-                            </li>
-                            <li className='flex lg:justify-end items-center gap-2'>
-                                <Phone className='size-5 shrink-0 lg:order-2' />
-                                <Link href='tel:+91-8237284906' className='hover:text-[var(--brand-cream)] transition-colors'>+91-8237284906</Link>
                             </li>
                             <li className='flex lg:justify-end items-center gap-2'>
                                 <Mail className='size-5 shrink-0 lg:order-2' />

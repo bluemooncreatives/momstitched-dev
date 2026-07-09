@@ -261,12 +261,13 @@ const ContactPage = () => {
             </div>
 
             <div>
-              <div className={styles.sectionLabel}><p>Phone</p></div>
+              <div className={styles.sectionLabel}><p>Mail</p></div>
               <div className={styles.divider} />
               <div className={styles.item}>
-                <a href="tel:+918237284906">+91 82372 84906</a>
+                <a href="mailto:momstitched.official@gmail.com">momstitched.official@gmail.com</a>
               </div>
             </div>
+
           </div>
 
           {/* Right column */}
@@ -285,13 +286,6 @@ const ContactPage = () => {
               </div>
             </div>
 
-            <div>
-              <div className={styles.sectionLabel}><p>Mail</p></div>
-              <div className={styles.divider} />
-              <div className={styles.item}>
-                <a href="mailto:momstitched.official@gmail.com">momstitched.official@gmail.com</a>
-              </div>
-            </div>
           </div>
 
         </div>
