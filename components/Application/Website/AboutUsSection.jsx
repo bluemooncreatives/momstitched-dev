@@ -15,18 +15,18 @@ gsap.registerPlugin(ScrollTrigger)
 const CONTENT = {
     leftImage: {
         src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1783146225/DSCF5008_1_r7uftx.jpg',
-        alt: 'Momstitched - handcrafted women\'s fashion',
+        alt: 'MomStitched - handcrafted women\'s fashion',
     },
     smallImage: {
         src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1779221853/mtonkotfj50dwoswlr2j.jpg',
-        alt: 'A detail from the Momstitched collection',
+        alt: 'A detail from the MomStitched collection',
     },
     bottomImage: {
         src: 'https://res.cloudinary.com/darrsi9y2/image/upload/v1781947914/wbbpf3ivaxy7f8geenmb.jpg',
-        alt: 'Momstitched atelier at work',
+        alt: 'MomStitched atelier at work',
     },
     paragraphs: [
-        'Momstitched is a family-owned contemporary women\'s fashion brand, founded by a devoted mother and her passion for handcrafted clothing. Our journey began with a mission to create garments that transcend trends and serve as a celebration of femininity, culture, and grace. Every stitch carries a story - of care, of craft, and of a deep love for the women who wear our pieces.',
+        'MomStitched is a family-owned contemporary women\'s fashion brand, founded by a devoted mother and her passion for handcrafted clothing. Our journey began with a mission to create garments that transcend trends and serve as a celebration of femininity, culture, and grace. Every stitch carries a story - of care, of craft, and of a deep love for the women who wear our pieces.',
         'We take pride in working with the finest fabrics and artisan techniques. Our collections are as unique as they are wearable - pieces designed to make every woman feel confident, beautiful, and deeply seen in what she wears. From delicate hand-embroidery to thoughtfully draped silhouettes, each garment is shaped by generations of tradition and a modern eye for elegance.',
     ],
     date: 'Est. 2019',

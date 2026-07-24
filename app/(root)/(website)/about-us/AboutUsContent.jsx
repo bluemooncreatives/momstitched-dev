@@ -359,7 +359,7 @@ const AboutUsContent = ({ products = [] }) => {
         <div className={styles.statementWrap}>
           <div ref={statementRef}>
             <h2 className={styles.statement}>
-              Momstitched isn&apos;t just a clothing brand - it&apos;s a story
+              MomStitched isn&apos;t just a clothing brand - it&apos;s a story
               stitched with love, resilience, and family.
             </h2>
           </div>
@@ -394,7 +394,7 @@ const AboutUsContent = ({ products = [] }) => {
               Not built by a corporation - built by a family, by hand.
             </h2>
             <p className={styles.peopleIntro}>
-              Behind every Momstitched piece is one small family doing every
+              Behind every MomStitched piece is one small family doing every
               part themselves - designing, stitching, packing, and shipping
               straight from our home in India to yours. These are the two women
               at the very heart of it.
