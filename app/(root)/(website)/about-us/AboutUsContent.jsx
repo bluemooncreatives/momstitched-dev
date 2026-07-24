@@ -35,9 +35,9 @@ const SANDHYA_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v178306
 
 // Brand-story paragraphs shown beneath the statement.
 const STORY = [
-  "Momstitched was born in May 2021, in the heart of India's hardest COVID days. What started as one small idea, carried through so much uncertainty, slowly grew into something far greater - a quiet symbol of hope. And it began with my mom: her creativity, her strength, and her endless love became the spirit behind every thread we stitch, and the reason this journey ever started.",
+  "MomSitched was born in May 2021, in the heart of India's hardest COVID days. What started as one small idea, carried through so much uncertainty, slowly grew into something far greater - a quiet symbol of hope. And it began with my mom: her creativity, her strength, and her endless love became the spirit behind every thread we stitch, and the reason this journey ever started.",
   "What makes us different is simple - we're not backed by big corporations, we're powered by family. My sister keeps everything running seamlessly online, my father handles logistics like a pro, and together, by hand, we build every part of this brand. Every design, every package, every decision travels straight from our home to yours.",
-  "Rooted in India and driven by passion, we make clothing that feels real, personal, and meaningful - because it truly is. This isn't fast fashion. It's family fashion. This is Momstitched.",
+  "Rooted in India and driven by passion, we make clothing that feels real, personal, and meaningful - because it truly is. This isn't fast fashion. It's family fashion. This is MomStitched.",
 ];
 
 // The two people behind the brand. `reverse` flips the image/text order.
@@ -48,18 +48,18 @@ const PEOPLE = [
     image: ADITI_IMAGE,
     bio: [
       "I started out in IT engineering - a world of code, systems, and logic. But creativity had other plans for me.",
-      "Taking a leap from tech into fashion wasn't random - it was inspired by the strongest influence in my life: my mom. Her creativity and passion became the soul of Momstitched, and the reason I dared to turn this idea into reality.",
+      "Taking a leap from tech into fashion wasn't random - it was inspired by the strongest influence in my life: my mom. Her creativity and passion became the soul of MomStitched, and the reason I dared to turn this idea into reality.",
       "Today I'm the face behind the brand, bringing together creativity, clarity, and a fresh perspective. I still carry my technical mindset - but now I use it to build something more expressive and personal.",
       "Bubbly, driven, and real - professional when it matters, cool always. For me, fashion is about confidence, identity, and owning your story. And I'm just getting started.",
     ],
   },
   {
     name: "Sandhya Dhakate",
-    role: "Mom · Heart of Momstitched",
+    role: "Mom · Heart of MomStitched",
     image: SANDHYA_IMAGE,
     reverse: true,
     bio: [
-      "She is the heart, the strength, and the soul behind Momstitched. A homemaker by role but a creator by passion, she has always expressed her love through every stitch she made for her daughters.",
+      "She is the heart, the strength, and the soul behind MomStitched. A homemaker by role but a creator by passion, she has always expressed her love through every stitch she made for her daughters.",
       "What began as simple, thoughtful creations at home has grown into something much bigger - today she stitches not just for us, but for daughters everywhere.",
       "Her strength lies in her warmth, her creativity, and the way she brings life into everything she touches - graceful, vibrant, and endlessly inspiring.",
       "Beyond the brand she's full of life — kitty parties, picnics, community work, and peace in her bhajan groups. Momstitched exists because of her: her love, her vision, and her magic in every stitch.",
