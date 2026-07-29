@@ -103,7 +103,7 @@ const AboutUsSection = () => {
                     </div>
                     <ShopAllButton
                         label="See More"
-                        href="/about"
+                        href="/about-us"
                         colorScheme="dark-red"
                         radius="md"
                         className="mt-3 min-w-0 w-full h-10 px-4 rounded-sm text-[0.72rem]"
