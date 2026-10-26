@@ -6,7 +6,7 @@ import {
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Recycle, Trash2, RotateCcw, Trash, Download, MoreHorizontal } from 'lucide-react'
 import useDeleteMutation from '@/hooks/useDeleteMutation'
 import ButtonLoading from '../ButtonLoading'
@@ -44,6 +44,12 @@ const Datatable = ({
     deleteType,
     trashView,
     createAction,
+    // Optional: extra query params sent with every fetch (e.g. a status
+    // filter). Changing them restarts at page 1 and clears the selection.
+    extraParams,
+    // Optional: ({ selectedIds, clearSelection, meta, isFetching }) => node,
+    // rendered alongside the built-in toolbar buttons.
+    renderToolbar,
 }) => {
 
     const [columnFilters, setColumnFilters] = useState([])
@@ -60,6 +66,12 @@ const Datatable = ({
     const deleteMutation = useDeleteMutation(queryKey, deleteEndpoint)
 
     const hasSelection = Object.keys(rowSelection).length > 0
+
+    const extraParamsKey = JSON.stringify(extraParams ?? {})
+    useEffect(() => {
+        setPagination((prev) => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
+        setRowSelection({})
+    }, [extraParamsKey])
     const handleGlobalFilterChange = (value) => {
         setGlobalFilter((prev) => {
             const nextValue = typeof value === 'function' ? value(prev) : value
@@ -121,8 +133,9 @@ const Datatable = ({
         isError,
         isRefetching,
         isLoading,
+        isFetching,
     } = useQuery({
-        queryKey: [queryKey, { columnFilters, globalFilter, pagination, sorting }],
+        queryKey: [queryKey, { columnFilters, globalFilter, pagination, sorting, extraParams: extraParamsKey }],
         queryFn: async () => {
             const { data: response } = await axios.get(fetchUrl, {
                 params: {
@@ -132,6 +145,7 @@ const Datatable = ({
                     globalFilter: globalFilter ?? '',
                     sorting: JSON.stringify(sorting ?? []),
                     deleteType,
+                    ...(extraParams ?? {}),
                 },
             })
             return response
@@ -246,6 +260,13 @@ const Datatable = ({
                         className="flex-1"
                     />
                     <div className="flex flex-wrap items-center gap-2">
+                        {renderToolbar?.({
+                            selectedIds: Object.keys(rowSelection),
+                            clearSelection: () => setRowSelection({}),
+                            meta,
+                            isFetching,
+                        })}
+
                         {deleteType !== 'PD' && (
                             <Button asChild variant="outline" size="lg" className="h-9">
                                 <Link href={trashView}>

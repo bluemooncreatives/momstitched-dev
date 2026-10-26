@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import ReviewModel from "@/models/Review.model";
+import { LIVE_REVIEW_FILTER } from "@/lib/reviewModeration";
 import mongoose from "mongoose";
 
 export async function GET(request) {
@@ -8,12 +9,13 @@ export async function GET(request) {
         await connectDB()
         const searchParams = request.nextUrl.searchParams
         const productId = searchParams.get('productId')
-        if (!productId) {
+        if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
             return response(false, 404, 'Product is missing.')
         }
 
+        // Drafts never count towards the public rating summary.
         const reviews = await ReviewModel.aggregate([
-            { $match: { product: new mongoose.Types.ObjectId(productId), deletedAt: null } },
+            { $match: { product: new mongoose.Types.ObjectId(productId), ...LIVE_REVIEW_FILTER } },
             { $group: { _id: "$rating", count: { $sum: 1 } } },
             { $sort: { _id: 1 } }
         ])

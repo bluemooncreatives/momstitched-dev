@@ -59,6 +59,11 @@ const LatestReview = () => {
                                     <AvatarImage src={review?.product?.media[0]?.secure_url || imgPlaceholder.src} />
                                 </Avatar>
                                 <span className="line-clamp-1 font-medium">{review?.product?.name || 'Not found'}</span>
+                                {review?.isPublished === false && (
+                                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                                        Draft
+                                    </span>
+                                )}
                             </div>
                         </TableCell>
                         <TableCell className="bg-background py-3">

@@ -26,6 +26,14 @@ const reviewSchema = new mongoose.Schema({
         required: true,
     },
 
+    // Draft/Live moderation. Drafts stay in the admin panel but are excluded
+    // from every storefront list and rating. Legacy rows without the field are
+    // treated as live (see lib/reviewModeration.js).
+    isPublished: {
+        type: Boolean,
+        default: true,
+    },
+
     deletedAt: {
         type: Date,
         default: null,
@@ -34,7 +42,7 @@ const reviewSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 
-reviewSchema.index({ product: 1, deletedAt: 1 })
+reviewSchema.index({ product: 1, deletedAt: 1, isPublished: 1 })
 reviewSchema.index({ user: 1, product: 1, deletedAt: 1 })
 
 const ReviewModel = mongoose.models.Review || mongoose.model('Review', reviewSchema, 'reviews')

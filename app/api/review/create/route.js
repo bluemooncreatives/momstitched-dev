@@ -10,6 +10,8 @@ import ReviewModel from "@/models/Review.model"
 import UserModel from "@/models/User.model"
 import { isValidObjectId } from "mongoose"
 import { ADMIN_REVIEW_SHOW } from "@/routes/AdminPanelRoute"
+import { NEW_REVIEWS_PUBLISHED } from "@/lib/reviewModeration"
+import { revalidateReviewCaches } from "@/lib/services/reviewCacheService"
 
 export async function POST(request) {
     try {
@@ -57,9 +59,15 @@ export async function POST(request) {
             rating: rating,
             title: title,
             review: review,
+            isPublished: NEW_REVIEWS_PUBLISHED,
         })
 
         await newReview.save()
+
+        // A live review changes the product's public rating straight away.
+        if (NEW_REVIEWS_PUBLISHED) {
+            revalidateReviewCaches()
+        }
 
         const reviewer = await UserModel.findById(auth.userId).select('name email').lean()
         const reviewerName = reviewer?.name || 'A customer'
@@ -68,7 +76,7 @@ export async function POST(request) {
         await notifyAdmins({
             type: ADMIN_EVENT.REVIEW_RECEIVED,
             dedupeKey: `${ADMIN_EVENT.REVIEW_RECEIVED}:${newReview._id}`,
-            title: `${rating}★ review on ${productData.name}`,
+            title: `${rating}★ review on ${productData.name}${NEW_REVIEWS_PUBLISHED ? '' : ' (awaiting approval)'}`,
             message: `${reviewerName}: “${title}”`,
             link: ADMIN_REVIEW_SHOW,
             meta: { reviewId: newReview._id.toString(), productId: product, rating },
@@ -83,6 +91,7 @@ export async function POST(request) {
                         { label: 'Title', value: title },
                         { label: 'Review', value: review },
                         { label: 'Customer', value: reviewer?.email ? `${reviewerName} · ${reviewer.email}` : reviewerName },
+                        { label: 'Status', value: NEW_REVIEWS_PUBLISHED ? 'Live on the storefront' : 'Draft — publish it to show it on the storefront' },
                     ],
                     ctaLabel: 'Moderate reviews',
                     ctaUrl: adminUrl(ADMIN_REVIEW_SHOW),
@@ -90,7 +99,14 @@ export async function POST(request) {
             },
         })
 
-        return response(true, 200, 'Your review submitted successfully.')
+        return response(
+            true,
+            200,
+            NEW_REVIEWS_PUBLISHED
+                ? 'Your review submitted successfully.'
+                : 'Thanks! Your review has been submitted and will appear once it is approved.',
+            { isPublished: NEW_REVIEWS_PUBLISHED }
+        )
 
     } catch (error) {
         return catchError(error)

@@ -1,6 +1,7 @@
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
-import { catchError, response } from "@/lib/helperFunction"
+import { catchError, escapeRegex, response } from "@/lib/helperFunction"
+import { reviewStatusFilter } from "@/lib/reviewModeration"
 import ReviewModel from "@/models/Review.model"
 
 import { NextResponse } from "next/server"
@@ -23,6 +24,8 @@ export async function GET(request) {
         const globalFilter = searchParams.get('globalFilter') || ""
         const sorting = JSON.parse(searchParams.get('sorting') || "[]")
         const deleteType = searchParams.get('deleteType')
+        // 'live' | 'draft' | '' (all)
+        const status = searchParams.get('status') || ''
 
         // Build match query  
         let matchQuery = {}
@@ -37,14 +40,22 @@ export async function GET(request) {
             preMatchQuery = { deletedAt: { $ne: null } }
         }
 
-        // Global search 
+        // Counts for the Draft/Live filter tabs ignore search and the current
+        // status, so each tab always shows how many it holds.
+        const statusBaseQuery = { ...preMatchQuery }
+
+        Object.assign(preMatchQuery, reviewStatusFilter(status))
+
+        // Global search (escaped: raw input like "(" would otherwise throw)
         if (globalFilter) {
+            const searchRegex = { $regex: escapeRegex(globalFilter), $options: 'i' }
+            const numericRating = Number(globalFilter)
             matchQuery["$or"] = [
-                { "productData.name": { $regex: globalFilter, $options: 'i' } },
-                { "userData.name": { $regex: globalFilter, $options: 'i' } },
-                { rating: { $regex: globalFilter, $options: 'i' } },
-                { title: { $regex: globalFilter, $options: 'i' } },
-                { review: { $regex: globalFilter, $options: 'i' } },
+                { "productData.name": searchRegex },
+                { "userData.name": searchRegex },
+                ...(Number.isInteger(numericRating) ? [{ rating: numericRating }] : []),
+                { title: searchRegex },
+                { review: searchRegex },
 
             ]
             postMatchQuery["$or"] = matchQuery["$or"]
@@ -52,23 +63,26 @@ export async function GET(request) {
 
         //  Column filteration  
 
+        const FILTERABLE = ['title', 'review']
         filters.forEach(filter => {
+            const regex = { $regex: escapeRegex(filter.value ?? ''), $options: 'i' }
             if (filter.id === 'product') {
-                matchQuery['productData.name'] = { $regex: filter.value, $options: 'i' }
-                postMatchQuery['productData.name'] = { $regex: filter.value, $options: 'i' }
+                matchQuery['productData.name'] = regex
+                postMatchQuery['productData.name'] = regex
             } else if (filter.id === 'user') {
-                matchQuery['userData.name'] = { $regex: filter.value, $options: 'i' }
-                postMatchQuery['userData.name'] = { $regex: filter.value, $options: 'i' }
-            } else {
-                matchQuery[filter.id] = { $regex: filter.value, $options: 'i' }
-                preMatchQuery[filter.id] = { $regex: filter.value, $options: 'i' }
+                matchQuery['userData.name'] = regex
+                postMatchQuery['userData.name'] = regex
+            } else if (FILTERABLE.includes(filter.id)) {
+                matchQuery[filter.id] = regex
+                preMatchQuery[filter.id] = regex
             }
         });
 
         //   Sorting  
         let sortQuery = {}
         sorting.forEach(sort => {
-            sortQuery[sort.id] = sort.desc ? -1 : 1
+            // The table's "status" column sorts on the underlying flag.
+            sortQuery[sort.id === 'status' ? 'isPublished' : sort.id] = sort.desc ? -1 : 1
         });
 
 
@@ -110,6 +124,8 @@ export async function GET(request) {
                     rating: 1,
                     review: 1,
                     title: 1,
+                    // Legacy reviews without the field are live.
+                    isPublished: { $ne: ['$isPublished', false] },
                     createdAt: 1,
                     updatedAt: 1,
                     deletedAt: 1
@@ -157,10 +173,18 @@ export async function GET(request) {
             totalRowCount = await ReviewModel.countDocuments(preMatchQuery)
         }
 
+        const [liveCount, draftCount] = await Promise.all([
+            ReviewModel.countDocuments({ ...statusBaseQuery, ...reviewStatusFilter('live') }),
+            ReviewModel.countDocuments({ ...statusBaseQuery, ...reviewStatusFilter('draft') }),
+        ])
+
         return NextResponse.json({
             success: true,
             data: getReview,
-            meta: { totalRowCount }
+            meta: {
+                totalRowCount,
+                statusCounts: { all: liveCount + draftCount, live: liveCount, draft: draftCount },
+            }
         })
 
     } catch (error) {

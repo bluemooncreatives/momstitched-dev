@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
 
 import ReviewModel from "@/models/Review.model"
+import { LIVE_REVIEW_FILTER } from "@/lib/reviewModeration"
 import mongoose from "mongoose"
 
 export async function GET(request) {
@@ -9,12 +10,16 @@ export async function GET(request) {
         await connectDB()
         const searchParams = request.nextUrl.searchParams
         const productId = searchParams.get('productId')
-        const page = parseInt(searchParams.get('page')) || 0
+        if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+            return response(false, 404, 'Product is missing.')
+        }
+        const page = Math.max(parseInt(searchParams.get('page')) || 0, 0)
         const limit = 10;
         const skip = page * limit
 
+        // Only live reviews are public; drafts stay in the admin panel.
         let matchQuery = {
-            deletedAt: null,
+            ...LIVE_REVIEW_FILTER,
             product: new mongoose.Types.ObjectId(productId)
         }
 

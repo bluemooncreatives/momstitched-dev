@@ -7,6 +7,9 @@ import BestsellersSection from '@/components/Application/Website/BestsellersSect
 // on the server, like BestsellersSection. Each code-splits its own client chunk.
 import CategoryArchiveSection from '@/components/Application/Website/CategoryArchiveSection'
 import Testimonial from '@/components/Application/Website/Testimonial'
+import JsonLd from '@/components/Application/JsonLd'
+import { FAQS } from '@/lib/faqData'
+import { faqJsonLd, organizationJsonLd, websiteJsonLd } from '@/lib/seo'
 
 // Defer all GSAP/ScrollTrigger and media-heavy sections into separate JS chunks
 // so they don't block parsing and hydration of the above-fold critical path.
@@ -31,6 +34,9 @@ export const metadata = {
 const Home = () => {
     return (
         <>
+            <JsonLd data={organizationJsonLd()} />
+            <JsonLd data={websiteJsonLd()} />
+            <JsonLd data={faqJsonLd(FAQS)} />
             <section>
                 <HeroSection />
             </section>

@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import ReviewModel from "@/models/Review.model";
+import { isReviewLive } from "@/lib/reviewModeration";
  
 export async function GET(request) {
     try {
@@ -22,7 +23,12 @@ export async function GET(request) {
             return response(false, 404, 'Collection empty.')
         }
 
-        return response(true, 200, 'Data found.', getReview)
+        const rows = getReview.map(({ isPublished, ...review }) => ({
+            ...review,
+            status: isReviewLive({ isPublished }) ? 'Live' : 'Draft',
+        }))
+
+        return response(true, 200, 'Data found.', rows)
 
 
     } catch (error) {

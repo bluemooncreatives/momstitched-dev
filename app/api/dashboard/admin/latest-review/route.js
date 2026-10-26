@@ -24,10 +24,14 @@ export async function GET() {
                     select: 'secure_url'
                 }
             })
+            .lean()
 
-        return response(true, 200, 'Latest review', latestReview)
+        // Legacy reviews without the flag are live.
+        const rows = latestReview.map((review) => ({ ...review, isPublished: review.isPublished !== false }))
 
-    } catch {
+        return response(true, 200, 'Latest review', rows)
+
+    } catch (error) {
         return catchError(error)
     }
 }
