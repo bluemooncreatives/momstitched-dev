@@ -1,7 +1,8 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import Image from 'next/image'
+import { showToast } from '@/lib/showToast'
 
-const ModalMediaBlock = ({ media, selectedMedia, setSelectedMedia, isMultiple }) => {
+const ModalMediaBlock = ({ media, selectedMedia, setSelectedMedia, isMultiple, max }) => {
     const handleCheck = () => {
         let newSelectedMedia = []
         const isSelected = selectedMedia.find(m => m._id === media._id) ? true : false
@@ -11,7 +12,10 @@ const ModalMediaBlock = ({ media, selectedMedia, setSelectedMedia, isMultiple })
                 //   remove selected media from array 
                 newSelectedMedia = selectedMedia.filter(m => m._id !== media._id)
             } else {
-                // add new media into array 
+                if (max && selectedMedia.length >= max) {
+                    return showToast('error', `You can select up to ${max} images.`)
+                }
+                // add new media into array (appended, so existing order is kept)
 
                 newSelectedMedia = [...selectedMedia, {
                     _id: media._id,
@@ -23,7 +27,7 @@ const ModalMediaBlock = ({ media, selectedMedia, setSelectedMedia, isMultiple })
 
         } else {
             // select single media 
-            setSelectedMedia([{ _id: media._id, url: media.secure_url }])
+            setSelectedMedia([{ _id: media._id, url: media.secure_url, alt: media.alt || '' }])
         }
     }
     return (

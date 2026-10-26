@@ -1,4 +1,5 @@
-import { revalidateTag } from "next/cache"
+import { revalidateCatalogue } from "@/lib/catalogueCache"
+import { findUnavailableMedia, unavailableMediaMessage } from "@/lib/mediaLibrary"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
@@ -42,6 +43,11 @@ export async function POST(request) {
         const pricing = validatePricing(variantData.mrp, variantData.sellingPrice)
         if (!pricing.ok) {
             return response(false, 400, pricing.message)
+        }
+
+        const unavailableMedia = await findUnavailableMedia(variantData.media)
+        if (unavailableMedia.length) {
+            return response(false, 400, unavailableMediaMessage(unavailableMedia.length))
         }
 
         const product = await ProductModel.findOne({ _id: variantData.product, deletedAt: null }).select('parentSku').lean()
@@ -90,8 +96,7 @@ export async function POST(request) {
 
         // A new variant can introduce a new colour/size — refresh the shop filter
         // list and the homepage "Shop by Colour" section.
-        revalidateTag('storefront-shop-filters')
-        revalidateTag('storefront-home-colors')
+        revalidateCatalogue()
 
         return response(true, 200, 'Product Variant added successfully.')
 

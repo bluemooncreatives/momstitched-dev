@@ -29,7 +29,7 @@ export async function GET(request, { params }) {
         filter._id = id
 
         const getProduct = await ProductModel.findOne(filter)
-            .populate('media', '_id secure_url')
+            .populate('media', '_id secure_url alt deletedAt deletingAt')
             .populate('sizeGuide', 'name slug type columns rows note isActive')
             .lean()
 

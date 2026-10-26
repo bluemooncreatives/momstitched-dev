@@ -3,14 +3,21 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import loading from '@/public/assets/images/loading.svg'
 import ModalMediaBlock from './ModalMediaBlock'
 import { showToast } from '@/lib/showToast'
 import ButtonLoading from '../ButtonLoading'
-const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple }) => {
+const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple, max }) => {
 
+    // Snapshot taken each time the dialog opens, so "Close" restores exactly
+    // what the form had — previously it restored an empty list on first open,
+    // wiping a product's existing images.
     const [previouslySelected, setPreviouslySelected] = useState([])
+    useEffect(() => {
+        if (open) setPreviouslySelected(selectedMedia)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open])
 
     const fetchMedia = async (page) => {
         const { data: response } = await axios.get(`/api/media?page=${page}&&limit=18&&deleteType=SD`)
@@ -59,7 +66,10 @@ const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
 
                 <div className='h-[90vh] rounded-xl border bg-background p-3 shadow-sm'>
                     <DialogHeader className="h-8 border-b">
-                        <DialogTitle>Media Selection</DialogTitle>
+                        <DialogTitle>
+                            Media Selection
+                            {isMultiple && max ? <span className="ml-2 text-sm font-normal text-muted-foreground">{selectedMedia.length} / {max} selected</span> : null}
+                        </DialogTitle>
                     </DialogHeader>
 
                     <div className='h-[calc(100%-80px)] overflow-auto py-2'>
@@ -86,6 +96,7 @@ const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
                                                                 selectedMedia={selectedMedia}
                                                                 setSelectedMedia={setSelectedMedia}
                                                                 isMultiple={isMultiple}
+                                                                max={max}
                                                             />
                                                         ))
                                                     }

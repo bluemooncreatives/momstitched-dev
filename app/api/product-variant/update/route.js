@@ -1,4 +1,5 @@
-import { revalidateTag } from "next/cache"
+import { revalidateCatalogue } from "@/lib/catalogueCache"
+import { findUnavailableMedia, unavailableMediaMessage } from "@/lib/mediaLibrary"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
@@ -42,6 +43,11 @@ export async function PUT(request) {
         const pricing = validatePricing(validatedData.mrp, validatedData.sellingPrice)
         if (!pricing.ok) {
             return response(false, 400, pricing.message)
+        }
+
+        const unavailableMedia = await findUnavailableMedia(validatedData.media)
+        if (unavailableMedia.length) {
+            return response(false, 400, unavailableMediaMessage(unavailableMedia.length))
         }
 
         const getProductVariant = await ProductVariantModel.findOne({ deletedAt: null, _id: validatedData._id })
@@ -92,8 +98,7 @@ export async function PUT(request) {
 
         // Colour / media edits can change the shop filter list and the homepage
         // "Shop by Colour" section (label + representative image).
-        revalidateTag('storefront-shop-filters')
-        revalidateTag('storefront-home-colors')
+        revalidateCatalogue()
 
         return response(true, 200, 'Product variant updated successfully.')
 
