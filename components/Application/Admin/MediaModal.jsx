@@ -8,7 +8,8 @@ import loading from '@/public/assets/images/loading.svg'
 import ModalMediaBlock from './ModalMediaBlock'
 import { showToast } from '@/lib/showToast'
 import ButtonLoading from '../ButtonLoading'
-const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple, max }) => {
+// onSelect(selected) — optional; return false to keep the dialog open.
+const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple, max, onSelect }) => {
 
     // Snapshot taken each time the dialog opens, so "Close" restores exactly
     // what the form had — previously it restored an empty list on first open,
@@ -49,6 +50,7 @@ const MediaModal = ({ open, setOpen, selectedMedia, setSelectedMedia, isMultiple
         if (selectedMedia.length <= 0) {
             return showToast('error', 'Please select a media.')
         }
+        if (onSelect?.(selectedMedia) === false) return
 
         setPreviouslySelected(selectedMedia)
         setOpen(false)

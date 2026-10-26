@@ -9,7 +9,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
-import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
+import { WEBSITE_CART, productHref } from '@/routes/WebsiteRoute'
 import { addIntoCart } from '@/store/reducer/cartReducer'
 import { showToast } from '@/lib/showToast'
 import styles from './BestsellersSection.module.css'
@@ -130,7 +130,7 @@ const BestsellersSectionClient = ({ products = [] }) => {
                 {/* ── Right: scrollable product cards ── */}
                 <div ref={trackRef} className={styles.track}>
                     {items.map((product, i) => {
-                        const href   = product ? WEBSITE_PRODUCT_DETAILS(product.slug) : '#'
+                        const href   = product ? productHref(product) : '#'
                         const imgSrc = product?.media?.[0]?.secure_url || imgPlaceholder
                         const imgAlt = product?.media?.[0]?.alt || product?.name || 'Product'
 

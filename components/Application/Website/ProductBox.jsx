@@ -5,7 +5,7 @@ import { memo, useState } from 'react'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
 import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
-import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
+import { WEBSITE_CART, productHref } from '@/routes/WebsiteRoute'
 import { ChevronLeft, ChevronRight, Eye, ShoppingBag, Star } from 'lucide-react'
 import { BrandButton, BrandOutlineButton } from '@/components/Application/Website/BrandButton'
 import { addIntoCart } from '@/store/reducer/cartReducer'
@@ -76,14 +76,14 @@ const ProductBox = ({ product, priority = false }) => {
                 />
 
                 <Link
-                    href={WEBSITE_PRODUCT_DETAILS(product.slug)}
+                    href={productHref(product)}
                     aria-label={`View ${product?.name}`}
                     className="absolute left-3 top-[3.25rem] z-20 flex size-9 items-center justify-center rounded-xs border border-border/40 bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground group-hover:opacity-100"
                 >
                     <Eye className="size-4" />
                 </Link>
 
-                <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} className="block h-full w-full">
+                <Link href={productHref(product)} className="block h-full w-full">
                     <Image
                         src={activeImage?.secure_url || imgPlaceholder.src}
                         width={600}
@@ -128,7 +128,7 @@ const ProductBox = ({ product, priority = false }) => {
             </div>
 
             <div className="flex flex-1 flex-col items-center gap-2 border-t border-border/60 px-3 py-3.5 text-center font-neue sm:gap-2 sm:px-4 sm:py-5">
-                <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} className="block w-full">
+                <Link href={productHref(product)} className="block w-full">
                     <h4 title={product?.name} className="w-full truncate text-left text-[15px] font-semibold leading-[1.2] text-foreground transition-colors group-hover:text-[var(--dark-red)] sm:text-base">
                         {product?.name}
                     </h4>
@@ -177,7 +177,7 @@ const ProductBox = ({ product, priority = false }) => {
                     )}
 
                     <BrandButton asChild className="text-[13px] tracking-normal sm:text-base">
-                        <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)} aria-label={`Buy Product: ${product?.name}`}>
+                        <Link href={productHref(product)} aria-label={`Buy Product: ${product?.name}`}>
                             Buy Product
                         </Link>
                     </BrandButton>

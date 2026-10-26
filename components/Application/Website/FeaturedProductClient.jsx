@@ -7,7 +7,7 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp'
-import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
+import { productHref } from '@/routes/WebsiteRoute'
 import './FeaturedProduct.css'
 import ShopAllButton from '@/components/Application/Website/ShopAllButton'
 
@@ -83,7 +83,7 @@ const FeaturedProductClient = ({ products = [] }) => {
                         const size = sizePattern[(i + index) % sizePattern.length]
                         return (
                             <div className={`fp-col ${size}`} key={product._id}>
-                                <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)}>
+                                <Link href={productHref(product)}>
                                     <Image
                                         src={product?.media?.[0]?.secure_url || imgPlaceholder.src}
                                         fill

@@ -5,6 +5,7 @@ import CategoryModel from '@/models/Category.model'
 import ProductModel from '@/models/Product.model'
 import ProductVariantModel from '@/models/ProductVariant.model'
 import '@/models/Media.model'
+import { liveMediaPopulate } from '@/lib/productMedia'
 
 // Regenerate the sitemap at most once an hour so new products show up
 // without hitting the database on every crawl.
@@ -41,19 +42,8 @@ export default async function sitemap() {
 
         const products = await ProductModel.find({ deletedAt: null, _id: { $in: stockedProductIds } })
             .select('slug category media updatedAt')
-            .populate({ path: 'media', match: { deletedAt: null }, select: 'secure_url' })
+            .populate(liveMediaPopulate('secure_url'))
             .lean()
-
-        productPages = products.map((product) => ({
-            url: xmlEscape(absoluteUrl(WEBSITE_PRODUCT_DETAILS(product.slug))),
-            lastModified: product.updatedAt,
-            changeFrequency: 'weekly',
-            priority: 0.8,
-            images: (product.media || [])
-                .map((media) => media?.secure_url)
-                .filter(Boolean)
-                .map(xmlEscape),
-        }))
 
         // Newest product update per category doubles as the category's lastModified.
         const latestByCategory = new Map()
@@ -69,6 +59,20 @@ export default async function sitemap() {
         })
             .select('slug')
             .lean()
+        const slugByCategory = new Map(categories.map((category) => [String(category._id), category.slug]))
+
+        // Canonical /shop/{category}/{slug}; never an old slug or the legacy
+        // /product URL (those only redirect).
+        productPages = products.map((product) => ({
+            url: xmlEscape(absoluteUrl(WEBSITE_PRODUCT_DETAILS(product.slug, slugByCategory.get(String(product.category))))),
+            lastModified: product.updatedAt,
+            changeFrequency: 'weekly',
+            priority: 0.8,
+            images: (product.media || [])
+                .map((media) => media?.secure_url)
+                .filter(Boolean)
+                .map(xmlEscape),
+        }))
 
         categoryPages = categories.map((category) => ({
             url: xmlEscape(categoryUrl(category.slug)),

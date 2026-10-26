@@ -6,7 +6,7 @@ import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp';
-import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute';
+import { productHref } from '@/routes/WebsiteRoute';
 
 const FeaturedProductSmall = ({ product }) => {
     const ref = useRef(null);
@@ -56,7 +56,7 @@ const FeaturedProductSmall = ({ product }) => {
     if (!product) return null;
 
     return (
-        <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)}>
+        <Link href={productHref(product)}>
             <div ref={ref} className="w-full bg-gray-200 rounded-sm overflow-hidden" style={{ aspectRatio: '1 / 1.15' }}>
                 {/* Image */}
                 <div className="relative w-full h-full bg-gray-200 flex items-center justify-center overflow-hidden">

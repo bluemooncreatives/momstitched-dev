@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
-import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute';
+import { productHref } from '@/routes/WebsiteRoute';
 import imgPlaceholder from '@/public/assets/images/img-placeholder.webp';
 import { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
@@ -73,7 +73,7 @@ const FeaturedProductCard = ({ product, size = 'medium' }) => {
         <div ref={ref} className={`group relative rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 ${sizeClasses[size]} h-full`}>
             {/* Full-card link sits behind everything */}
             <Link
-                href={WEBSITE_PRODUCT_DETAILS(product.slug)}
+                href={productHref(product)}
                 className="absolute inset-0 z-10"
                 aria-label={product?.name}
             />
