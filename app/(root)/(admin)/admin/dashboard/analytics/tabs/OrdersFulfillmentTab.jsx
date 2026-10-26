@@ -8,9 +8,9 @@
 import { Clock, Truck, Package, CreditCard } from 'lucide-react'
 import { OrderPipeline, PaymentMix, BuyingHeatmap, RecentOrders } from '../Panels'
 
-const SectionLabel = ({ icon: Icon, bg, fg = 'var(--primary-foreground)', title, description }) => (
+const SectionLabel = ({ icon: Icon, title, description }) => (
     <div className="mb-3 flex items-center gap-3">
-        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: bg, color: fg }} aria-hidden="true">
+        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-primary" aria-hidden="true">
             <Icon className="size-4" />
         </span>
         <div>
@@ -24,7 +24,7 @@ const OrdersFulfillmentTab = ({ data, isLoading }) => (
     <div className="flex flex-col gap-4 sm:gap-6">
         {/* Pipeline + Payment */}
         <div>
-            <SectionLabel icon={Package} bg="var(--chart-2)" fg="#0A2F24" title="Order Pipeline & Payments" description="Current order status flow and payment breakdown" />
+            <SectionLabel icon={Package} title="Order Pipeline & Payments" description="Current order status flow and payment breakdown" />
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <OrderPipeline statusCounts={data?.statusCounts} shipmentCounts={data?.shipmentCounts} placed={data?.breakdown?.placed} />
                 <PaymentMix paymentMethods={data?.paymentMethods} paymentStatuses={data?.paymentStatuses} />
@@ -34,7 +34,7 @@ const OrdersFulfillmentTab = ({ data, isLoading }) => (
 
         {/* Buying heatmap */}
         <div>
-            <SectionLabel icon={Clock} bg="var(--chart-4)" title="When Customers Order" description="Orders by weekday and hour (India time) - spot your peak windows" />
+            <SectionLabel icon={Clock} title="When Customers Order" description="Orders by weekday and hour (India time) - spot your peak windows" />
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <BuyingHeatmap heatmap={data?.heatmap} />
                 {/* Courier status summary */}

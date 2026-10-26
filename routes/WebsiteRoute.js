@@ -5,7 +5,23 @@ export const WEBSITE_RESETPASSWORD = "/auth/reset-password"
 
 export const WEBSITE_SHOP = "/shop"
 
-export const WEBSITE_PRODUCT_DETAILS = (slug) => slug ? `/product/${slug}` : '/product'
+export const WEBSITE_CATEGORY = (slug) => `/category/${encodeURIComponent(slug)}`
+
+// Canonical product URL is /shop/{category}/{slug}. Callers that don't know the
+// category (cart lines, orders, search) get the legacy /product/{slug}, which
+// 308-redirects to the canonical URL — so every link works either way.
+export const WEBSITE_PRODUCT_DETAILS = (slug, categorySlug) => {
+    if (!slug) return '/product'
+    return categorySlug
+        ? `/shop/${encodeURIComponent(categorySlug)}/${encodeURIComponent(slug)}`
+        : `/product/${encodeURIComponent(slug)}`
+}
+
+// Category slug from either a populated `category` or a flat `categorySlug`.
+export const productCategorySlug = (product) =>
+    product?.categorySlug || (product?.category && typeof product.category === 'object' ? product.category.slug : undefined)
+
+export const productHref = (product) => WEBSITE_PRODUCT_DETAILS(product?.slug, productCategorySlug(product))
 
 export const WEBSITE_CART = "/cart"
 export const WEBSITE_CHECKOUT = "/checkout"

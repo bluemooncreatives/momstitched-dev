@@ -16,7 +16,8 @@ import useFetch from '@/hooks/useFetch'
 import Select from '@/components/Application/Select'
 import MediaModal from '@/components/Application/Admin/MediaModal'
 import ColorHexPicker from '@/components/Application/Admin/ColorHexPicker'
-import Image from 'next/image'
+import MediaOrderField, { toMediaItem, unavailableCount } from '@/components/Application/Admin/MediaOrderField'
+import { MAX_PRODUCT_MEDIA } from '@/lib/productMedia'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { sizes } from '@/lib/utils'
 const breadcrumbData = [
@@ -137,6 +138,9 @@ const AddProduct = () => {
     try {
       if (selectedMedia.length <= 0) {
         return showToast('error', 'Please select media.')
+      }
+      if (unavailableCount(selectedMedia) > 0) {
+        return showToast('error', 'Remove the images that are in the media trash before saving.')
       }
 
       const pricing = validatePricing(values.mrp, values.sellingPrice)
@@ -384,34 +388,16 @@ const AddProduct = () => {
               </div>
             </div>
 
-            <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
+            <div className="md:col-span-2 rounded border border-dashed p-4 sm:p-5">
               <MediaModal
                 open={open}
                 setOpen={setOpen}
                 selectedMedia={selectedMedia}
-                setSelectedMedia={setSelectedMedia}
+                setSelectedMedia={(next) => setSelectedMedia(typeof next === 'function' ? next : next.map(toMediaItem))}
                 isMultiple={true}
+                max={MAX_PRODUCT_MEDIA}
               />
-
-              {selectedMedia.length > 0 && (
-                <div className="flex justify-center items-center flex-wrap mb-3 gap-2">
-                  {selectedMedia.map((media) => (
-                    <div key={media._id} className="h-24 w-24 border">
-                      <Image
-                        src={media.url}
-                        height={100}
-                        width={100}
-                        alt=""
-                        className="size-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div onClick={() => setOpen(true)} className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer">
-                <span className="font-semibold">Select Media</span>
-              </div>
+              <MediaOrderField items={selectedMedia} onChange={setSelectedMedia} onAdd={() => setOpen(true)} />
             </div>
 
             <div className="mb-3 mt-5">

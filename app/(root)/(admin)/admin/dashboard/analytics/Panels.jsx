@@ -12,7 +12,6 @@ import {
     ExternalLink,
     ImageOff,
     Inbox,
-    Mail,
     MapPin,
     MessageSquareWarning,
     PackageCheck,
@@ -32,7 +31,6 @@ import {
     ADMIN_CONTACTS_SHOW,
     ADMIN_COUPON_SHOW,
     ADMIN_CUSTOMERS_SHOW,
-    ADMIN_NEWSLETTER_SHOW,
     ADMIN_ORDER_DETAILS,
     ADMIN_ORDER_SHOW,
     ADMIN_PRODUCT_EDIT,
@@ -41,7 +39,6 @@ import {
 } from '@/routes/AdminPanelRoute'
 import { WEBSITE_PRODUCT_DETAILS } from '@/routes/WebsiteRoute'
 import {
-    NEWSLETTER_SOURCE_LABEL,
     PAYMENT_METHOD_LABEL,
     PAYMENT_STATUS_LABEL,
     dateTime,
@@ -60,14 +57,14 @@ const SLOTS = ['var(--viz-1)', 'var(--viz-2)', 'var(--viz-3)']
 // ── Action center ────────────────────────────────────────────────────
 export const ActionCenter = ({ actions, loading }) => {
     const items = [
-        { key: 'pendingOrders', icon: ShoppingBag, label: 'Orders to process', value: actions?.pendingOrders, href: ADMIN_ORDER_SHOW, tone: 'sun' },
+        { key: 'pendingOrders', icon: ShoppingBag, label: 'Orders to process', value: actions?.pendingOrders, href: ADMIN_ORDER_SHOW, tone: 'warn' },
         { key: 'staleOrders', icon: Clock, label: 'Waiting over 48 h', value: actions?.staleOrders, href: ADMIN_ORDER_SHOW, tone: 'danger' },
         { key: 'unverifiedOrders', icon: ShieldAlert, label: 'Unverified orders', value: actions?.unverifiedOrders, href: ADMIN_ORDER_SHOW, tone: 'danger' },
-        { key: 'outstandingAmount', icon: Wallet, label: `To collect · ${num(actions?.outstandingOrders)} orders`, value: actions?.outstandingAmount, money: true, href: ADMIN_ORDER_SHOW, tone: 'olive' },
-        { key: 'unreadContacts', icon: Inbox, label: 'Unread queries', value: actions?.unreadContacts, href: ADMIN_CONTACTS_SHOW, tone: 'sun' },
+        { key: 'outstandingAmount', icon: Wallet, label: `To collect · ${num(actions?.outstandingOrders)} orders`, value: actions?.outstandingAmount, money: true, href: ADMIN_ORDER_SHOW, tone: 'accent' },
+        { key: 'unreadContacts', icon: Inbox, label: 'Unread queries', value: actions?.unreadContacts, href: ADMIN_CONTACTS_SHOW, tone: 'warn' },
         { key: 'lowRatedReviews', icon: MessageSquareWarning, label: 'Low ratings (≤2★)', value: actions?.lowRatedReviews, href: ADMIN_REVIEW_SHOW, tone: 'danger' },
-        { key: 'productsWithoutImage', icon: ImageOff, label: 'Products without photos', value: actions?.productsWithoutImage, href: ADMIN_PRODUCT_SHOW, tone: 'olive' },
-        { key: 'activeCoupons', icon: Tag, label: 'Active coupons', value: actions?.activeCoupons, href: ADMIN_COUPON_SHOW, tone: 'pine', info: true },
+        { key: 'productsWithoutImage', icon: ImageOff, label: 'Products without photos', value: actions?.productsWithoutImage, href: ADMIN_PRODUCT_SHOW, tone: 'accent' },
+        { key: 'activeCoupons', icon: Tag, label: 'Active coupons', value: actions?.activeCoupons, href: ADMIN_COUPON_SHOW, tone: 'neutral', info: true },
     ]
     const open = items.filter((i) => !i.info && Number(i.value) > 0)
 
@@ -77,7 +74,7 @@ export const ActionCenter = ({ actions, loading }) => {
                 <h3 id="actions-title" className="flex items-center gap-2 text-sm font-semibold">
                     Needs attention
                     {!loading && (
-                        <span className={cn('rounded-full border px-2 py-0.5 text-[0.6875rem] font-semibold', open.length ? 'ef-tone--sun' : 'ef-tone--forest')}>
+                        <span className={cn('rounded-full border px-2 py-0.5 text-[0.6875rem] font-semibold', open.length ? 'admin-tone--warn' : 'admin-tone--good')}>
                             {open.length ? `${open.length} to review` : 'All clear'}
                         </span>
                     )}
@@ -90,7 +87,7 @@ export const ActionCenter = ({ actions, loading }) => {
                     return (
                         <li key={key} className="bg-card">
                             <Link href={href} className="group flex h-full flex-col gap-2 p-3.5 transition hover:bg-muted/60 sm:p-4">
-                                <span className={cn('flex size-8 items-center justify-center rounded-lg border', active ? `ef-tone--${tone}` : 'border-transparent bg-muted text-muted-foreground')}>
+                                <span className={cn('flex size-8 items-center justify-center rounded-lg border', active ? `admin-tone--${tone}` : 'border-transparent bg-muted text-muted-foreground')}>
                                     <Icon className="size-4" aria-hidden="true" />
                                 </span>
                                 <span className={cn('text-xl font-bold tabular-nums leading-none', !active && !info && 'text-muted-foreground')}>
@@ -194,7 +191,7 @@ export const OrderPipeline = ({ statusCounts = {}, shipmentCounts = {}, placed =
                     </ol>
                     <div className="mt-4 grid grid-cols-2 gap-2">
                         {lost.map((l) => (
-                            <div key={l.key} className={cn('rounded-lg border px-3 py-2 text-sm', l.value ? 'ef-tone--danger' : 'text-muted-foreground')}>
+                            <div key={l.key} className={cn('rounded-lg border px-3 py-2 text-sm', l.value ? 'admin-tone--danger' : 'text-muted-foreground')}>
                                 <p className="text-xs">{l.label}</p>
                                 <p className="font-semibold tabular-nums">{num(l.value)} <span className="text-xs font-normal">· {pct(share(l.value, placed), 0)}</span></p>
                             </div>
@@ -286,7 +283,7 @@ export const PaymentMix = ({ paymentMethods = [], paymentStatuses = [] }) => {
             {paymentStatuses.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-1.5 border-t pt-3">
                     {paymentStatuses.map((p) => (
-                        <span key={p.status} className={cn('rounded-full border px-2.5 py-0.5 text-xs', p.status === 'fully_paid' ? 'ef-tone--forest' : p.status === 'partial_paid' ? 'ef-tone--sun' : 'ef-tone--danger')}>
+                        <span key={p.status} className={cn('rounded-full border px-2.5 py-0.5 text-xs', p.status === 'fully_paid' ? 'admin-tone--good' : p.status === 'partial_paid' ? 'admin-tone--warn' : 'admin-tone--danger')}>
                             {PAYMENT_STATUS_LABEL[p.status] || p.status}: <b className="tabular-nums">{num(p.orders)}</b> · {inr(p.amount, { compact: true })}
                         </span>
                     ))}
@@ -393,7 +390,7 @@ export const TopProducts = ({ items = [], totalSales = 0 }) => {
                                     <span className="flex shrink-0 items-center gap-2">
                                         {pct(share(p.sales, totalSales), 0)} of sales
                                         {p.slug && (
-                                            <Link href={WEBSITE_PRODUCT_DETAILS(p)} target="_blank" aria-label={`View ${p.name} on the storefront`} className="hover:text-foreground">
+                                            <Link href={WEBSITE_PRODUCT_DETAILS(p.slug)} target="_blank" aria-label={`View ${p.name} on the storefront`} className="hover:text-foreground">
                                                 <ExternalLink className="size-3.5" />
                                             </Link>
                                         )}
@@ -492,7 +489,7 @@ export const CustomerInsights = ({ customerMix, topCustomers = [], kpis, audienc
                                     {initialsOf(c.name)}
                                 </span>
                                 <div className="min-w-0 flex-1">
-                                    <p className="truncate text-sm font-medium">{c.name || 'Guest'} {c.returning && <span className="ml-1 rounded-full border px-1.5 text-[0.625rem] ef-tone--sun">Returning</span>}</p>
+                                    <p className="truncate text-sm font-medium">{c.name || 'Guest'} {c.returning && <span className="ml-1 rounded-full border px-1.5 text-[0.625rem] admin-tone--warn">Returning</span>}</p>
                                     <p className="truncate text-xs text-muted-foreground">{c.email}</p>
                                 </div>
                                 <div className="shrink-0 text-right">
@@ -524,7 +521,7 @@ export const ReviewsPanel = ({ reviews, kpis }) => {
                         <div className="text-center">
                             <p className="text-3xl sm:text-4xl font-bold tabular-nums leading-none">{avg.toFixed(1)}</p>
                             <p className="mt-1.5 flex justify-center gap-0.5" aria-label={`${avg.toFixed(1)} out of 5`}>
-                                {Array.from({ length: 5 }).map((_, i) => <Star key={i} aria-hidden="true" className={cn('size-3', i < Math.round(avg) ? 'fill-[var(--brand-gold)] text-[var(--brand-gold)]' : 'text-foreground/20')} />)}
+                                {Array.from({ length: 5 }).map((_, i) => <Star key={i} aria-hidden="true" className={cn('size-3', i < Math.round(avg) ? 'fill-[var(--viz-star)] text-[var(--viz-star)]' : 'text-foreground/20')} />)}
                             </p>
                         </div>
                         <ul className="flex-1 space-y-1">
@@ -558,16 +555,14 @@ export const ReviewsPanel = ({ reviews, kpis }) => {
 
 // ── Audience ─────────────────────────────────────────────────────────
 export const AudiencePanel = ({ audience, kpis }) => {
-    const sources = Object.entries(audience?.newsletterSources || {}).sort((a, b) => b[1] - a[1])
-    const max = Math.max(0, ...sources.map(([, v]) => v))
     const stats = [
         { label: 'New accounts', value: kpis?.newCustomers?.value, icon: Users, href: ADMIN_CUSTOMERS_SHOW },
-        { label: 'Newsletter sign-ups', value: kpis?.signups?.value, icon: Mail, href: ADMIN_NEWSLETTER_SHOW },
+        { label: 'Registered customers', value: audience?.totalCustomers, icon: Users, href: ADMIN_CUSTOMERS_SHOW },
         { label: 'Contact queries', value: audience?.contacts, icon: Inbox, href: ADMIN_CONTACTS_SHOW },
-        { label: 'Active subscribers', value: audience?.subscribers, icon: Mail, href: ADMIN_NEWSLETTER_SHOW },
+        { label: 'New reviews', value: kpis?.reviews?.value, icon: Star, href: ADMIN_REVIEW_SHOW },
     ]
     return (
-        <Panel id="audience" title="Audience growth" description="Accounts, subscribers and enquiries">
+        <Panel id="audience" title="Audience growth" description="Accounts, reviews and enquiries">
             <div className="grid grid-cols-2 gap-2">
                 {stats.map(({ label, value, icon: Icon, href }) => (
                     <Link key={label} href={href} className="rounded-lg border p-3 transition hover:border-primary/40 hover:bg-muted/40">
@@ -577,20 +572,6 @@ export const AudiencePanel = ({ audience, kpis }) => {
                     </Link>
                 ))}
             </div>
-            <p className="mb-2 mt-4 text-xs font-medium text-muted-foreground">Sign-ups by placement</p>
-            {sources.length ? (
-                <ul className="space-y-2">
-                    {sources.map(([source, count]) => (
-                        <li key={source} className="grid grid-cols-[6rem_1fr_2rem] items-center gap-2 text-xs sm:grid-cols-[7rem_1fr_2rem]">
-                            <span className="truncate">{NEWSLETTER_SOURCE_LABEL[source] || source}</span>
-                            <ShareBar value={count} max={max} />
-                            <span className="text-right font-semibold tabular-nums">{count}</span>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p className="text-xs text-muted-foreground">No newsletter sign-ups in this range.</p>
-            )}
         </Panel>
     )
 }
@@ -629,7 +610,7 @@ export const CatalogueHealth = ({ catalogue }) => {
 }
 
 // ── Recent orders ────────────────────────────────────────────────────
-const STATUS_TONE = { pending: 'sun', processing: 'olive', shipped: 'pine', delivered: 'forest', cancelled: 'danger', unverified: 'danger' }
+const STATUS_TONE = { pending: 'warn', processing: 'accent', shipped: 'neutral', delivered: 'good', cancelled: 'danger', unverified: 'danger' }
 
 export const RecentOrders = ({ orders = [] }) => (
     <Panel id="recent" title="Latest orders" description="Most recent in range" action={<PanelLink href={ADMIN_ORDER_SHOW}>All orders</PanelLink>}>
@@ -646,7 +627,7 @@ export const RecentOrders = ({ orders = [] }) => (
                             </div>
                             <div className="flex shrink-0 flex-col items-end gap-1">
                                 <span className="text-sm font-semibold tabular-nums">{inr(o.totalAmount)}</span>
-                                <span className={cn('rounded-full border px-2 py-0 text-[0.625rem] font-medium capitalize', `ef-tone--${STATUS_TONE[o.status] || 'pine'}`)}>{o.status}</span>
+                                <span className={cn('rounded-full border px-2 py-0 text-[0.625rem] font-medium capitalize', `admin-tone--${STATUS_TONE[o.status] || 'neutral'}`)}>{o.status}</span>
                             </div>
                         </Link>
                     </li>

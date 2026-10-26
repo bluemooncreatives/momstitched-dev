@@ -5,6 +5,7 @@ import { MAX_CART_QTY, MIN_CART_QTY } from "@/lib/cartConstants";
 import ProductVariantModel from "@/models/ProductVariant.model";
 import "@/models/Product.model";
 import "@/models/Media.model";
+import { liveMediaPopulate } from "@/lib/productMedia";
 
 // Generous upper bound on distinct lines; stops a tampered payload from turning
 // this public endpoint into an expensive query.
@@ -32,7 +33,8 @@ export async function POST(request) {
         const variants = variantIds.length > 0
             ? await ProductVariantModel.find({ _id: { $in: variantIds }, deletedAt: null })
                 .populate({ path: 'product', match: { deletedAt: null }, select: 'name slug' })
-                .populate('media', 'secure_url')
+                // Main image = first live image in saved order.
+                .populate(liveMediaPopulate('secure_url'))
                 .lean()
             : []
 

@@ -12,9 +12,9 @@ import { KpiTile } from '../ui'
 import { CustomerInsights, AudiencePanel, Regions } from '../Panels'
 import { ADMIN_CUSTOMERS_SHOW } from '@/routes/AdminPanelRoute'
 
-const SectionLabel = ({ icon: Icon, bg, fg = 'var(--primary-foreground)', title, description }) => (
+const SectionLabel = ({ icon: Icon, title, description }) => (
     <div className="mb-3 flex items-center gap-3">
-        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: bg, color: fg }} aria-hidden="true">
+        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-primary" aria-hidden="true">
             <Icon className="size-4" />
         </span>
         <div>
@@ -36,7 +36,7 @@ const CustomersTab = ({ data, isLoading, kpis, timeline }) => {
         <div className="flex flex-col gap-4 sm:gap-6">
             {/* Customer KPIs */}
             <div>
-                <SectionLabel icon={Users} bg="var(--chart-1)" title="Customer KPIs" description="Acquisition, retention and engagement metrics" />
+                <SectionLabel icon={Users} title="Customer KPIs" description="Acquisition, retention and engagement metrics" />
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                     {tiles.map((tile, i) => <KpiTile key={tile.label} index={i + 4} {...tile} loading={isLoading || !data} />)}
                 </div>
@@ -44,7 +44,7 @@ const CustomersTab = ({ data, isLoading, kpis, timeline }) => {
 
             {/* Customer insights + audience growth */}
             <div>
-                <SectionLabel icon={UserPlus} bg="var(--chart-2)" fg="#0A2F24" title="Audience & Loyalty" description="New vs returning buyers, top spenders and newsletter growth" />
+                <SectionLabel icon={UserPlus} title="Audience & Loyalty" description="New vs returning buyers, top spenders and audience growth" />
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     <CustomerInsights customerMix={data?.customerMix} topCustomers={data?.topCustomers} kpis={data?.kpis} audience={data?.audience} />
                     <AudiencePanel audience={data?.audience} kpis={data?.kpis} />
@@ -53,7 +53,7 @@ const CustomersTab = ({ data, isLoading, kpis, timeline }) => {
 
             {/* Geographic reach */}
             <div>
-                <SectionLabel icon={MapPin} bg="var(--chart-3)" title="Geographic Reach" description="States by net sales volume in this range" />
+                <SectionLabel icon={MapPin} title="Geographic Reach" description="States by net sales volume in this range" />
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     <Regions regions={data?.regions} />
                 </div>

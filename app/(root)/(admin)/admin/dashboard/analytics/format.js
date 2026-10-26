@@ -57,4 +57,3 @@ export const titleCase = (s) => String(s || '').replace(/_/g, ' ').replace(/\b\w
 
 export const PAYMENT_METHOD_LABEL = { cod: 'Cash on delivery', full: 'Prepaid', partial: 'Part prepaid', unknown: 'Unknown' }
 export const PAYMENT_STATUS_LABEL = { fully_paid: 'Paid', partial_paid: 'Part paid', unpaid: 'Unpaid' }
-export const NEWSLETTER_SOURCE_LABEL = { popup: 'Popup', section: 'Homepage band', footer: 'Footer', unknown: 'Other' }

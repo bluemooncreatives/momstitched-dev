@@ -13,9 +13,9 @@ import SalesTrend from '../SalesTrend'
 import { MoneyFlow, ActionCenter } from '../Panels'
 import { ADMIN_ORDER_SHOW } from '@/routes/AdminPanelRoute'
 
-const SectionLabel = ({ icon: Icon, bg, fg = 'var(--primary-foreground)', title, description }) => (
+const SectionLabel = ({ icon: Icon, title, description }) => (
     <div className="mb-3 flex items-center gap-3">
-        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: bg, color: fg }} aria-hidden="true">
+        <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-primary" aria-hidden="true">
             <Icon className="size-4" />
         </span>
         <div>
@@ -44,7 +44,7 @@ const SalesRevenueTab = ({ data, isLoading, kpis, timeline }) => {
 
             {/* KPI tiles */}
             <div>
-                <SectionLabel icon={IndianRupee} bg="var(--chart-1)" title="Sales KPIs" description="Compared with the previous period of equal length" />
+                <SectionLabel icon={IndianRupee} title="Sales KPIs" description="Compared with the previous period of equal length" />
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                     {tiles.map((tile, i) => <KpiTile key={tile.label} index={i} {...tile} loading={isLoading || !data} />)}
                 </div>
@@ -52,7 +52,7 @@ const SalesRevenueTab = ({ data, isLoading, kpis, timeline }) => {
 
             {/* Sales trend + money flow */}
             <div>
-                <SectionLabel icon={TrendingUp} bg="var(--chart-3)" title="Revenue Over Time" description="Interactive trend chart with period comparison" />
+                <SectionLabel icon={TrendingUp} title="Revenue Over Time" description="Interactive trend chart with period comparison" />
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     {data ? <SalesTrend data={data} kpis={data.kpis} /> : <div className="h-64 animate-pulse rounded-xl bg-muted lg:col-span-2" />}
                     <MoneyFlow breakdown={data?.breakdown} />

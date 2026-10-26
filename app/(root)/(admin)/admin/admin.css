@@ -132,3 +132,42 @@
 @media (prefers-reduced-motion: reduce) {
   .admin-table__progress { animation: none; width: 100%; opacity: 0.5; }
 }
+
+/* ────────────────────────────────────────────────────────────────
+   Analytics chart tokens (dashboard → Analytics).
+   Categorical slots validated with the dataviz palette checker
+   (all pairs, 3 slots): light on #FFFFFF, dark on the admin card
+   (#150A0A). Every multi-series chart also carries a legend and a
+   table view. Single-measure charts use --viz-1 only.
+   ──────────────────────────────────────────────────────────────── */
+.admin-theme {
+  --viz-1: #A50E15;       /* brand red — primary measure, slot 1 */
+  --viz-2: #B07A0C;       /* amber — slot 2 */
+  --viz-3: #2F6AA8;       /* blue — slot 3 */
+  --viz-prev: #A8A09F;    /* previous-period comparison line */
+  --viz-grid: rgb(60 20 20 / 0.08);
+  --viz-axis: #6E5F5D;
+  --viz-good: #2F7A45;
+  --viz-bad: #B3261E;
+  --viz-star: #C98A12;
+}
+.dark .admin-theme {
+  --viz-1: #C8333E;
+  --viz-2: #BB8C1C;
+  --viz-3: #4A8AD2;
+  --viz-prev: #7A6E6D;
+  --viz-grid: rgb(255 240 240 / 0.08);
+  --viz-axis: #C4BBBB;
+  --viz-good: #6FBF86;
+  --viz-bad: #F2665C;
+  --viz-star: #E0A83A;
+}
+
+/* Status chips used by the analytics panels. Colour is never alone:
+   each chip also carries its label. */
+.admin-tone--warn    { border-color: color-mix(in srgb, var(--viz-star) 45%, transparent); background-color: color-mix(in srgb, var(--viz-star) 14%, transparent); color: color-mix(in srgb, var(--viz-star) 70%, var(--foreground)); }
+.admin-tone--accent  { border-color: color-mix(in srgb, var(--primary) 30%, transparent); background-color: color-mix(in srgb, var(--primary) 8%, transparent); color: var(--primary); }
+.admin-tone--neutral { border-color: var(--border); background-color: var(--muted); color: var(--foreground); }
+.admin-tone--good    { border-color: color-mix(in srgb, var(--viz-good) 32%, transparent); background-color: color-mix(in srgb, var(--viz-good) 11%, transparent); color: var(--viz-good); }
+.admin-tone--danger  { border-color: color-mix(in srgb, var(--destructive) 32%, transparent); background-color: color-mix(in srgb, var(--destructive) 10%, transparent); color: var(--destructive); }
+.dark .admin-tone--accent { color: color-mix(in srgb, var(--primary) 55%, var(--foreground)); }

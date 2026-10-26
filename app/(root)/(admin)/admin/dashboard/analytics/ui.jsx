@@ -82,12 +82,11 @@ export const Sparkline = ({ data, dataKey, id }) => {
 
 export const KpiTile = ({ label, value, change, inverse, hint, spark, sparkKey, href, loading, index = 0 }) => {
     const Icon = [IndianRupee, ShoppingBag, Receipt, Package, UsersRound, UserPlus, Repeat2, Ban][index % 8]
-    const color = `var(--chart-${index % 4 + 1})`
     const body = (
         <>
             <div className="flex items-start justify-between gap-2">
                 <p className="text-xs font-medium leading-snug text-foreground sm:text-sm">{label}</p>
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full sm:size-9" style={{ backgroundColor: color, color: index % 4 === 1 ? "#0A2F24" : "var(--background)" }}><Icon className="size-4" aria-hidden="true" /></span>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-primary sm:size-9"><Icon className="size-4" aria-hidden="true" /></span>
             </div>
             <p className="mt-2.5 truncate text-xl sm:mt-3 sm:text-3xl font-bold leading-none tracking-tight tabular-nums">
                 {loading ? <span className="inline-block h-7 w-24 animate-pulse rounded bg-muted align-middle" /> : value}
@@ -96,11 +95,11 @@ export const KpiTile = ({ label, value, change, inverse, hint, spark, sparkKey, 
             {spark && <div className="mt-auto pt-3">{loading ? <div className="h-10 animate-pulse rounded bg-muted/60" /> : <Sparkline data={spark} dataKey={sparkKey} id={sparkKey + label.replace(/\W/g, '')} />}</div>}
         </>
     )
-    const cls = 'flex h-full min-w-0 flex-col rounded-xl border-l-4 bg-card p-3.5 sm:p-5 text-card-foreground ring-1 ring-foreground/10 transition hover:-translate-y-0.5 hover:shadow-lg'
+    const cls = 'flex h-full min-w-0 flex-col rounded-xl border-l-4 border-l-primary bg-card p-3.5 sm:p-5 text-card-foreground ring-1 ring-foreground/10 transition hover:-translate-y-0.5 hover:shadow-lg'
     return href ? (
-        <Link href={href} style={{ borderLeftColor: color }} className={cn(cls, 'hover:border-primary/40 hover:shadow-[0_8px_24px_-12px_rgb(11_61_46/0.25)]')}>{body}</Link>
+        <Link href={href} className={cn(cls, 'hover:shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]')}>{body}</Link>
     ) : (
-        <div className={cls} style={{ borderLeftColor: color }}>{body}</div>
+        <div className={cls}>{body}</div>
     )
 }
 
