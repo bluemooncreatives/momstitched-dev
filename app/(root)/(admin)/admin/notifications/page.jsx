@@ -2,6 +2,7 @@
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import PageHeader from '@/components/Application/Admin/PageHeader'
 import NotificationItem from '@/components/Application/Admin/notifications/NotificationItem'
+import ConfirmDialog from '@/components/Application/Admin/data-table/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -32,6 +33,8 @@ const NotificationsPage = () => {
     const [status, setStatus] = useState('all')
     const [type, setType] = useState('all')
     const [selected, setSelected] = useState(() => new Set())
+    // { ids } for a delete, { clearRead: true } for "delete all read".
+    const [pendingConfirm, setPendingConfirm] = useState(null)
 
     const { data, isPending, isError, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationFeed({ status, type })
     const { markRead, markUnread, markAllRead, remove, clearRead, isMarking, isDeleting } = useNotificationActions()
@@ -78,14 +81,21 @@ const NotificationsPage = () => {
 
     const handleDelete = (ids) => {
         if (!ids.length) return
-        if (!confirm(`Delete ${ids.length} notification${ids.length === 1 ? '' : 's'}? This cannot be undone and removes ${ids.length === 1 ? 'it' : 'them'} for every admin.`)) return
-        remove(ids, { onSuccess: () => setSelected(new Set()) })
+        setPendingConfirm({ ids })
     }
 
-    const handleClearRead = () => {
-        if (!confirm('Delete every notification you have already read? This cannot be undone.')) return
-        clearRead({ onSuccess: () => setSelected(new Set()) })
+    const handleClearRead = () => setPendingConfirm({ clearRead: true })
+
+    const confirmPending = () => {
+        const options = { onSuccess: () => { setSelected(new Set()); setPendingConfirm(null) } }
+        if (pendingConfirm?.clearRead) clearRead(options)
+        else if (pendingConfirm?.ids) remove(pendingConfirm.ids, options)
     }
+
+    const pendingCount = pendingConfirm?.ids?.length || 0
+    const confirmCopy = pendingConfirm?.clearRead
+        ? { title: 'Delete all read notifications?', description: 'Every notification you have already read is removed. This cannot be undone.' }
+        : { title: `Delete ${pendingCount} notification${pendingCount === 1 ? '' : 's'}?`, description: `This cannot be undone and removes ${pendingCount === 1 ? 'it' : 'them'} for every admin.` }
 
     const emptyMessage = status === 'unread'
         ? 'No unread notifications. You’re all caught up.'
@@ -270,6 +280,16 @@ const NotificationsPage = () => {
                     )}
                 </div>
             </div>
+
+            <ConfirmDialog
+                open={Boolean(pendingConfirm)}
+                onOpenChange={(open) => { if (!open) setPendingConfirm(null) }}
+                title={confirmCopy.title}
+                description={confirmCopy.description}
+                confirmLabel="Delete"
+                loading={isDeleting}
+                onConfirm={confirmPending}
+            />
         </div>
     )
 }

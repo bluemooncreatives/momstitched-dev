@@ -8,6 +8,8 @@ import { use, useEffect, useState } from "react"
 import { ADMIN_DASHBOARD, ADMIN_ORDER_SHOW } from "@/routes/AdminPanelRoute"
 import BreadCrumb from "@/components/Application/Admin/BreadCrumb"
 import PageHeader from "@/components/Application/Admin/PageHeader"
+import AdminRecordState from "@/components/Application/Admin/AdminRecordState"
+import { AdminLoadingState } from "@/components/Application/Admin/AdminEmptyState"
 import ShipmentManagement from "@/components/Application/Admin/ShipmentManagement"
 import ButtonLoading from "@/components/Application/ButtonLoading"
 import { showToast } from "@/lib/showToast"
@@ -48,7 +50,7 @@ const OrderDetails = ({ params }) => {
     const [orderData, setOrderData] = useState()
     const [orderStatus, setOrderStatus] = useState()
     const [updatingStatus, setUpdatingStatus] = useState(false)
-    const { data, loading } = useFetch(`/api/orders/get/${order_id}`)
+    const { data, error: recordError, errorStatus: recordErrorStatus, refetch: refetchRecord } = useFetch(`/api/orders/get/${order_id}`)
 
 
     useEffect(() => {
@@ -79,6 +81,20 @@ const OrderDetails = ({ params }) => {
         }
     }
 
+    if (recordError) {
+        return (
+            <AdminRecordState
+                entity="Order"
+                error={recordError}
+                errorStatus={recordErrorStatus}
+                onRetry={refetchRecord}
+                backHref={ADMIN_ORDER_SHOW}
+                backLabel="Back to orders"
+                header={{ title: 'Order Details', description: 'Review order items, shipping, and status.', breadcrumb: <BreadCrumb breadcrumbData={breadcrumbData} /> }}
+            />
+        )
+    }
+
     return (
         <div className="flex flex-col gap-4 sm:gap-6">
             <PageHeader
@@ -89,9 +105,7 @@ const OrderDetails = ({ params }) => {
 
             <div className="rounded-md bg-card">
                 {!orderData ? (
-                    <div className="flex justify-center items-center py-24">
-                        <h4 className="text-red-500 text-xl font-semibold">Order Not Found</h4>
-                    </div>
+                    <AdminLoadingState label="Loading order…" className="py-24" />
                 ) : (
                     <div className="px-4 py-4">
                         <div className="mb-5">

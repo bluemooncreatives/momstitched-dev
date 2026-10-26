@@ -7,37 +7,84 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { Recycle, Trash2, RotateCcw, Trash, Download, MoreHorizontal } from 'lucide-react'
+import { AlertTriangle, Download, Inbox, Loader2, MoreHorizontal, Recycle, RotateCcw, SearchX, Trash, Trash2, X } from 'lucide-react'
 import useDeleteMutation from '@/hooks/useDeleteMutation'
-import ButtonLoading from '../ButtonLoading'
 import { showToast } from '@/lib/showToast'
+import { cn } from '@/lib/utils'
+import { serverColumnFilter } from '@/lib/adminCatalogFilters.mjs'
 import { download, generateCsv, mkConfig } from 'export-to-csv'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
 import DataTableToolbar from './data-table/DataTableToolbar'
+import DataTableFilters from './data-table/DataTableFilters'
 import DataTablePagination from './data-table/DataTablePagination'
 import DataTableColumnHeader from './data-table/DataTableColumnHeader'
+import DataTableViewOptions from './data-table/DataTableViewOptions'
+import DataTableMobileSort from './data-table/DataTableMobileSort'
+import ConfirmDialog from './data-table/ConfirmDialog'
 
+const SKELETON_ROWS = 6
+
+// CSV cells must be flat: arrays/objects become JSON, dates stay strings.
+const flattenForCsv = (rows) =>
+    rows.map((row) => Object.fromEntries(
+        Object.entries(row || {}).map(([key, value]) => [
+            key,
+            value === null || value === undefined
+                ? ''
+                : typeof value === 'object'
+                    ? JSON.stringify(value)
+                    : value,
+        ])
+    ))
+
+const DELETE_COPY = {
+    SD: (n) => ({
+        title: `Move ${n} ${n === 1 ? 'record' : 'records'} to the recycle bin?`,
+        description: 'They disappear from this list but can be restored from the recycle bin at any time.',
+        confirmLabel: 'Move to bin',
+        tone: 'danger',
+    }),
+    PD: (n) => ({
+        title: `Delete ${n} ${n === 1 ? 'record' : 'records'} forever?`,
+        description: 'This permanently removes the data. It cannot be undone.',
+        confirmLabel: 'Delete forever',
+        tone: 'danger',
+    }),
+    RSD: (n) => ({
+        title: `Restore ${n} ${n === 1 ? 'record' : 'records'}?`,
+        description: 'They go back to their original list and become active again.',
+        confirmLabel: 'Restore',
+        tone: 'neutral',
+    }),
+}
+
+/**
+ * Server-driven admin table (search, sort, paging on the API), shared by
+ * every admin list.
+ *
+ *  • Debounced search, click-to-sort headers, column visibility.
+ *  • Selecting rows swaps the toolbar for a selection bar: export selected,
+ *    move to bin / restore / delete forever, clear.
+ *  • Select and Actions columns stay pinned while wide tables scroll; below
+ *    md the rows render as label/value cards with a sort menu instead.
+ *  • Skeleton rows while loading, a thin progress bar while refreshing,
+ *    an empty state that can clear the search, and an error state with retry.
+ *  • Deletes confirm in an in-app dialog and step back a page when the last
+ *    row of a page is removed.
+ */
 const Datatable = ({
     queryKey,
     fetchUrl,
     columnsConfig,
+    filtersConfig,
     initialPageSize = 10,
     exportEndpoint,
     deleteEndpoint,
@@ -48,96 +95,70 @@ const Datatable = ({
     // filter). Changing them restarts at page 1 and clears the selection.
     extraParams,
     // Optional: ({ selectedIds, clearSelection, meta, isFetching }) => node,
-    // rendered alongside the built-in toolbar buttons.
+    // rendered in the toolbar and in the selection bar.
     renderToolbar,
 }) => {
-
     const [columnFilters, setColumnFilters] = useState([])
     const [globalFilter, setGlobalFilter] = useState('')
     const [sorting, setSorting] = useState([])
-    const [pagination, setPagination] = useState({
-        pageIndex: 0,
-        pageSize: initialPageSize,
-    })
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: initialPageSize })
     const [rowSelection, setRowSelection] = useState({})
-    const [columnVisibility, setColumnVisibility] = useState({})
+    // Columns marked `hidden: true` start hidden but stay available under
+    // "Columns" (long addresses, internal ids).
+    const [columnVisibility, setColumnVisibility] = useState(() =>
+        Object.fromEntries((columnsConfig || []).filter((col) => col.hidden).map((col) => [col.id || col.accessorKey, false]))
+    )
     const [exportLoading, setExportLoading] = useState(false)
+    const [pendingDelete, setPendingDelete] = useState(null)
 
     const deleteMutation = useDeleteMutation(queryKey, deleteEndpoint)
-
-    const hasSelection = Object.keys(rowSelection).length > 0
+    const selectedIds = Object.keys(rowSelection)
+    const selectedCount = selectedIds.length
+    const hasFilters = columnFilters.length > 0
+    const filteredExport = Boolean(filtersConfig?.length && (hasFilters || globalFilter))
 
     const extraParamsKey = JSON.stringify(extraParams ?? {})
     useEffect(() => {
-        setPagination((prev) => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
+        setPagination((p) => (p.pageIndex === 0 ? p : { ...p, pageIndex: 0 }))
         setRowSelection({})
     }, [extraParamsKey])
+
     const handleGlobalFilterChange = (value) => {
-        setGlobalFilter((prev) => {
-            const nextValue = typeof value === 'function' ? value(prev) : value
-            if (nextValue !== prev) {
-                setPagination((prevPagination) => ({ ...prevPagination, pageIndex: 0 }))
-            }
-            return nextValue
-        })
+        const nextValue = typeof value === 'function' ? value(globalFilter) : value
+        setGlobalFilter(nextValue)
+        setPagination((p) => ({ ...p, pageIndex: 0 }))
+        setRowSelection({})
     }
 
+    const handleColumnFiltersChange = (updater) => {
+        setColumnFilters(updater)
+        setPagination((p) => ({ ...p, pageIndex: 0 }))
+        setRowSelection({})
+    }
+
+    const clearSearchAndFilters = () => {
+        handleGlobalFilterChange('')
+        handleColumnFiltersChange([])
+    }
+
+    // Row menus call this; it opens the confirmation instead of acting.
     const handleDelete = (ids, selectedDeleteType) => {
-        let confirmed = false
-        if (selectedDeleteType === 'PD') {
-            confirmed = confirm('Are you sure you want to delete the data permanently?')
-        } else {
-            confirmed = confirm('Are you sure you want to move data into trash?')
-        }
-
-        if (confirmed) {
-            deleteMutation.mutate({ ids, deleteType: selectedDeleteType })
-            setRowSelection({})
-        }
-    }
-
-    const handleExport = async (selectedRows) => {
-        setExportLoading(true)
-        try {
-            const csvConfig = mkConfig({
-                fieldSeparator: ',',
-                decimalSeparator: '.',
-                useKeysAsHeaders: true,
-                filename: 'csv-data',
-            })
-
-            let csv
-
-            if (hasSelection) {
-                const rowData = selectedRows.map((row) => row.original)
-                csv = generateCsv(csvConfig)(rowData)
-            } else {
-                const { data: response } = await axios.get(exportEndpoint)
-                if (!response.success) {
-                    throw new Error(response.message)
-                }
-
-                csv = generateCsv(csvConfig)(response.data)
-            }
-
-            download(csvConfig)(csv)
-        } catch (error) {
-            showToast('error', error.message)
-        } finally {
-            setExportLoading(false)
-        }
+        if (!ids?.length) return
+        setPendingDelete({ ids, type: selectedDeleteType })
     }
 
     const {
         data: { data = [], meta } = {},
         isError,
-        isRefetching,
-        isLoading,
         isFetching,
+        isLoading,
+        isPlaceholderData,
+        refetch,
     } = useQuery({
-        queryKey: [queryKey, { columnFilters, globalFilter, pagination, sorting, extraParams: extraParamsKey }],
-        queryFn: async () => {
+        queryKey: [queryKey, { columnFilters, globalFilter, pagination, sorting, deleteType, extraParams: extraParamsKey }],
+        queryFn: async ({ signal }) => {
             const { data: response } = await axios.get(fetchUrl, {
+                signal,
                 params: {
                     start: pagination.pageIndex * pagination.pageSize,
                     size: pagination.pageSize,
@@ -148,10 +169,78 @@ const Datatable = ({
                     ...(extraParams ?? {}),
                 },
             })
+            if (!response.success) throw new Error(response.message || 'Could not load this table.')
             return response
         },
         placeholderData: keepPreviousData,
+        // Refresh catalogue options on return from create/edit pages and when
+        // an admin returns to this tab after changing records elsewhere.
+        ...(filtersConfig?.length ? { staleTime: 0, refetchOnWindowFocus: true, refetchOnReconnect: true } : {}),
     })
+
+    const total = Number(meta?.totalRowCount) || 0
+    const rows = Array.isArray(data) ? data : []
+
+    // A refreshed dataset can shrink after deletes or edits in another tab.
+    useEffect(() => {
+        if (isFetching || isPlaceholderData || isError) return
+        const lastPage = Math.max(0, Math.ceil(total / pagination.pageSize) - 1)
+        if (pagination.pageIndex > lastPage) {
+            setPagination((p) => ({ ...p, pageIndex: lastPage }))
+            setRowSelection({})
+        }
+    }, [total, pagination.pageSize, pagination.pageIndex, isFetching, isPlaceholderData, isError])
+
+    const confirmDelete = async () => {
+        if (!pendingDelete) return
+        const { ids, type } = pendingDelete
+        try {
+            await deleteMutation.mutateAsync({ ids, deleteType: type })
+            setRowSelection({})
+            // Removing every row on the last page would leave an empty page.
+            if (ids.length >= rows.length && pagination.pageIndex > 0) {
+                setPagination((p) => ({ ...p, pageIndex: p.pageIndex - 1 }))
+            }
+            setPendingDelete(null)
+        } catch {
+            // The mutation already reported the error; keep the dialog open.
+        }
+    }
+
+    const handleExport = async (selectedRows) => {
+        setExportLoading(true)
+        try {
+            const stamp = new Date().toISOString().slice(0, 10)
+            const csvConfig = mkConfig({
+                fieldSeparator: ',',
+                decimalSeparator: '.',
+                useKeysAsHeaders: true,
+                filename: `${String(queryKey).replace(/-data$/, '')}-${selectedCount ? 'selected' : filteredExport ? 'filtered' : 'all'}-${stamp}`,
+            })
+
+            let records
+            if (selectedCount) {
+                records = selectedRows.map((row) => row.original)
+            } else {
+                const { data: response } = await axios.get(exportEndpoint, filtersConfig?.length ? {
+                    params: { filters: JSON.stringify(columnFilters), globalFilter, sorting: JSON.stringify(sorting), deleteType },
+                } : undefined)
+                if (!response.success) throw new Error(response.message)
+                records = response.data
+            }
+
+            if (!records?.length) {
+                showToast('info', 'There is nothing to export yet.')
+                return
+            }
+            download(csvConfig)(generateCsv(csvConfig)(flattenForCsv(records)))
+            showToast('success', `Exported ${records.length} ${records.length === 1 ? 'row' : 'rows'}.`)
+        } catch (error) {
+            showToast('error', error.message)
+        } finally {
+            setExportLoading(false)
+        }
+    }
 
     const mappedColumns = useMemo(() => {
         const selectionColumn = {
@@ -160,7 +249,7 @@ const Datatable = ({
                 <Checkbox
                     checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
+                    aria-label="Select all rows on this page"
                 />
             ),
             cell: ({ row }) => (
@@ -172,39 +261,52 @@ const Datatable = ({
             ),
             enableSorting: false,
             enableHiding: false,
+            meta: { pin: 'left' },
         }
 
-        const dataColumns = (columnsConfig || []).map((col) => ({
-            accessorKey: col.accessorKey,
-            id: col.id || col.accessorKey,
-            header: ({ column }) => {
-                const title = typeof col.header === 'string' ? col.header : col.accessorKey
-                return (
-                    <DataTableColumnHeader column={column} title={title} />
-                )
-            },
-            cell: ({ row, getValue }) => {
-                if (typeof col.Cell === 'function') {
-                    return col.Cell({ renderedCellValue: getValue(), row: { original: row.original } })
-                }
-                const value = getValue()
-                return value ?? '-'
-            },
-        }))
+        const dataColumns = (columnsConfig || []).map((col) => {
+            const title = typeof col.header === 'string' ? col.header : col.accessorKey
+            return {
+                accessorKey: col.accessorKey,
+                id: col.id || col.accessorKey,
+                // Manual filtering still runs TanStack's automatic removal check.
+                // Its inferred numeric filter expects arrays and removes our
+                // server-side { min, max } values unless we supply a filterFn.
+                filterFn: serverColumnFilter,
+                meta: { title },
+                header: ({ column }) => <DataTableColumnHeader column={column} title={title} />,
+                cell: ({ row, getValue }) => {
+                    if (typeof col.Cell === 'function') {
+                        return col.Cell({ renderedCellValue: getValue(), row: { original: row.original } })
+                    }
+                    const value = getValue()
+                    if (value === null || value === undefined || value === '' || value === '-') {
+                        return <span className="text-muted-foreground/60">-</span>
+                    }
+                    const text = String(value)
+                    return (
+                        <span className="block max-w-[240px] truncate" title={text.length > 30 ? text : undefined}>
+                            {text}
+                        </span>
+                    )
+                },
+            }
+        })
 
         const actionsColumn = {
             id: 'actions',
-            header: () => <div className="text-right">Actions</div>,
+            header: () => <span className="sr-only">Actions</span>,
             cell: ({ row }) => {
                 const actionItems = createAction
                     ? createAction({ original: row.original }, deleteType, handleDelete)
                     : []
+                if (!actionItems?.length) return null
 
                 return (
                     <div className="flex justify-end">
                         <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon-sm" className="cursor-pointer">
+                                <Button variant="ghost" size="icon-sm" className="cursor-pointer max-md:size-9" aria-label="Row actions">
                                     <MoreHorizontal className="size-4" />
                                 </Button>
                             </DropdownMenuTrigger>
@@ -219,172 +321,308 @@ const Datatable = ({
             },
             enableSorting: false,
             enableHiding: false,
+            meta: { pin: 'right' },
         }
 
         return [selectionColumn, ...dataColumns, actionsColumn]
+        // handleDelete only sets state, so a stale closure is harmless.
     }, [columnsConfig, createAction, deleteType])
 
     const table = useReactTable({
-        data,
+        data: rows,
         columns: mappedColumns,
-        state: {
-            sorting,
-            pagination,
-            rowSelection,
-            globalFilter,
-            columnFilters,
-            columnVisibility,
-        },
-        rowCount: meta?.totalRowCount ?? 0,
+        state: { sorting, pagination, rowSelection, globalFilter, columnFilters, columnVisibility },
+        rowCount: total,
         manualPagination: true,
         manualSorting: true,
         manualFiltering: true,
         enableRowSelection: true,
         getRowId: (originalRow) => originalRow._id,
-        onSortingChange: setSorting,
-        onPaginationChange: setPagination,
+        onSortingChange: (updater) => {
+            setSorting(updater)
+            setPagination((p) => ({ ...p, pageIndex: 0 }))
+            setRowSelection({})
+        },
+        onPaginationChange: (updater) => { setPagination(updater); setRowSelection({}) },
         onRowSelectionChange: setRowSelection,
         onColumnVisibilityChange: setColumnVisibility,
         onGlobalFilterChange: handleGlobalFilterChange,
-        onColumnFiltersChange: setColumnFilters,
+        onColumnFiltersChange: handleColumnFiltersChange,
         getCoreRowModel: getCoreRowModel(),
     })
 
+    const visibleColumns = table.getVisibleLeafColumns().length
+    const searching = Boolean(globalFilter)
+    const narrowing = searching || hasFilters
+    const pinClass = (pin) =>
+        pin === 'left'
+            ? 'sticky left-0 z-[1] w-12 pl-4 pr-2'
+            : pin === 'right'
+                ? 'sticky right-0 z-[1] w-14 pr-3 shadow-[inset_1px_0_0_var(--border)]'
+                : ''
+
+    const extraToolbar = renderToolbar?.({
+        selectedIds,
+        clearSelection: () => setRowSelection({}),
+        meta,
+        isFetching,
+    })
+
+    const dialogCopy = pendingDelete ? DELETE_COPY[pendingDelete.type]?.(pendingDelete.ids.length) : null
+    const pageRows = table.getRowModel().rows
+    const showError = !isLoading && isError
+    const showEmpty = !isLoading && !showError && pageRows.length === 0
+
+    // Error / empty copy shared by the desktop table and the phone card list.
+    const stateBlock = showError ? (
+        <div className="mx-auto flex max-w-sm flex-col items-center text-center">
+            <span className="flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                <AlertTriangle className="size-5" aria-hidden="true" />
+            </span>
+            <p className="mt-4 font-semibold">Couldn’t load this table</p>
+            <p className="mt-1 text-sm text-muted-foreground">Check your connection and try again.</p>
+            <Button variant="outline" className="mt-5 h-10 gap-2 px-4 sm:h-9" onClick={() => refetch()}>
+                <RotateCcw className="size-4" /> Retry
+            </Button>
+        </div>
+    ) : showEmpty ? (
+        <div className="mx-auto flex max-w-sm flex-col items-center text-center">
+            <span className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
+                {narrowing ? <SearchX className="size-5" aria-hidden="true" /> : <Inbox className="size-5" aria-hidden="true" />}
+            </span>
+            <p className="mt-4 break-all font-semibold">{hasFilters ? 'No records match these filters' : searching ? `No matches for “${globalFilter}”` : 'Nothing here yet'}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+                {narrowing
+                    ? 'Adjust your filters or try a different search term.'
+                    : deleteType === 'PD'
+                        ? 'The recycle bin is empty.'
+                        : 'New records will appear here as they come in.'}
+            </p>
+            {narrowing && (
+                <Button variant="outline" className="mt-5 h-10 px-4 sm:h-9" onClick={clearSearchAndFilters}>
+                    {hasFilters ? 'Clear search and filters' : 'Clear search'}
+                </Button>
+            )}
+        </div>
+    ) : null
+
     return (
-        <div className="space-y-4">
-            <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                    <DataTableToolbar
-                        table={table}
-                        searchPlaceholder="Search in table..."
-                        className="flex-1"
-                    />
-                    <div className="flex flex-wrap items-center gap-2">
-                        {renderToolbar?.({
-                            selectedIds: Object.keys(rowSelection),
-                            clearSelection: () => setRowSelection({}),
-                            meta,
-                            isFetching,
-                        })}
-
-                        {deleteType !== 'PD' && (
-                            <Button asChild variant="outline" size="lg" className="h-9">
-                                <Link href={trashView}>
-                                    <Recycle className="mr-2 size-4" />
-                                    Recycle Bin
-                                </Link>
+        <div className="admin-table overflow-hidden rounded-xl border bg-card shadow-[0_1px_2px_rgb(0_0_0/0.04)]">
+            {/* Toolbar / selection bar */}
+            <div className="flex min-h-[3.75rem] flex-col gap-3 border-b px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+                {selectedCount > 0 ? (
+                    <div className="flex w-full flex-col gap-2.5 animate-in fade-in slide-in-from-top-1 duration-200 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-2 text-sm">
+                            <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground tabular-nums">
+                                {selectedCount}
+                            </span>
+                            <span className="font-medium">selected</span>
+                            <button type="button" onClick={() => setRowSelection({})} className="ml-1 inline-flex min-h-9 items-center gap-1 rounded-md px-2 py-1 text-muted-foreground transition hover:bg-muted hover:text-foreground">
+                                <X className="size-3.5" aria-hidden="true" /> Clear
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
+                            {extraToolbar}
+                            <Button variant="outline" className="h-10 gap-2 px-3 sm:h-9" disabled={exportLoading} onClick={() => handleExport(table.getSelectedRowModel().rows)}>
+                                {exportLoading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+                                <span className="sm:hidden">Export</span><span className="max-sm:hidden">Export selected</span>
                             </Button>
-                        )}
-
-                        {deleteType === 'SD' && (
-                            <Button
-                                variant="destructive"
-                                size="lg"
-                                className="h-9"
-                                disabled={!hasSelection}
-                                onClick={() => handleDelete(Object.keys(rowSelection), deleteType)}
-                            >
-                                <Trash2 className="mr-2 size-4" />
-                                Delete
-                            </Button>
-                        )}
-
-                        {deleteType === 'PD' && (
-                            <>
-                                <Button
-                                    variant="outline"
-                                    size="lg"
-                                    className="h-9"
-                                    disabled={!hasSelection}
-                                    onClick={() => handleDelete(Object.keys(rowSelection), 'RSD')}
-                                >
-                                    <RotateCcw className="mr-2 size-4" />
-                                    Restore
+                            {deleteType === 'SD' && (
+                                <Button variant="destructive" className="h-10 gap-2 px-3 sm:h-9" onClick={() => handleDelete(selectedIds, 'SD')}>
+                                    <Trash2 className="size-4" /> Move to bin
                                 </Button>
-                                <Button
-                                    variant="destructive"
-                                    size="lg"
-                                    className="h-9"
-                                    disabled={!hasSelection}
-                                    onClick={() => handleDelete(Object.keys(rowSelection), deleteType)}
-                                >
-                                    <Trash className="mr-2 size-4" />
-                                    Delete Forever
-                                </Button>
-                            </>
-                        )}
-
-                        <ButtonLoading
-                            type="button"
-                            text={
+                            )}
+                            {deleteType === 'PD' && (
                                 <>
-                                    <Download className="mr-2 size-4" /> Export
+                                    <Button variant="outline" className="h-10 gap-2 px-3 sm:h-9" onClick={() => handleDelete(selectedIds, 'RSD')}>
+                                        <RotateCcw className="size-4" /> Restore
+                                    </Button>
+                                    <Button variant="destructive" className="col-span-2 h-10 gap-2 px-3 sm:h-9" onClick={() => handleDelete(selectedIds, 'PD')}>
+                                        <Trash className="size-4" /> Delete forever
+                                    </Button>
                                 </>
-                            }
-                            loading={exportLoading}
-                            onClick={() => handleExport(table.getSelectedRowModel().rows)}
-                            className="h-9 cursor-pointer"
-                            size="lg"
-                        />
+                            )}
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <>
+                        <DataTableToolbar table={table} searchPlaceholder="Search this table…" busy={isFetching} />
+                        <div className="flex flex-wrap items-center gap-2 max-sm:[&>*]:flex-1">
+                            {extraToolbar}
+                            <DataTableMobileSort table={table} className="md:hidden" />
+                            <DataTableViewOptions table={table} />
+                            {deleteType !== 'PD' && trashView && (
+                                <Button asChild variant="outline" className="h-10 gap-2 px-3 sm:h-9">
+                                    <Link href={trashView} aria-label="Recycle bin">
+                                        <Recycle className="size-4" aria-hidden="true" />
+                                        <span className="hidden lg:inline">Recycle bin</span>
+                                    </Link>
+                                </Button>
+                            )}
+                            {exportEndpoint && (
+                                <Button className="h-10 gap-2 px-3 sm:h-9" disabled={exportLoading || total === 0 || isFetching || isError} onClick={() => handleExport([])}>
+                                    {exportLoading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+                                    <span className="sm:hidden">Export</span><span className="max-sm:hidden">{filteredExport ? 'Export filtered' : 'Export all'}</span>
+                                </Button>
+                            )}
+                        </div>
+                    </>
+                )}
             </div>
 
-            <div className="overflow-hidden rounded-md bg-card border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id} className="group/row">
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead
-                                        key={header.id}
-                                        className="bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted"
-                                    >
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(header.column.columnDef.header, header.getContext())}
-                                    </TableHead>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow>
-                                <TableCell colSpan={mappedColumns.length} className="h-24 text-center">
-                                    Loading...
-                                </TableCell>
-                            </TableRow>
-                        ) : table.getRowModel().rows.length > 0 ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="group/row">
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell
-                                            key={cell.id}
-                                            className="bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted"
+            {filtersConfig?.length > 0 && <DataTableFilters table={table} config={filtersConfig} facets={meta?.facets} total={total} busy={isFetching} loading={isLoading} failed={isError} />}
+
+            {/* Table */}
+            <div className="relative">
+                {isFetching && !isLoading && (
+                    <div className="absolute inset-x-0 top-0 z-[2] h-0.5 overflow-hidden bg-primary/10" aria-hidden="true">
+                        <div className="admin-table__progress h-full w-1/3 bg-primary" />
+                    </div>
+                )}
+                <div className="admin-table__scroll hidden overflow-x-auto md:block">
+                    <table className="w-full caption-bottom border-separate border-spacing-0 text-sm">
+                        <thead>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <tr key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        const sorted = header.column.getIsSorted()
+                                        return (
+                                            <th
+                                                key={header.id}
+                                                scope="col"
+                                                aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : undefined}
+                                                className={cn(
+                                                    'h-11 border-b bg-muted px-3 text-left align-middle text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground',
+                                                    pinClass(header.column.columnDef.meta?.pin)
+                                                )}
+                                            >
+                                                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                            </th>
+                                        )
+                                    })}
+                                </tr>
+                            ))}
+                        </thead>
+                        <tbody>
+                            {isLoading ? (
+                                Array.from({ length: SKELETON_ROWS }).map((_, i) => (
+                                    <tr key={`skeleton-${i}`} aria-hidden="true">
+                                        {Array.from({ length: visibleColumns }).map((__, j) => (
+                                            <td key={j} className="border-b bg-card px-3 py-3.5">
+                                                <span
+                                                    className="block h-3.5 animate-pulse rounded bg-muted"
+                                                    style={{ width: j === 0 ? 16 : j === visibleColumns - 1 ? 20 : `${50 + ((i * 7 + j * 13) % 45)}%` }}
+                                                />
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            ) : stateBlock ? (
+                                <tr>
+                                    <td colSpan={visibleColumns} className="bg-card px-6 py-14">{stateBlock}</td>
+                                </tr>
+                            ) : (
+                                pageRows.map((row) => (
+                                    <tr key={row.id} data-state={row.getIsSelected() ? 'selected' : undefined} className="group/row">
+                                        {row.getVisibleCells().map((cell) => (
+                                            <td
+                                                key={cell.id}
+                                                className={cn(
+                                                    'whitespace-nowrap border-b bg-card px-3 py-3 align-middle transition-colors group-last/row:border-b-0 group-hover/row:bg-[color-mix(in_srgb,var(--muted)_65%,var(--card))] group-data-[state=selected]/row:bg-secondary',
+                                                    pinClass(cell.column.columnDef.meta?.pin)
+                                                )}
+                                            >
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Phones: one card per row, label/value pairs, actions top-right. */}
+                <div className="md:hidden">
+                    {isLoading ? (
+                        <ul aria-hidden="true" className="divide-y">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <li key={`skeleton-${i}`} className="flex gap-3 px-3 py-4">
+                                    <span className="size-4 shrink-0 animate-pulse rounded bg-muted" />
+                                    <div className="flex-1 space-y-2.5">
+                                        {Array.from({ length: 3 }).map((__, j) => (
+                                            <span key={j} className="block h-3.5 animate-pulse rounded bg-muted" style={{ width: `${55 + ((i * 7 + j * 13) % 40)}%` }} />
+                                        ))}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : stateBlock ? (
+                        <div className="px-4 py-12">{stateBlock}</div>
+                    ) : (
+                        <>
+                            <label className="flex min-h-11 items-center gap-3 border-b bg-muted px-3 text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                                <Checkbox
+                                    checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+                                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                                    aria-label="Select all rows on this page"
+                                />
+                                Select all on this page
+                            </label>
+                            <ul className="divide-y">
+                                {pageRows.map((row) => {
+                                    const cells = row.getVisibleCells()
+                                    const dataCells = cells.filter((cell) => !cell.column.columnDef.meta?.pin)
+                                    const actionsCell = cells.find((cell) => cell.column.id === 'actions')
+                                    return (
+                                        <li
+                                            key={row.id}
+                                            data-state={row.getIsSelected() ? 'selected' : undefined}
+                                            className="flex items-start gap-3 bg-card px-3 py-3.5 transition-colors data-[state=selected]:bg-secondary"
                                         >
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={mappedColumns.length} className="h-24 text-center">
-                                    {isError ? 'Error loading data.' : 'No records found.'}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                                            <Checkbox
+                                                className="mt-0.5"
+                                                checked={row.getIsSelected()}
+                                                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                                                aria-label="Select row"
+                                            />
+                                            <dl className="grid min-w-0 flex-1 grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)] items-baseline gap-x-3 gap-y-2 text-sm">
+                                                {dataCells.map((cell) => (
+                                                    <div key={cell.id} className="contents">
+                                                        <dt className="truncate text-xs text-muted-foreground">{cell.column.columnDef.meta?.title || cell.column.id}</dt>
+                                                        <dd className="min-w-0 break-words [&_.truncate]:max-w-full">{flexRender(cell.column.columnDef.cell, cell.getContext())}</dd>
+                                                    </div>
+                                                ))}
+                                            </dl>
+                                            {actionsCell && (
+                                                <div className="-my-1 -mr-1 shrink-0">
+                                                    {flexRender(actionsCell.column.columnDef.cell, actionsCell.getContext())}
+                                                </div>
+                                            )}
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        </>
+                    )}
+                </div>
             </div>
 
-            <div className="flex flex-col gap-3">
-                <div className="px-2 text-sm text-muted-foreground">
-                    {isRefetching ? 'Refreshing...' : `${meta?.totalRowCount ?? 0} total rows`}
-                </div>
-                <DataTablePagination table={table} />
+            {/* Footer */}
+            <div className="border-t bg-card px-3 py-3 sm:px-4">
+                <DataTablePagination table={table} total={total} />
             </div>
+
+            <ConfirmDialog
+                open={Boolean(pendingDelete)}
+                onOpenChange={(open) => { if (!open) setPendingDelete(null) }}
+                title={dialogCopy?.title}
+                description={dialogCopy?.description}
+                confirmLabel={dialogCopy?.confirmLabel}
+                tone={dialogCopy?.tone}
+                loading={deleteMutation.isPending}
+                onConfirm={confirmDelete}
+            />
         </div>
     )
 }

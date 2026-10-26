@@ -3,6 +3,8 @@ import { use, useEffect, useState } from 'react'
 import useFetch from '@/hooks/useFetch'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import PageHeader from '@/components/Application/Admin/PageHeader'
+import AdminRecordState from '@/components/Application/Admin/AdminRecordState'
+import { AdminLoadingState } from '@/components/Application/Admin/AdminEmptyState'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ADMIN_CONTACTS_SHOW, ADMIN_DASHBOARD } from '@/routes/AdminPanelRoute'
@@ -18,13 +20,27 @@ const breadcrumbData = [
 const ContactDetail = ({ params }) => {
   const { id } = use(params)
   const [contact, setContact] = useState(null)
-  const { data, loading } = useFetch(`/api/contact/get/${id}`)
+  const { data, error: recordError, errorStatus: recordErrorStatus, refetch: refetchRecord } = useFetch(`/api/contact/get/${id}`)
 
   useEffect(() => {
     if (data?.success) {
       setContact(data.data)
     }
   }, [data])
+
+  if (recordError) {
+    return (
+      <AdminRecordState
+        entity="Message"
+        error={recordError}
+        errorStatus={recordErrorStatus}
+        onRetry={refetchRecord}
+        backHref={ADMIN_CONTACTS_SHOW}
+        backLabel="Back to contact queries"
+        header={{ title: 'View Message', description: 'Full details of this contact query.', breadcrumb: <BreadCrumb breadcrumbData={breadcrumbData} /> }}
+      />
+    )
+  }
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
@@ -35,17 +51,7 @@ const ContactDetail = ({ params }) => {
       />
 
       <div className="rounded-md bg-card">
-        {loading && (
-          <div className="flex justify-center items-center py-24 text-muted-foreground text-sm">
-            Loading…
-          </div>
-        )}
-
-        {!loading && !contact && (
-          <div className="flex justify-center items-center py-24">
-            <p className="text-red-500 text-lg font-medium">Message not found.</p>
-          </div>
-        )}
+        {!contact && <AdminLoadingState label="Loading message…" className="py-24" />}
 
         {contact && (
           <div className="p-6 max-w-3xl">

@@ -82,6 +82,31 @@ const ShowReview = () => {
             { onSuccess: clearSelection }
         )
 
+        if (selectedIds.length) {
+            return (
+                <>
+                    <Button
+                        variant="outline"
+                        className="h-10 gap-2 px-3 sm:h-9"
+                        disabled={statusMutation.isPending}
+                        onClick={() => bulk(true)}
+                    >
+                        <Eye className="size-4" />
+                        Publish
+                    </Button>
+                    <Button
+                        variant="outline"
+                        className="h-10 gap-2 px-3 sm:h-9"
+                        disabled={statusMutation.isPending}
+                        onClick={() => bulk(false)}
+                    >
+                        <EyeOff className="size-4" />
+                        Unpublish
+                    </Button>
+                </>
+            )
+        }
+
         return (
             <>
                 <div role="tablist" aria-label="Filter by status" className="inline-flex h-9 items-center rounded-md border bg-background p-0.5">
@@ -106,26 +131,6 @@ const ShowReview = () => {
                         </button>
                     ))}
                 </div>
-                <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-9"
-                    disabled={!selectedIds.length || statusMutation.isPending}
-                    onClick={() => bulk(true)}
-                >
-                    <Eye className="mr-2 size-4" />
-                    Publish
-                </Button>
-                <Button
-                    variant="outline"
-                    size="lg"
-                    className="h-9"
-                    disabled={!selectedIds.length || statusMutation.isPending}
-                    onClick={() => bulk(false)}
-                >
-                    <EyeOff className="mr-2 size-4" />
-                    Unpublish
-                </Button>
             </>
         )
     }, [setPublished, status, statusMutation.isPending])

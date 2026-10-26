@@ -17,7 +17,8 @@ export async function GET(request, { params }) {
         const id = getParams.id
 
         const filter = {
-            deletedAt: null
+            deletedAt: null,
+            deletingAt: null
         }
 
         if (!isValidObjectId(id)) {

@@ -18,11 +18,12 @@ export async function GET(request) {
         const deleteType = searchParams.get('deleteType')
 
         // SD=> soft delete , RSD=> restore soft delete, PD => permanent delete
-        let filter = {}
+        // Rows mid-way through a permanent delete are hidden from every view.
+        let filter = { deletingAt: null }
         if (deleteType === 'SD') {
-            filter = { deletedAt: null }
+            filter = { ...filter, deletedAt: null }
         } else if (deleteType === 'PD') {
-            filter = { deletedAt: { $ne: null } }
+            filter = { ...filter, deletedAt: { $ne: null } }
         }
 
 

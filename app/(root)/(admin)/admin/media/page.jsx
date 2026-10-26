@@ -3,6 +3,7 @@ import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import Media from '@/components/Application/Admin/Media'
 import PageHeader from '@/components/Application/Admin/PageHeader'
 import UploadMedia from '@/components/Application/Admin/UploadMedia'
+import ConfirmDialog from '@/components/Application/Admin/data-table/ConfirmDialog'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -28,6 +29,7 @@ const MediaContent = () => {
     const [deleteType, setDeleteType] = useState('SD')
     const [selectedMedia, setSelectedMedia] = useState([])
     const [selectAll, setSelectAll] = useState(false)
+    const [pendingDelete, setPendingDelete] = useState(null)
     const searchParams = useSearchParams()
 
     useEffect(() => {
@@ -69,20 +71,23 @@ const MediaContent = () => {
 
     const deleteMutation = useDeleteMutation('media-data', '/api/media/delete')
 
-    const handleDelete = (ids, deleteType) => {
-        let c = true
-        if (deleteType === 'PD') {
-            c = confirm('Are you sure you want to delete the data permanently?')
-        }
-
-        if (c) {
-            deleteMutation.mutate({ ids, deleteType })
-        }
-
+    const runDelete = (ids, deleteType) => {
+        deleteMutation.mutate({ ids, deleteType })
         setSelectAll(false)
         setSelectedMedia([])
-
     }
+
+    // Permanent deletes confirm in a dialog first; trash and restore act at once.
+    const handleDelete = (ids, deleteType) => {
+        if (!ids?.length) return
+        if (deleteType === 'PD') {
+            setPendingDelete({ ids, deleteType })
+            return
+        }
+        runDelete(ids, deleteType)
+    }
+
+    const pendingCount = pendingDelete?.ids.length || 0
 
     const handleSelectAll = () => {
         setSelectAll(!selectAll)
@@ -210,6 +215,18 @@ const MediaContent = () => {
                     />
                 )}
             </div>
+
+            <ConfirmDialog
+                open={Boolean(pendingDelete)}
+                onOpenChange={(open) => { if (!open) setPendingDelete(null) }}
+                title={`Delete ${pendingCount} ${pendingCount === 1 ? 'file' : 'files'} forever?`}
+                description="This permanently removes the media from the library and Cloudinary. It cannot be undone."
+                confirmLabel="Delete forever"
+                onConfirm={() => {
+                    runDelete(pendingDelete.ids, pendingDelete.deleteType)
+                    setPendingDelete(null)
+                }}
+            />
         </div>
     )
 }
