@@ -9,7 +9,7 @@ import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
  */
 
 const BRAND = {
-    name: 'MOMSTITCHED',
+    name: 'MomStitched',
     tagline: 'Fashion, stitched with love',
     email: 'support@momstitched.com',
     web: 'www.momstitched.com',

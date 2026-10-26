@@ -10,7 +10,7 @@ export const metadata = {
     template: '%s | MomStitched',
   },
   description:
-    "From everyday comfort to festive charm, Momstitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
+    "From everyday comfort to festive charm, MomStitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
   robots: {
     index: true,
     follow: true,
@@ -28,7 +28,7 @@ export const metadata = {
     siteName: 'MomStitched',
     title: 'MomStitched - Handcrafted Women\'s Ethnic Wear',
     description:
-      "From everyday comfort to festive charm, Momstitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
+      "From everyday comfort to festive charm, MomStitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
     url: 'https://www.momstitched.com',
     images: [
       {
@@ -41,9 +41,9 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Momstitched - Handcrafted Women\'s Ethnic Wear',
+    title: 'MomStitched - Handcrafted Women\'s Ethnic Wear',
     description:
-      "From everyday comfort to festive charm, Momstitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
+      "From everyday comfort to festive charm, MomStitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
     images: ['/assets/images/hero/01.webp'],
   },
   icons: {

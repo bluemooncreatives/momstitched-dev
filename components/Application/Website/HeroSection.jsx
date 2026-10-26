@@ -25,7 +25,7 @@ const SLIDES = [
     title: "The Revival Ensemble",
     writeup: "Where tradition meets modern femininity - handcrafted women's wear stitched with a mother's devotion and an artist's eye.",
     src: "/assets/images/hero/01.webp",
-    alt: "Momstitched festive ethnic wear collection for women",
+    alt: "MomStitched festive ethnic wear collection for women",
   },
   {
     id: 2,
@@ -33,7 +33,7 @@ const SLIDES = [
     title: "Heritage in Every Thread",
     writeup: "Festive ethnic wear and everyday elegance, curated for the woman who carries grace in every step she takes.",
     src: "/assets/images/hero/02.webp",
-    alt: "Momstitched timeless women's ethnic wear collection",
+    alt: "MomStitched timeless women's ethnic wear collection",
   },
   {
     id: 3,
@@ -41,7 +41,7 @@ const SLIDES = [
     title: "The Art of Refined Dressing",
     writeup: "Premium fabrics, thoughtful silhouettes, and meticulous detailing — women's fashion that speaks before you say a word.",
     src: "/assets/images/hero/03.webp",
-    alt: "Momstitched elegant designer women's wear",
+    alt: "MomStitched elegant designer women's wear",
   },
   {
     id: 4,
@@ -49,7 +49,7 @@ const SLIDES = [
     title: "Crafted to Be Cherished",
     writeup: "Timeless Indian women's fashion that transcends seasons — pieces made to accompany every celebration, big and small.",
     src: "/assets/images/hero/04.webp",
-    alt: "Momstitched eternal women's fashion collection",
+    alt: "MomStitched eternal women's fashion collection",
   },
 ];
 

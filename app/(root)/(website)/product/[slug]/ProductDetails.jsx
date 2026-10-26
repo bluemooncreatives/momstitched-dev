@@ -327,7 +327,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                 {product.category.name}
                             </Link>
                         ) : (
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--dark-red)]">Momstitched</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--dark-red)]">MomStitched</p>
                         )}
 
                         <h1 className="font-header mt-2 text-[1.75rem] leading-[1.1] tracking-[-0.02em] text-foreground sm:text-[2rem] lg:text-[2.25rem]">
