@@ -1,10 +1,10 @@
 import { emailVerificationLink } from "@/email/emailVerificationLink";
 import { otpEmail } from "@/email/otpEmail";
 import { connectDB } from "@/lib/databaseConnection";
-import { catchError, generateOTP, response } from "@/lib/helperFunction";
+import { catchError, response } from "@/lib/helperFunction";
+import { issueOtp, otpErrorMessage } from "@/lib/otp";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
-import OTPModel from "@/models/Otp.model";
 import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
 import { z } from "zod";
@@ -67,20 +67,18 @@ export async function POST(request) {
         }
 
 
-        // otp generation 
-        await OTPModel.deleteMany({ email })  // deleting old otps 
-
-        const OTP = generateOTP()
-
-        // storing otp into database (save before sending mail to avoid race)
-        const newOtpData = new OTPModel({
-            email, otp: OTP
-        })
-
-        await newOtpData.save()
+        // otp generation (stored before sending mail to avoid race)
+        const issued = await issueOtp({ email, purpose: 'login' })
+        // Re-submitting the form within the cooldown: the code already sent is still valid.
+        if (!issued.ok && issued.reason === 'cooldown') {
+            return response(true, 200, 'A code was sent recently. Please check your email.')
+        }
+        if (!issued.ok) {
+            return response(false, 429, otpErrorMessage(issued.reason, issued.retryAfter), { retryAfter: issued.retryAfter })
+        }
 
         // send OTP email
-        const OTPEmailTemplate = otpEmail(OTP, { name: getUser.name, purpose: 'login' })
+        const OTPEmailTemplate = otpEmail(issued.otp, { name: getUser.name, purpose: 'login' })
         const otpEmailStatus = await sendMail("Your MomStitched login code", email, OTPEmailTemplate)
         if (!otpEmailStatus.success) {
             return response(false, 500, 'Something went wrong.')

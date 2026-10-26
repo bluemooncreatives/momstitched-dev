@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight, Eye, ShoppingBag, Star } from 'lucide-react'
 import { BrandButton, BrandOutlineButton } from '@/components/Application/Website/BrandButton'
 import { addIntoCart } from '@/store/reducer/cartReducer'
 import { showToast } from '@/lib/showToast'
+import WishlistButton from '@/components/Application/Website/WishlistButton'
 
 const ProductBox = ({ product, priority = false }) => {
     const dispatch = useDispatch()
@@ -68,10 +69,16 @@ const ProductBox = ({ product, priority = false }) => {
                     {hasDiscount ? `Sale ${discount}%` : 'Hot'}
                 </span>
 
+                <WishlistButton
+                    productId={product?._id}
+                    productName={product?.name}
+                    className="absolute left-3 top-3 z-20"
+                />
+
                 <Link
                     href={WEBSITE_PRODUCT_DETAILS(product.slug)}
                     aria-label={`View ${product?.name}`}
-                    className="absolute left-3 top-3 z-20 flex size-9 items-center justify-center rounded-xs border border-border/40 bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground group-hover:opacity-100"
+                    className="absolute left-3 top-[3.25rem] z-20 flex size-9 items-center justify-center rounded-xs border border-border/40 bg-background/85 text-foreground/70 opacity-0 shadow-sm backdrop-blur-sm transition duration-200 hover:bg-background hover:text-foreground group-hover:opacity-100"
                 >
                     <Eye className="size-4" />
                 </Link>

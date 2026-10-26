@@ -34,6 +34,7 @@ import { showToast } from "@/lib/showToast"
 import { Button } from "@/components/ui/button"
 import ProductBox from "@/components/Application/Website/ProductBox"
 import LazyHydrate from "@/components/Application/LazyHydrate"
+import WishlistButton from "@/components/Application/Website/WishlistButton"
 
 // Split the heavy client-only islands out of the page's hydration chunk.
 // ProductReveiw drags in react-hook-form, zod, tanstack-query and axios but
@@ -461,14 +462,17 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
 
                         {/* Quantity + Add to cart */}
                         {!variant?._id ? (
-                            <Button
-                                type="button"
-                                variant="brand"
-                                disabled
-                                className="h-12 w-full rounded-[var(--radius-sm)] text-[12px] font-semibold uppercase tracking-[0.2em]"
-                            >
-                                Unavailable
-                            </Button>
+                            <div className="flex flex-row items-stretch gap-3">
+                                <Button
+                                    type="button"
+                                    variant="brand"
+                                    disabled
+                                    className="h-12 flex-1 rounded-[var(--radius-sm)] text-[12px] font-semibold uppercase tracking-[0.2em]"
+                                >
+                                    Unavailable
+                                </Button>
+                                <WishlistButton productId={product._id} productName={product.name} variant="outline" />
+                            </div>
                         ) : !inCart ? (
                             /* ── Not in cart: pick a quantity, then add ──────────── */
                             <div className="flex flex-row items-stretch gap-3">
@@ -503,6 +507,8 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                         onClick={handleAddToCart}
                                     />
                                 </div>
+
+                                <WishlistButton productId={product._id} productName={product.name} variant="outline" />
                             </div>
                         ) : (
                             /* ── In cart: live stepper bound to the cart line ────── */
@@ -538,6 +544,8 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                         <Link href={WEBSITE_CART}>Go To Cart</Link>
                                     </Button>
                                 </div>
+
+                                <WishlistButton productId={product._id} productName={product.name} variant="outline" />
                             </div>
                         )}
 

@@ -1,5 +1,7 @@
 import Footer from '@/components/Application/Website/Footer'
 import Header from '@/components/Application/Website/Header'
+import CartPriceSync from '@/components/Application/Website/CartPriceSync'
+import MobileCartBar from '@/components/Application/Website/MobileCartBar'
 import { getFooterCategories } from '@/lib/services/categoryService'
 
 const Layout = async ({ children }) => {
@@ -12,6 +14,8 @@ const Layout = async ({ children }) => {
                 {children}
             </main>
             <Footer categoryLinks={footerCategories} />
+            <MobileCartBar />
+            <CartPriceSync />
         </div>
     )
 }

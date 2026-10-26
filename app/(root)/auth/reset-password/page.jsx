@@ -27,7 +27,8 @@ const ResetPassword = () => {
     const [emailVerificationLoading, setEmailVerificationLoading] = useState(false)
     const [otpVerificationLoading, setOtpVerificationLoading] = useState(false)
     const [otpEmail, setOtpEmail] = useState()
-    const [isOtpVerified, setIsOtpVerified] = useState(false)
+    // Single-use proof from verify-otp; the only thing update-password accepts.
+    const [resetToken, setResetToken] = useState()
     const formSchema = zSchema.pick({ email: true })
 
     const form = useForm({
@@ -55,12 +56,18 @@ const ResetPassword = () => {
             const { data: otpResponse } = await axios.post('/api/auth/reset-password/verify-otp', values)
             if (!otpResponse.success) throw new Error(otpResponse.message)
             showToast('success', otpResponse.message)
-            setIsOtpVerified(true)
+            setResetToken(otpResponse.data.resetToken)
         } catch (error) {
             showToast('error', error.message)
         } finally {
             setOtpVerificationLoading(false)
         }
+    }
+
+    // Token expired or already used — start the flow over from the email step.
+    const handleResetExpired = () => {
+        setResetToken(undefined)
+        setOtpEmail(undefined)
     }
 
     return (
@@ -126,9 +133,9 @@ const ResetPassword = () => {
                         </>
                     ) : (
                         <>
-                            {!isOtpVerified
-                                ? <OTPVerification email={otpEmail} onSubmit={handleOtpVerification} loading={otpVerificationLoading} />
-                                : <UpdatePassword email={otpEmail} />
+                            {!resetToken
+                                ? <OTPVerification email={otpEmail} onSubmit={handleOtpVerification} loading={otpVerificationLoading} resendEndpoint='/api/auth/reset-password/send-otp' />
+                                : <UpdatePassword email={otpEmail} resetToken={resetToken} onExpired={handleResetExpired} />
                             }
                         </>
                     )}

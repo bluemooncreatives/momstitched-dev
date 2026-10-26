@@ -100,6 +100,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
+    // Saved products. Capped at MAX_WISHLIST_ITEMS (lib/wishlist.js) by the
+    // wishlist service. Hidden by default so the list never rides along on
+    // unrelated user queries (admin customer table, auth lookups, …).
+    wishlist: {
+        type: [{
+            _id: false,
+            product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+            addedAt: { type: Date, default: Date.now },
+        }],
+        default: [],
+        select: false,
+    },
+    // Bumped on every wishlist write. The merge (read → union → write) uses it as
+    // an optimistic-concurrency token so two tabs signing in at once can't
+    // clobber each other's changes.
+    wishlistVersion: {
+        type: Number,
+        default: 0,
+        select: false,
+    },
     deletedAt: {
         type: Date,
         default: null,

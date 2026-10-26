@@ -1,9 +1,12 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
+import { consumeResetToken } from "@/lib/otp";
 import { sendMail } from "@/lib/sendMail";
 import { passwordChanged } from "@/email/passwordChanged";
 import { zSchema } from "@/lib/zodSchema";
+import OTPModel from "@/models/Otp.model";
 import UserModel from "@/models/User.model";
+import { z } from "zod";
 
 export async function PUT(request) {
     try {
@@ -11,6 +14,8 @@ export async function PUT(request) {
         const payload = await request.json()
         const validationSchema = zSchema.pick({
             email: true, password: true
+        }).extend({
+            resetToken: z.string().regex(/^[a-f0-9]{64}$/, 'Invalid reset token.')
         })
 
         const validatedData = validationSchema.safeParse(payload)
@@ -18,7 +23,13 @@ export async function PUT(request) {
             return response(false, 401, 'Invalid or missing input field.', validatedData.error)
         }
 
-        const { email, password } = validatedData.data
+        const { email, password, resetToken } = validatedData.data
+
+        // Without a valid token from a verified reset code, nothing changes.
+        const isTokenValid = await consumeResetToken(email, resetToken)
+        if (!isTokenValid) {
+            return response(false, 410, 'Your reset session has expired. Please request a new code.')
+        }
 
         const getUser = await UserModel.findOne({ deletedAt: null, email }).select("+password")
 
@@ -33,6 +44,9 @@ export async function PUT(request) {
         // email + password login.
         getUser.isEmailVerified = true
         await getUser.save()
+
+        // Any login code issued under the old password is no longer trustworthy.
+        await OTPModel.deleteMany({ email })
 
         // Security notice. Best-effort — the reset already succeeded.
         try {

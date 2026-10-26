@@ -4,6 +4,7 @@ import { store } from '@/store/store'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import AuthHydrator from '@/components/Application/AuthHydrator'
+import WishlistSync from '@/components/Application/WishlistSync'
 
 const ReactQueryDevtools = process.env.NODE_ENV === 'development'
     ? dynamic(() => import('@tanstack/react-query-devtools').then(m => ({ default: m.ReactQueryDevtools })), { ssr: false })
@@ -29,6 +30,7 @@ const GlobalProvider = ({ children }) => {
         <QueryClientProvider client={queryClient}>
             <Provider store={store}>
                 <AuthHydrator />
+                <WishlistSync />
                 {children}
             </Provider>
             {ReactQueryDevtools ? <ReactQueryDevtools initialIsOpen={false} /> : null}

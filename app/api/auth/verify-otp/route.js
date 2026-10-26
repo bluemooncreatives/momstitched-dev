@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { zSchema } from "@/lib/zodSchema";
 import { claimGuestOrders } from "@/lib/services/orderService";
-import OTPModel from "@/models/Otp.model";
+import { otpErrorMessage, verifyOtp } from "@/lib/otp";
 import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
@@ -22,9 +22,10 @@ export async function POST(request) {
 
         const { email, otp } = validatedData.data
 
-        const getOtpData = await OTPModel.findOne({ email, otp })
-        if (!getOtpData) {
-            return response(false, 404, 'Invalid or expired otp.')
+        // Consumes the code on success, so it can't be replayed.
+        const verified = await verifyOtp({ email, purpose: 'login', otp })
+        if (!verified.ok) {
+            return response(false, 400, otpErrorMessage(verified.reason))
         }
 
         const getUser = await UserModel.findOne({ deletedAt: null, email }).lean()
@@ -67,9 +68,6 @@ export async function POST(request) {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
         })
-
-        // remove otp after validation  
-        await getOtpData.deleteOne()
 
         return response(true, 200, 'Login successfull.', loggedInUserData)
 

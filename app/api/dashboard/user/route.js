@@ -1,10 +1,40 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import OrderModel, { withDefaultShipmentMany } from "@/models/Order.model";
-import MediaModel from "@/models/Media.model";
-import ProductModel from "@/models/Product.model";
-import ProductVariantModel from "@/models/ProductVariant.model";
+import { getRecentUserOrders, getUserDashboardStats, toUserObjectId } from "@/lib/services/userOrderService";
+import UserModel from "@/models/User.model";
+
+const ADDRESS_FIELDS = ['address', 'landmark', 'city', 'state', 'pincode', 'country']
+const REQUIRED_ADDRESS_FIELDS = ['address', 'city', 'state', 'pincode', 'country']
+
+const filled = (value) => typeof value === 'string' && value.trim().length > 0
+
+// Each check is worth an equal share of the completion percentage.
+const getProfileCompletion = (user) => {
+    const checks = [
+        { key: 'name', label: 'Add your name', done: filled(user.name) },
+        { key: 'email', label: 'Verify your email', done: Boolean(user.isEmailVerified) },
+        { key: 'phone', label: 'Add a phone number', done: filled(user.phone) },
+        { key: 'avatar', label: 'Upload a profile photo', done: filled(user.avatar?.url) },
+        { key: 'address', label: 'Save a shipping address', done: REQUIRED_ADDRESS_FIELDS.every((field) => filled(user[field])) },
+    ]
+    const doneCount = checks.filter((check) => check.done).length
+
+    return {
+        percent: Math.round((doneCount / checks.length) * 100),
+        missing: checks.filter((check) => !check.done).map(({ key, label }) => ({ key, label })),
+    }
+}
+
+const getSavedAddress = (user) => {
+    if (!ADDRESS_FIELDS.some((field) => filled(user[field]))) return null
+    return {
+        ...Object.fromEntries(ADDRESS_FIELDS.map((field) => [field, filled(user[field]) ? user[field].trim() : ''])),
+        name: user.name || '',
+        phone: user.phone || '',
+        isComplete: REQUIRED_ADDRESS_FIELDS.every((field) => filled(user[field])),
+    }
+}
 
 export async function GET(request) {
     try {
@@ -14,26 +44,35 @@ export async function GET(request) {
             return response(false, 401, 'Unauthorized')
         }
 
-        const userId = auth.userId
-
-        // Orders are always tied to the account that placed them, so match strictly
-        // by user. (The order's contact email is user-supplied and must NOT be used
-        // for access, or one customer could surface their order on another's account.)
-        const orderFilter = {
-            deletedAt: null,
-            user: userId
+        const userObjectId = toUserObjectId(auth.userId)
+        if (!userObjectId) {
+            return response(false, 401, 'Unauthorized')
         }
 
-        // get recent orders 
-        const recentOrders = await OrderModel.find(orderFilter).populate('products.productId', 'name slug').populate({
-            path: 'products.variantId',
-            populate: { path: 'media' }
-        }).limit(10).lean()
+        const [user, stats, recentOrders] = await Promise.all([
+            UserModel.findOne({ _id: userObjectId, deletedAt: null })
+                .select('name email phone avatar isEmailVerified createdAt ' + ADDRESS_FIELDS.join(' '))
+                .lean(),
+            getUserDashboardStats(userObjectId),
+            getRecentUserOrders(userObjectId, 5),
+        ])
 
-        // get total order count 
-        const totalOrder = await OrderModel.countDocuments(orderFilter)
+        if (!user) {
+            return response(false, 404, 'User not found.')
+        }
 
-        return response(true, 200, 'Dashboard info.', { recentOrders: withDefaultShipmentMany(recentOrders), totalOrder })
+        return response(true, 200, 'Dashboard info.', JSON.parse(JSON.stringify({
+            user: {
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar?.url || null,
+                memberSince: user.createdAt,
+            },
+            stats,
+            profileCompletion: getProfileCompletion(user),
+            savedAddress: getSavedAddress(user),
+            recentOrders,
+        })))
 
     } catch (error) {
         return catchError(error)

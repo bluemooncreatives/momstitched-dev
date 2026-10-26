@@ -5,6 +5,7 @@ import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 
 import authReducer from "./reducer/authReducer";
 import cartReducer from "./reducer/cartReducer";
+import wishlistReducer from "./reducer/wishlistReducer";
 
 // redux-persist's default storage logs "failed to create sync storage, falling
 // back to noop storage" whenever it's evaluated on the server — Next.js executes
@@ -31,13 +32,15 @@ const storage =
 const rootReducer = combineReducers({
   authStore: authReducer,
   cartStore: cartReducer,
+  wishlistStore: wishlistReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
 
-  // Persist only cart, NOT auth
+  // Persist only cart, NOT auth. The wishlist keeps its own localStorage
+  // snapshot (see WishlistSync) so it can sync across tabs.
   whitelist: ["cartStore"],
 };
 

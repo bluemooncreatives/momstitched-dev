@@ -73,6 +73,39 @@ export const cartReducer = createSlice({
         clearCart: (state, action) => {
             state.products = []
             state.count = 0
+        },
+        // Apply a background re-price (CartPriceSync). Only lines that were part
+        // of the request are touched: a line added while it was in flight is
+        // kept as-is, and the shopper's current qty always wins over the qty
+        // that was sent.
+        syncCartPrices: (state, action) => {
+            const { checkedVariantIds, verified } = action.payload
+            const checked = new Set(checkedVariantIds.map(String))
+            const verifiedById = new Map(verified.map((line) => [String(line.variantId), line]))
+
+            state.products = state.products.reduce((lines, product) => {
+                const key = String(product.variantId)
+                if (!checked.has(key)) {
+                    lines.push(product)
+                    return lines
+                }
+                const fresh = verifiedById.get(key)
+                if (!fresh) return lines // no longer sold → drop
+                lines.push({
+                    ...product,
+                    productId: String(fresh.productId),
+                    name: fresh.name,
+                    url: fresh.url,
+                    size: fresh.size,
+                    color: fresh.color,
+                    mrp: fresh.mrp,
+                    sellingPrice: fresh.sellingPrice,
+                    media: fresh.media || product.media,
+                    qty: clampQty(product.qty),
+                })
+                return lines
+            }, [])
+            state.count = state.products.length
         }
 
     }
@@ -83,6 +116,7 @@ export const {
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
-    clearCart
+    clearCart,
+    syncCartPrices
 } = cartReducer.actions
 export default cartReducer.reducer

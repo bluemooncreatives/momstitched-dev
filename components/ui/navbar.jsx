@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import Cart from "@/components/Application/Website/Cart"
+import WishlistHeaderLink from "@/components/Application/Website/WishlistHeaderLink"
 import GlobalSearch from "@/components/Application/Website/GlobalSearch"
 import { BrandButton, BrandOutlineButton } from "@/components/Application/Website/BrandButton"
 import userIcon from "@/public/assets/images/user.png"
@@ -94,6 +95,11 @@ export default function Navbar({
               <SearchIcon className="h-6 w-6" strokeWidth={1.75} />
             </button>
 
+            <WishlistHeaderLink
+              className="px-1.5 py-1.5 sm:px-2.5 sm:py-2"
+              iconClassName="h-4 w-4 text-foreground sm:h-5 sm:w-5"
+            />
+
             <div>
               <Cart />
             </div>
@@ -141,6 +147,11 @@ export default function Navbar({
             >
               <SearchIcon className="size-4" strokeWidth={1.75} />
             </Button>
+
+            <WishlistHeaderLink
+              className="size-8 text-stone-700 hover:text-[var(--brand-primary-hover)]"
+              iconClassName="size-4"
+            />
 
             <div>
               <Cart />

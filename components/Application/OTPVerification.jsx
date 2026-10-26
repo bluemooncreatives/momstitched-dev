@@ -1,6 +1,6 @@
 import { zSchema } from '@/lib/zodSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ButtonLoading from './ButtonLoading'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
@@ -8,9 +8,20 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp'
 import { showToast } from '@/lib/showToast'
 import axios from 'axios'
 
-const OTPVerification = ({ email, onSubmit, loading }) => {
+// Mirrors OTP_RESEND_COOLDOWN_MS in lib/otp.js.
+const RESEND_COOLDOWN_SECONDS = 60
+
+const OTPVerification = ({ email, onSubmit, loading, resendEndpoint = '/api/auth/resend-otp' }) => {
 
     const [isResendingOtp, setIsResendingOtp] = useState(false)
+    // A code was just sent when this screen mounts, so start in cooldown.
+    const [resendIn, setResendIn] = useState(RESEND_COOLDOWN_SECONDS)
+
+    useEffect(() => {
+        if (resendIn <= 0) return
+        const timer = setTimeout(() => setResendIn((seconds) => seconds - 1), 1000)
+        return () => clearTimeout(timer)
+    }, [resendIn])
 
     const formSchema = zSchema.pick({
         otp: true, email: true
@@ -31,12 +42,15 @@ const OTPVerification = ({ email, onSubmit, loading }) => {
     const resendOTP = async () => {
         try {
             setIsResendingOtp(true)
-            const { data: resendOtpResponse } = await axios.post('/api/auth/resend-otp',
+            const { data: resendOtpResponse } = await axios.post(resendEndpoint,
                 { email }
             )
             if (!resendOtpResponse.success) {
+                if (resendOtpResponse.data?.retryAfter) setResendIn(resendOtpResponse.data.retryAfter)
                 throw new Error(resendOtpResponse.message)
             }
+            form.setValue('otp', '')
+            setResendIn(RESEND_COOLDOWN_SECONDS)
             showToast('success', resendOtpResponse.message)
         } catch (error) {
             showToast('error', error.message)
@@ -81,10 +95,12 @@ const OTPVerification = ({ email, onSubmit, loading }) => {
                     <div className='mb-3'>
                         <ButtonLoading loading={loading} type="submit" text="Verify" variant="brand" className="h-9 w-full rounded-sm text-base font-semibold uppercase cursor-pointer" />
                         <div className='text-center mt-5'>
-                            {!isResendingOtp ?
-                                <button onClick={resendOTP} type='button' className='text-blue-500 cursor-pointer hover:underline'>Resend OTP</button>
-                                :
+                            {isResendingOtp ?
                                 <span className='text-md'>Resending....</span>
+                                : resendIn > 0 ?
+                                    <span className='text-md text-muted-foreground'>Resend OTP in {resendIn}s</span>
+                                    :
+                                    <button onClick={resendOTP} type='button' className='text-blue-500 cursor-pointer hover:underline'>Resend OTP</button>
                             }
 
                         </div>

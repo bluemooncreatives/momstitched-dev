@@ -1,10 +1,8 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
+import { issueResetToken, otpErrorMessage, verifyOtp } from "@/lib/otp";
 import { zSchema } from "@/lib/zodSchema";
-import OTPModel from "@/models/Otp.model";
 import UserModel from "@/models/User.model";
-import { SignJWT } from "jose";
-import { cookies } from "next/headers";
 
 export async function POST(request) {
     try {
@@ -21,9 +19,9 @@ export async function POST(request) {
 
         const { email, otp } = validatedData.data
 
-        const getOtpData = await OTPModel.findOne({ email, otp })
-        if (!getOtpData) {
-            return response(false, 404, 'Invalid or expired otp.')
+        const verified = await verifyOtp({ email, purpose: 'reset-password', otp })
+        if (!verified.ok) {
+            return response(false, 400, otpErrorMessage(verified.reason))
         }
 
         const getUser = await UserModel.findOne({ deletedAt: null, email }).lean()
@@ -31,10 +29,11 @@ export async function POST(request) {
             return response(false, 404, 'User not found.')
         }
 
-        // remove otp after validation  
-        await getOtpData.deleteOne()
+        // The code is consumed; hand back a single-use token that the
+        // update-password step must present. This is the only proof it accepts.
+        const resetToken = await issueResetToken(email)
 
-        return response(true, 200, 'Otp verified.')
+        return response(true, 200, 'Otp verified.', { resetToken })
 
     } catch (error) {
         return catchError(error)

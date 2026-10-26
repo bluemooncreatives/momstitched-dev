@@ -3,6 +3,7 @@ import { showToast } from "@/lib/showToast";
 import { WEBSITE_LOGIN } from "@/routes/WebsiteRoute";
 import { logout } from "@/store/reducer/authReducer";
 import { persistor } from "@/store/store";
+import { clearWishlistSnapshot } from "@/lib/wishlistStorage";
 import { signOut } from "next-auth/react";
 
 import axios from "axios";
@@ -31,6 +32,7 @@ const LogoutButton = () => {
 
       // Remove persisted storage
       await persistor.purge();
+      clearWishlistSnapshot();
 
       // Sign out NextAuth session as well.
       await signOut({

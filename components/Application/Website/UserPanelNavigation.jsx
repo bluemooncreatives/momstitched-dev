@@ -1,21 +1,23 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import { showToast } from '@/lib/showToast'
-import { USER_DASHBOARD, USER_ORDERS, USER_PROFILE, WEBSITE_LOGIN } from '@/routes/WebsiteRoute'
+import { USER_DASHBOARD, USER_ORDERS, USER_PROFILE, WEBSITE_LOGIN, WEBSITE_WISHLIST } from '@/routes/WebsiteRoute'
 import { logout } from '@/store/reducer/authReducer'
 import { persistor } from '@/store/store'
+import { clearWishlistSnapshot } from '@/lib/wishlistStorage'
 import axios from 'axios'
 import Link from 'next/link'
 import { signOut } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
-import { LayoutDashboard, User, ShoppingBag, LogOut } from 'lucide-react'
+import { LayoutDashboard, User, ShoppingBag, LogOut, Heart } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const navLinks = [
     { label: 'Dashboard', href: USER_DASHBOARD, icon: LayoutDashboard },
     { label: 'Profile', href: USER_PROFILE, icon: User },
     { label: 'Orders', href: USER_ORDERS, icon: ShoppingBag },
+    { label: 'Wishlist', href: WEBSITE_WISHLIST, icon: Heart },
 ]
 
 const UserPanelNavigation = () => {
@@ -35,6 +37,8 @@ const UserPanelNavigation = () => {
 
             dispatch(logout())
             await persistor.purge()
+            // The saved list lives on the account; don't leave a copy for the next visitor.
+            clearWishlistSnapshot()
 
             await signOut({
                 redirect: false,

@@ -1,9 +1,9 @@
 import { otpEmail } from "@/email/otpEmail";
 import { connectDB } from "@/lib/databaseConnection";
-import { catchError, generateOTP, response } from "@/lib/helperFunction";
+import { catchError, response } from "@/lib/helperFunction";
+import { issueOtp, otpErrorMessage } from "@/lib/otp";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
-import OTPModel from "@/models/Otp.model";
 import UserModel from "@/models/User.model";
 
 export async function POST(request) {
@@ -24,17 +24,14 @@ export async function POST(request) {
             return response(false, 404, 'User not found.')
         }
 
+        // Only re-sends a login code that the password step already started —
+        // otherwise this endpoint would let anyone skip the password entirely.
+        const issued = await issueOtp({ email, purpose: 'login', requirePending: true })
+        if (!issued.ok) {
+            return response(false, 429, otpErrorMessage(issued.reason, issued.retryAfter), { retryAfter: issued.retryAfter })
+        }
 
-        // remove old otps 
-        await OTPModel.deleteMany({ email })
-        const otp = generateOTP()
-        const newOtpData = new OTPModel({
-            email, otp
-        })
-
-        await newOtpData.save()
-
-        const otpSendStatus = await sendMail('Your MomStitched login code', email, otpEmail(otp, { name: getUser.name, purpose: 'login' }))
+        const otpSendStatus = await sendMail('Your MomStitched login code', email, otpEmail(issued.otp, { name: getUser.name, purpose: 'login' }))
 
         if (!otpSendStatus.success) {
             return response(false, 400, 'Failed to resend otp.')

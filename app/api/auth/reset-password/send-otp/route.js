@@ -1,9 +1,9 @@
 import { otpEmail } from "@/email/otpEmail";
 import { connectDB } from "@/lib/databaseConnection";
-import { catchError, generateOTP, response } from "@/lib/helperFunction";
+import { catchError, response } from "@/lib/helperFunction";
+import { issueOtp, otpErrorMessage } from "@/lib/otp";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
-import OTPModel from "@/models/Otp.model";
 import UserModel from "@/models/User.model";
 
 export async function POST(request) {
@@ -26,22 +26,23 @@ export async function POST(request) {
             return response(false, 404, 'User not found.')
         }
 
-        // remove old otps 
-        await OTPModel.deleteMany({ email })
-        const otp = generateOTP()
-        const newOtpData = new OTPModel({
-            email, otp
-        })
-
-        await newOtpData.save()
-
-        const otpSendStatus = await sendMail('Reset your password — MomStitched', email, otpEmail(otp, { name: getUser.name, purpose: 'reset' }))
-
-        if (!otpSendStatus.success) {
-            return response(false, 400, 'Failed to resend otp.')
+        // Also serves "Resend OTP" on the reset screen; cooldown + send cap apply.
+        const issued = await issueOtp({ email, purpose: 'reset-password' })
+        // Re-submitting within the cooldown: the code already sent is still valid.
+        if (!issued.ok && issued.reason === 'cooldown') {
+            return response(true, 200, 'A code was sent recently. Please check your email.')
+        }
+        if (!issued.ok) {
+            return response(false, 429, otpErrorMessage(issued.reason, issued.retryAfter), { retryAfter: issued.retryAfter })
         }
 
-        return response(true, 200, 'Please verify your account.')
+        const otpSendStatus = await sendMail('Reset your password — MomStitched', email, otpEmail(issued.otp, { name: getUser.name, purpose: 'reset' }))
+
+        if (!otpSendStatus.success) {
+            return response(false, 400, 'Failed to send otp.')
+        }
+
+        return response(true, 200, 'We have sent a reset code to your email.')
 
     } catch (error) {
         return catchError(error)

@@ -21,7 +21,7 @@ import axios from 'axios'
 import { showToast } from '@/lib/showToast'
 import { useRouter } from 'next/navigation'
 import { WEBSITE_LOGIN } from '@/routes/WebsiteRoute'
-const UpdatePassword = ({ email }) => {
+const UpdatePassword = ({ email, resetToken, onExpired }) => {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [isTypePassword, setIsTypePassword] = useState(true)
@@ -46,8 +46,13 @@ const UpdatePassword = ({ email }) => {
     const handlePasswordUpdate = async (values) => {
         try {
             setLoading(true)
-            const { data: passwordUpdate } = await axios.put('/api/auth/reset-password/update-password', values)
+            const { data: passwordUpdate } = await axios.put('/api/auth/reset-password/update-password', {
+                email: values.email,
+                password: values.password,
+                resetToken,
+            })
             if (!passwordUpdate.success) {
+                if (passwordUpdate.statusCode === 410) onExpired?.()
                 throw new Error(passwordUpdate.message)
             }
 
