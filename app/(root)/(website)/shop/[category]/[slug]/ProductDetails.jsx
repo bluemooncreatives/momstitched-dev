@@ -20,7 +20,7 @@ import {
     StarHalf,
     Truck,
 } from 'lucide-react'
-import { WEBSITE_CART, WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute"
+import { WEBSITE_CART, WEBSITE_CATEGORY, WEBSITE_SHOP, productHref } from "@/routes/WebsiteRoute"
 import Image from "next/image"
 import Link, { useLinkStatus } from "next/link"
 import dynamic from "next/dynamic"
@@ -213,7 +213,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                 <>
                                     <BreadcrumbSeparator />
                                     <BreadcrumbItem>
-                                        <BreadcrumbLink href={`${WEBSITE_SHOP}?category=${encodeURIComponent(product.category.slug)}`}>
+                                        <BreadcrumbLink href={WEBSITE_CATEGORY(product.category.slug)}>
                                             {product.category.name}
                                         </BreadcrumbLink>
                                     </BreadcrumbItem>
@@ -322,7 +322,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                     <div className="flex flex-col">
                         {product?.category?.name ? (
                             <Link
-                                href={`${WEBSITE_SHOP}?category=${encodeURIComponent(product.category.slug)}`}
+                                href={WEBSITE_CATEGORY(product.category.slug)}
                                 className="w-fit text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--dark-red)] transition-colors hover:text-[var(--dark-red-2)]"
                             >
                                 {product.category.name}
@@ -380,7 +380,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                         return (
                                             <Link
                                                 key={name}
-                                                href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${encodeURIComponent(name)}&size=${encodeURIComponent(sizeForColor(name))}`}
+                                                href={`${productHref(product)}?color=${encodeURIComponent(name)}&size=${encodeURIComponent(sizeForColor(name))}`}
                                                 title={name}
                                                 aria-label={`Color ${name}`}
                                                 aria-pressed={isSelected}
@@ -442,7 +442,7 @@ const ProductDetails = ({ product, variant, colors, colorEntries, sizes, variant
                                         return (
                                             <Link
                                                 key={size}
-                                                href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${encodeURIComponent(variant.color)}&size=${encodeURIComponent(size)}`}
+                                                href={`${productHref(product)}?color=${encodeURIComponent(variant.color)}&size=${encodeURIComponent(size)}`}
                                                 aria-pressed={isSelected}
                                                 className={cn(
                                                     'relative min-w-[44px] rounded-[var(--radius-sm)] border px-3.5 py-2 text-center text-sm font-medium transition',
