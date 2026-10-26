@@ -65,6 +65,10 @@ export const ADMIN_ORDER_DETAILS = (order_id) => order_id ? `/admin/orders/detai
 export const ADMIN_CONTACTS_SHOW = '/admin/contacts'
 export const ADMIN_CONTACT_DETAILS = (id) => id ? `/admin/contacts/details/${id}` : ''
 
+// Notification routes
+export const ADMIN_NOTIFICATIONS = '/admin/notifications'
+export const ADMIN_NOTIFICATION_SETTINGS = '/admin/notifications/settings'
+
 // Trash route
 
 export const ADMIN_TRASH = '/admin/trash'

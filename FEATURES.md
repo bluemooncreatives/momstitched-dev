@@ -50,6 +50,8 @@ A full-stack Next.js 15 (App Router) e-commerce platform for a clothing brand, w
 40. Role-based access control — separate permissions for admin staff vs. regular customers, enforced on every page and API request.
 41. Automated transactional emails: order confirmation, order status updates, OTP codes, password change alerts, email verification, welcome email, and contact form confirmations.
 42. Secure infrastructure: encrypted sessions, security headers, and safe handling of uploaded files.
+43. Admin notification center: a live bell in the admin topbar plus a full notifications page for new orders, contact messages, reviews, customer signups and shipment alerts, with per-admin read/unread state.
+44. Admin email alerts: every new order (and any other event an admin opts into) is emailed to the admin team automatically, with configurable recipients, per-event toggles and a test-email button.
 
 ---
 
@@ -69,6 +71,8 @@ A full-stack Next.js 15 (App Router) e-commerce platform for a clothing brand, w
 | **Media** | Cloudinary asset metadata (public_id, URLs, alt/title), referenced by Product/ProductVariant. |
 | **Contact** | Support ticket (`MS-XXXXXXXX` ID), sender info, subject/message, read flag. |
 | **Otp** | Email + 6-digit code, TTL-indexed (Mongo auto-expires after 10 min). |
+| **Notification** | Admin event log: type (from `lib/adminNotificationEvents.js`), title/message, admin-panel link, meta, per-admin `readBy`, email delivery outcome (status/recipients/error), unique sparse `dedupeKey` for idempotency. |
+| **NotificationSetting** | Singleton: email all admin accounts / store inbox toggles, extra recipients (max 10), per-event email on/off. |
 
 ---
 
@@ -134,6 +138,8 @@ A full-stack Next.js 15 (App Router) e-commerce platform for a clothing brand, w
 - **Testimonial management**: full CRUD, reorder, active/inactive toggle for homepage display.
 - **Media library**: infinite-scroll grid, Cloudinary direct-upload widget (5MB cap, multiple sources), reusable picker modal for product/variant forms, trash/restore/permanent-delete.
 - **Contact queries**: inbox-style list/detail view of support tickets with auto-read-tracking and mailto reply.
+- **Notifications**: topbar bell (unread badge, 30s polling while visible, toast on new events, mark all read) and `/admin/notifications` (All/Unread tabs, type filter, bulk read/unread/delete, clear read, load more, email delivery status per item).
+- **Notification settings** (`/admin/notifications/settings`): recipients (all admin accounts, store inbox, extra emails), live "who will be emailed" preview with store-inbox fallback, per-event email toggles, unsaved-changes guard, send test email.
 - **Unified trash/recycle bin**: soft-delete → restore/permanently-delete flow shared across nearly every entity.
 - **Admin search**: Ctrl+K global admin command palette.
 - Consistent infra: server-driven TanStack Table (pagination/sort/filter), react-hook-form + zod validation, light/dark theme switch.
@@ -149,6 +155,7 @@ A full-stack Next.js 15 (App Router) e-commerce platform for a clothing brand, w
 - **Orders**: admin list/export/detail/status-update/trash; user-scoped order list (strictly `user`-matched, never by email) and dashboard stats; PDF invoice generation (ownership-checked).
 - **Payments**: Razorpay order creation, order-save with full server-side price/signature re-verification.
 - **Content**: reviews (public read/summary, authenticated create, admin moderation), testimonials (admin CRUD+reorder), size guides (admin CRUD), media (admin CRUD + Cloudinary-synced delete), contact form (public submit + admin inbox).
+- **Notifications**: admin feed (cursor-paginated, status/type filters, unread count), mark read/unread, delete/clear-read, settings get/save, test email. Events are raised through `notifyAdmins()` (`lib/services/notificationService.js`) from save-order, contact, review create, register, Google sign-up and the shipment cron; it never throws, so a notification problem can't fail checkout.
 - **Ops**: dashboard analytics aggregations, daily cron (`/api/cron/sync-shipments`, secret-protected) that batch-syncs shipment tracking status from the courier for all in-transit orders.
 - **Dev/utility**: `cloudinary-signature` (client upload signing), `faker/product` (dev seed data), `test` (DB connectivity check).
 - Cross-cutting conventions: standard `{success, statusCode, message, data}` response envelope, centralized Mongo error handling, zod validation via a shared schema object, server-authoritative pricing (`lib/pricing.js` — client discount % is always ignored and recomputed), uniform soft-delete/restore/permanent-delete (`SD`/`RSD`/`PD`) pattern across nearly every resource.

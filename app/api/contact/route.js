@@ -3,6 +3,9 @@ import { contactConfirmation } from '@/email/contactConfirmation'
 import { catchError, response } from '@/lib/helperFunction'
 import { generateTicketId } from '@/lib/generateTicketId'
 import { sendMail } from '@/lib/sendMail'
+import { notifyAdmins } from '@/lib/services/notificationService'
+import { ADMIN_EVENT } from '@/lib/adminNotificationEvents'
+import { ADMIN_CONTACT_DETAILS } from '@/routes/AdminPanelRoute'
 import ContactModel from '@/models/Contact.model'
 import { connectDB } from '@/lib/databaseConnection'
 import { isAuthenticated } from '@/lib/authentication'
@@ -67,16 +70,24 @@ export async function POST(request) {
     const ticketId = contact.ticketId
     const emailPayload = { ...payload, ticketId }
 
-    // Notify the store inbox and acknowledge the customer. Both are best-effort:
-    // the query is already saved, and sendMail never throws (it returns a
-    // result), so a mail outage must not break the user-facing flow.
+    // Notify the admin team (in-app + email to the configured recipients) and
+    // acknowledge the customer. Both are best-effort: the query is already
+    // saved, and neither sendMail nor notifyAdmins throws, so a mail outage
+    // must not break the user-facing flow.
     await Promise.allSettled([
-      sendMail(
-        `New Contact Message [${ticketId}]${payload.subject ? `: ${payload.subject}` : ''} — from ${payload.name}`,
-        process.env.NODEMAILER_EMAIL,
-        contactNotification(emailPayload),
-        { replyTo: payload.email }
-      ),
+      notifyAdmins({
+        type: ADMIN_EVENT.CONTACT_RECEIVED,
+        dedupeKey: `${ADMIN_EVENT.CONTACT_RECEIVED}:${ticketId}`,
+        title: `New message from ${payload.name}`,
+        message: payload.subject || payload.message.slice(0, 140),
+        link: ADMIN_CONTACT_DETAILS(contact._id.toString()),
+        meta: { ticketId, contactId: contact._id.toString(), email: payload.email },
+        email: {
+          subject: `New Contact Message [${ticketId}]${payload.subject ? `: ${payload.subject}` : ''} — from ${payload.name}`,
+          html: contactNotification(emailPayload),
+          replyTo: payload.email,
+        },
+      }),
       sendMail(
         `We've received your message — Ref ${ticketId}`,
         payload.email,

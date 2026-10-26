@@ -1,4 +1,8 @@
 import { orderNotification } from "@/email/orderNotification";
+import { adminOrderNotification } from "@/email/adminOrderNotification";
+import { ADMIN_EVENT } from "@/lib/adminNotificationEvents";
+import { adminUrl, notifyAdmins } from "@/lib/services/notificationService";
+import { ADMIN_ORDER_DETAILS } from "@/routes/AdminPanelRoute";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { sendMail } from "@/lib/sendMail";
@@ -143,7 +147,17 @@ export async function POST(request) {
                 ? 'partial_paid'
                 : 'fully_paid'
 
-        await OrderModel.create({
+        // Idempotency: a retried/double-submitted request for the same order id
+        // must not create a second order or re-send the customer/admin emails.
+        const existingOrder = await OrderModel.findOne({ order_id: orderId }).select('user').lean()
+        if (existingOrder) {
+            if (String(existingOrder.user) !== String(resolvedUserId)) {
+                return response(false, 409, 'This order id is already in use. Please try again.')
+            }
+            return response(true, 200, 'Your order has already been placed.')
+        }
+
+        const createdOrder = await OrderModel.create({
             user: resolvedUserId,
             name: validatedData.name,
             email: validatedData.email,
@@ -189,20 +203,34 @@ export async function POST(request) {
             }
         }
 
-        // Order confirmation email. Best-effort only — the order is already saved,
-        // so a mail failure must never fail the request. All money values here are
-        // the server-computed ones (not the client's), so the email can never show
-        // a tampered total.
-        try {
+        // Customer confirmation + admin alert, sent in parallel. Best-effort only —
+        // the order is already saved, so a mail failure must never fail the
+        // request. All money values here are the server-computed ones (not the
+        // client's), so neither email can ever show a tampered total.
+        const address = {
+            address: validatedData.address,
+            landmark: validatedData.landmark,
+            city: validatedData.city,
+            state: validatedData.state,
+            pincode: validatedData.pincode,
+            country: validatedData.country,
+        }
+        const items = validatedData.products.map((p) => ({
+            name: p.name,
+            qty: p.qty,
+            mrp: p.mrp,
+            sellingPrice: p.sellingPrice,
+        }))
+        const itemCount = items.reduce((sum, item) => sum + item.qty, 0)
+        const formattedTotal = totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
+        const paymentLabel = { cod: 'COD', partial: `${partialPaymentPercentage}% paid`, full: 'Paid' }[paymentMethod]
+
+        const sendCustomerConfirmation = async () => {
             const mailData = {
                 name: validatedData.name,
                 order_id: orderId,
                 orderDetailsUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order-details/${orderId}`,
-                items: validatedData.products.map((p) => ({
-                    name: p.name,
-                    qty: p.qty,
-                    sellingPrice: p.sellingPrice,
-                })),
+                items,
                 subtotal,
                 couponDiscountAmount,
                 totalAmount,
@@ -210,20 +238,57 @@ export async function POST(request) {
                 paidAmount,
                 remainingAmount,
                 phone: validatedData.phone,
-                address: {
-                    address: validatedData.address,
-                    landmark: validatedData.landmark,
-                    city: validatedData.city,
-                    state: validatedData.state,
-                    pincode: validatedData.pincode,
-                    country: validatedData.country,
-                },
+                address,
             }
 
-            await sendMail('Your MomStitched order is confirmed', validatedData.email, orderNotification(mailData))
+            const result = await sendMail('Your MomStitched order is confirmed', validatedData.email, orderNotification(mailData))
+            if (!result.success) {
+                console.error('Order confirmation email failed:', result.message)
+            }
+        }
 
-        } catch (error) {
-            console.log(error)
+        const notifyAdminTeam = () => notifyAdmins({
+            type: ADMIN_EVENT.ORDER_PLACED,
+            dedupeKey: `${ADMIN_EVENT.ORDER_PLACED}:${orderId}`,
+            title: `New order ${orderId}`,
+            message: `${validatedData.name} placed an order for ${itemCount} item${itemCount === 1 ? '' : 's'} — ${formattedTotal} (${paymentLabel}).`,
+            link: ADMIN_ORDER_DETAILS(orderId),
+            meta: {
+                orderId,
+                orderDbId: createdOrder._id.toString(),
+                customerName: validatedData.name,
+                customerEmail: validatedData.email,
+                totalAmount,
+                remainingAmount,
+                paymentMethod,
+                itemCount,
+            },
+            email: {
+                subject: `New order ${orderId} — ${formattedTotal} (${paymentLabel}) from ${validatedData.name}`,
+                replyTo: validatedData.email,
+                html: adminOrderNotification({
+                    order_id: orderId,
+                    adminOrderUrl: adminUrl(ADMIN_ORDER_DETAILS(orderId)),
+                    customer: { name: validatedData.name, email: validatedData.email, phone: validatedData.phone },
+                    items,
+                    subtotal,
+                    couponDiscountAmount,
+                    totalAmount,
+                    paymentMethod,
+                    partialPaymentPercentage,
+                    paidAmount,
+                    remainingAmount,
+                    paymentId,
+                    address,
+                    ordernote: validatedData.ordernote,
+                    placedAt: createdOrder.createdAt,
+                }),
+            },
+        })
+
+        const [customerMail] = await Promise.allSettled([sendCustomerConfirmation(), notifyAdminTeam()])
+        if (customerMail.status === 'rejected') {
+            console.error('Order confirmation email failed:', customerMail.reason)
         }
 
         const successMessage = paymentMethod === 'cod'

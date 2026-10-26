@@ -2,6 +2,7 @@ import { emailVerificationLink } from "@/email/emailVerificationLink";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { sendMail } from "@/lib/sendMail";
+import { notifyCustomerRegistered } from "@/lib/services/notificationService";
 import { zSchema } from "@/lib/zodSchema";
 import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
@@ -43,6 +44,13 @@ export async function POST(request) {
         })
 
         await NewRegistration.save()
+
+        await notifyCustomerRegistered({
+            userId: NewRegistration._id,
+            name,
+            email,
+            provider: 'email',
+        })
 
         const secret = new TextEncoder().encode(process.env.SECRET_KEY)
         const token = await new SignJWT({ userId: NewRegistration._id.toString() })

@@ -5,6 +5,7 @@ import UserDropdown from './UserDropdown'
 import AdminSearch from './AdminSearch'
 import AdminMobileSearch from './AdminMobileSearch'
 import Header from './layout/Header'
+import NotificationBell from './notifications/NotificationBell'
 import TopNav from './layout/TopNav'
 import { Button } from '@/components/ui/button'
 import { Settings } from 'lucide-react'
@@ -38,6 +39,7 @@ const Topbar = () => {
                     <AdminSearch />
                 </div>
                 <AdminMobileSearch />
+                <NotificationBell />
                 <ThemeSwitch />
                 <Button variant="ghost" size="icon" aria-label="Settings">
                     <Settings className="size-4" />
