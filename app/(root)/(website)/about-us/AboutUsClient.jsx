@@ -6,6 +6,6 @@ const AboutUsContent = dynamic(() => import("./AboutUsContent"), {
   ssr: false,
 });
 
-export default function AboutUsClient({ products = [] }) {
-  return <AboutUsContent products={products} />;
+export default function AboutUsClient({ content, products = [] }) {
+  return <AboutUsContent content={content} products={products} />;
 }

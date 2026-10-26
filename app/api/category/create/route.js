@@ -1,8 +1,9 @@
-import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
+import { revalidateCatalogue } from "@/lib/catalogueCache"
+import { categorySchema } from "@/lib/categoryConfig"
+import { categorySaveProblem, coverFields } from "@/lib/categorySave"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError,  response } from "@/lib/helperFunction"
-import { zSchema } from "@/lib/zodSchema"
 import CategoryModel from "@/models/Category.model"
 
 export async function POST(request) {
@@ -15,29 +16,30 @@ export async function POST(request) {
         await connectDB()
         const payload = await request.json()
 
-        const schema = zSchema.pick({
-            name: true, slug: true
-        })
-
-        const validate = schema.safeParse(payload)
+        const validate = categorySchema.safeParse(payload)
         if (!validate.success) {
-            return response(false, 400, 'Invalid or missing fields.', validate.error)
+            return response(false, 400, validate.error.issues[0]?.message || 'Invalid or missing fields.', validate.error)
         }
 
-        const { name, slug } = validate.data
+        const data = validate.data
+
+        const problem = await categorySaveProblem(data)
+        if (problem) return response(false, problem.status, problem.message)
 
         const newCategory = new CategoryModel({
-            name, slug
+            name: data.name,
+            slug: data.slug,
+            ...coverFields(data),
+            intro: data.intro,
+            faqs: data.faqs,
         })
 
         await newCategory.save()
 
-        // The new category can change the shop filter list and the homepage
-        // "Categories" section (once it has products), so refresh those caches.
-        revalidateTag('storefront-shop-filters')
-        revalidateTag('storefront-home-categories')
+        // Shop filters, homepage tiles, footer, landing pages and the sitemap.
+        revalidateCatalogue()
 
-        return response(true, 200, 'Category added successfully.')
+        return response(true, 200, 'Category added successfully.', { _id: newCategory._id })
 
     } catch (error) {
         return catchError(error)

@@ -39,7 +39,8 @@ const FAQItem = ({ faq, isOpen, onToggle }) => (
     </div>
 )
 
-const FAQSection = () => {
+// Defaults render the homepage FAQ; category pages pass their own questions.
+const FAQSection = ({ faqs = FAQS, eyebrow = 'Got Questions?', title = 'Frequently Asked', topics = 'Returns · Shipping · Orders' }) => {
     const [openIndex, setOpenIndex] = useState(null)
     const sectionRef = useRef(null)
     const headerRef = useRef(null)
@@ -95,14 +96,14 @@ const FAQSection = () => {
             <div ref={headerRef} className="mb-4 flex items-end justify-between lg:mb-6">
                 <div>
                     <p className="text-[1rem] font-semibold uppercase text-[var(--dark-red)]/60">
-                        Got Questions?
+                        {eyebrow}
                     </p>
                     <h2 className="mt-1.5 font-neue text-[clamp(1.8rem,4.8vw,3.8rem)] font-medium uppercase text-[var(--dark-red-2)]">
-                        Frequently Asked
+                        {title}
                     </h2>
                 </div>
                 <span className="hidden text-[0.68rem] font-semibold uppercase text-muted-foreground sm:block">
-                    Returns · Shipping · Orders
+                    {topics}
                 </span>
             </div>
 
@@ -111,7 +112,7 @@ const FAQSection = () => {
 
             {/* two-column grid on desktop */}
             <div className="grid gap-x-16 lg:grid-cols-2">
-                {FAQS.map((faq, i) => (
+                {faqs.map((faq, i) => (
                     <div
                         key={i}
                         ref={(el) => { itemRefs.current[i] = el }}

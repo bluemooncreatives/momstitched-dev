@@ -9,6 +9,9 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 import SplitType from "@/lib/SplitType/index";
 import ShopAllButton from "@/components/Application/Website/ShopAllButton";
 import ProductBox from "@/components/Application/Website/ProductBox";
+import { DEFAULT_ABOUT_PAGE } from "@/lib/pageContent/aboutPage";
+import { paragraphs } from "@/lib/pageContent/shared";
+import { initialsOf } from "@/lib/utils";
 import styles from "./about-us.module.css";
 
 if (typeof window !== "undefined") {
@@ -21,57 +24,20 @@ if (typeof window !== "undefined") {
   }
 }
 
-// ── Scroll-controlled middle image ──────────────────────────────────
-const SCROLL_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781947528/qcbfdwai0pmvv97khlcw.jpg";
+// The copy and photos come from Admin → Pages → About Us (merged over the
+// designed defaults in lib/pageContent/aboutPage.js).
 
-// Hero images (left thumb · center · right thumb)
-const HERO_LEFT_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1783146225/DSCF5008_1_r7uftx.jpg";
-const HERO_CENTER_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1783063101/WhatsApp_Image_2026-07-03_at_12.46.03_PM_uqte4t.jpg";
-const HERO_RIGHT_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781942605/x98cddrvoz82losytye7.jpg";
-
-// Profile photos — kept separate from the hero images above so each can change independently.
-const ADITI_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1781945835/einxusjo1pubrtkgfddc.jpg";
-const SANDHYA_IMAGE = "https://res.cloudinary.com/darrsi9y2/image/upload/v1783063101/WhatsApp_Image_2026-07-03_at_12.46.03_PM_uqte4t.jpg";
-
-// Brand-story paragraphs shown beneath the statement.
-const STORY = [
-  "MomStitched was born in May 2021, in the heart of India's hardest COVID days. What started as one small idea, carried through so much uncertainty, slowly grew into something far greater - a quiet symbol of hope. And it began with my mom: her creativity, her strength, and her endless love became the spirit behind every thread we stitch, and the reason this journey ever started.",
-  "What makes us different is simple - we're not backed by big corporations, we're powered by family. My sister keeps everything running seamlessly online, my father handles logistics like a pro, and together, by hand, we build every part of this brand. Every design, every package, every decision travels straight from our home to yours.",
-  "Rooted in India and driven by passion, we make clothing that feels real, personal, and meaningful - because it truly is. This isn't fast fashion. It's family fashion. This is MomStitched.",
-];
-
-// The two people behind the brand. `reverse` flips the image/text order.
-const PEOPLE = [
-  {
-    name: "Aditi Dhakate",
-    role: "Founder · Face Behind the brand",
-    image: ADITI_IMAGE,
-    bio: [
-      "I started out in IT engineering - a world of code, systems, and logic. But creativity had other plans for me.",
-      "Taking a leap from tech into fashion wasn't random - it was inspired by the strongest influence in my life: my mom. Her creativity and passion became the soul of MomStitched, and the reason I dared to turn this idea into reality.",
-      "Today I'm the face behind the brand, bringing together creativity, clarity, and a fresh perspective. I still carry my technical mindset - but now I use it to build something more expressive and personal.",
-      "Bubbly, driven, and real - professional when it matters, cool always. For me, fashion is about confidence, identity, and owning your story. And I'm just getting started.",
-    ],
-  },
-  {
-    name: "Sandhya Dhakate",
-    role: "Mom · Heart of MomStitched",
-    image: SANDHYA_IMAGE,
-    reverse: true,
-    bio: [
-      "She is the heart, the strength, and the soul behind MomStitched. A homemaker by role but a creator by passion, she has always expressed her love through every stitch she made for her daughters.",
-      "What began as simple, thoughtful creations at home has grown into something much bigger - today she stitches not just for us, but for daughters everywhere.",
-      "Her strength lies in her warmth, her creativity, and the way she brings life into everything she touches - graceful, vibrant, and endlessly inspiring.",
-      "Beyond the brand she's full of life — kitty parties, picnics, community work, and peace in her bhajan groups. MomStitched exists because of her: her love, her vision, and her magic in every stitch.",
-    ],
-  },
-];
+// A photo slot that may be empty; empty slots are left out of the page.
+const hasPhoto = (img) => Boolean(img?.url);
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const AboutUsContent = ({ products = [] }) => {
+const AboutUsContent = ({ content = DEFAULT_ABOUT_PAGE, products = [] }) => {
+  const { hero, story, feature, family, related } = content;
+  const storyParagraphs = paragraphs(story.body);
+  const captionLines = hero.caption.split("\n").map((line) => line.trim()).filter(Boolean);
   const container = useRef(null);
   const headlineRef = useRef(null);
   const statementRef = useRef(null);
@@ -307,39 +273,48 @@ const AboutUsContent = ({ products = [] }) => {
       <div className={styles.inner}>
         {/* Hero: centered image, flanking thumbs, giant headline */}
         <div className={styles.hero} ref={heroRef}>
-          <div className={`${styles.flankImage} ${styles.flankLeft}`} ref={flankLeftRef}>
-            <Image
-              src={HERO_LEFT_IMAGE}
-              alt="MomStitched detail"
-              fill
-              sizes="130px"
-              className="object-cover"
-            />
-          </div>
-          <div className={`${styles.flankImage} ${styles.flankRight}`} ref={flankRightRef}>
-            <Image
-              src={HERO_RIGHT_IMAGE}
-              alt="MomStitched detail"
-              fill
-              sizes="110px"
-              className="object-cover"
-            />
-          </div>
+          {hasPhoto(hero.left) && (
+            <div className={`${styles.flankImage} ${styles.flankLeft}`} ref={flankLeftRef}>
+              <Image
+                src={hero.left.url}
+                alt={hero.left.alt}
+                fill
+                sizes="130px"
+                className="object-cover"
+                style={{ objectPosition: hero.left.position }}
+              />
+            </div>
+          )}
+          {hasPhoto(hero.right) && (
+            <div className={`${styles.flankImage} ${styles.flankRight}`} ref={flankRightRef}>
+              <Image
+                src={hero.right.url}
+                alt={hero.right.alt}
+                fill
+                sizes="110px"
+                className="object-cover"
+                style={{ objectPosition: hero.right.position }}
+              />
+            </div>
+          )}
 
-          <div className={styles.centerImage} ref={centerImgRef}>
-            <Image
-              src={HERO_CENTER_IMAGE}
-              alt="MomStitched atelier"
-              fill
-              priority
-              sizes="(max-width: 900px) 70vw, 360px"
-              className="object-cover"
-            />
-          </div>
+          {hasPhoto(hero.centre) && (
+            <div className={styles.centerImage} ref={centerImgRef}>
+              <Image
+                src={hero.centre.url}
+                alt={hero.centre.alt}
+                fill
+                priority
+                sizes="(max-width: 900px) 70vw, 360px"
+                className="object-cover"
+                style={{ objectPosition: hero.centre.position }}
+              />
+            </div>
+          )}
 
           <div className={styles.headlineMask}>
             <h1 className={styles.headline} ref={headlineRef}>
-              about us
+              {hero.headline}
             </h1>
           </div>
         </div>
@@ -349,108 +324,125 @@ const AboutUsContent = ({ products = [] }) => {
           <span className={styles.plus}>+</span>
           <span className={styles.rule} />
           <span className={styles.caption}>
-            Born May 2021 · made by family,
-            <br />
-            rooted in India
+            {captionLines.map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br />}
+                {line}
+              </span>
+            ))}
           </span>
         </div>
 
         {/* Big statement + brand story */}
-        <div className={styles.statementWrap}>
-          <div ref={statementRef}>
-            <h2 className={styles.statement}>
-              MomStitched isn&apos;t just a clothing brand - it&apos;s a story
-              stitched with love, resilience, and family.
-            </h2>
-          </div>
-          <div className={styles.story} ref={supportRef}>
-            {STORY.map((para, i) => (
-              <p className={styles.storyText} key={i}>
-                {para}
-              </p>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Full-width scroll-scaled middle image (Image 2) */}
-      <div className={styles.scrollImageWrap}>
-        <img
-          ref={scrollImgRef}
-          src={SCROLL_IMAGE}
-          alt="MomStitched craftsmanship"
-          className={styles.scrollImage}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-
-      <div className={styles.inner}>
-        {/* The family behind the brand */}
-        <div className={styles.people} ref={peopleRef}>
-          <div className={styles.peopleHead}>
-            <span className={styles.peopleEyebrow}>THE FAMILY</span>
-            <h2 className={styles.peopleHeadline}>
-              Not built by a corporation - built by a family, by hand.
-            </h2>
-            <p className={styles.peopleIntro}>
-              Behind every MomStitched piece is one small family doing every
-              part themselves - designing, stitching, packing, and shipping
-              straight from our home in India to yours. These are the two women
-              at the very heart of it.
-            </p>
-          </div>
-
-          {PEOPLE.map((person) => (
-            <article
-              key={person.name}
-              className={`${styles.profile} ${
-                person.reverse ? styles.profileReverse : ""
-              }`}
-            >
-              <div className={styles.profileImg}>
-                <Image
-                  src={person.image}
-                  alt={person.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 45vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className={styles.profileBody}>
-                <span className={styles.profileRole}>{person.role}</span>
-                <h3 className={styles.profileName}>{person.name}</h3>
-                {person.bio.map((para, i) => (
-                  <p className={styles.profileBio} key={i}>
+        {story.enabled && (
+          <div className={styles.statementWrap}>
+            <div ref={statementRef}>
+              <h2 className={styles.statement}>{story.statement}</h2>
+            </div>
+            {storyParagraphs.length > 0 && (
+              <div className={styles.story} ref={supportRef}>
+                {storyParagraphs.map((para, i) => (
+                  <p className={styles.storyText} key={i}>
                     {para}
                   </p>
                 ))}
               </div>
-            </article>
-          ))}
-
-          {/* CTA — shared website button for consistent styling */}
-          <div className={styles.ctaWrap}>
-            <ShopAllButton
-              label="Get in touch"
-              href="/contact"
-              colorScheme="dark-red"
-              radius="sm"
-            />
+            )}
           </div>
-        </div>
+        )}
       </div>
 
+      {/* Full-width scroll-scaled middle image */}
+      {feature.enabled && hasPhoto(feature.image) && (
+        <div className={styles.scrollImageWrap}>
+          <img
+            ref={scrollImgRef}
+            src={feature.image.url}
+            alt={feature.image.alt}
+            className={styles.scrollImage}
+            style={{ objectPosition: feature.image.position }}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      )}
+
+      {family.enabled && (
+        <div className={styles.inner}>
+          {/* The family behind the brand */}
+          <div className={styles.people} ref={peopleRef}>
+            <div className={styles.peopleHead}>
+              {family.eyebrow && <span className={styles.peopleEyebrow}>{family.eyebrow}</span>}
+              <h2 className={styles.peopleHeadline}>{family.title}</h2>
+              {family.intro && <p className={styles.peopleIntro}>{family.intro}</p>}
+            </div>
+
+            {/* Profiles alternate photo left / right. */}
+            {family.people.map((person, index) => (
+              <article
+                key={`${person.name}-${index}`}
+                className={`${styles.profile} ${
+                  index % 2 === 1 ? styles.profileReverse : ""
+                }`}
+              >
+                <div className={styles.profileImg}>
+                  {hasPhoto(person.photo) ? (
+                    <Image
+                      src={person.photo.url}
+                      alt={person.photo.alt || person.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 45vw"
+                      className="object-cover"
+                      style={{ objectPosition: person.photo.position }}
+                    />
+                  ) : (
+                    <span
+                      aria-hidden="true"
+                      className="grid size-full place-items-center font-neue text-[clamp(3rem,8vw,6rem)] text-[var(--dark-red)]/40"
+                    >
+                      {initialsOf(person.name)}
+                    </span>
+                  )}
+                </div>
+                <div className={styles.profileBody}>
+                  {person.role && <span className={styles.profileRole}>{person.role}</span>}
+                  <h3 className={styles.profileName}>{person.name}</h3>
+                  {paragraphs(person.bio).map((para, i) => (
+                    <p className={styles.profileBio} key={i}>
+                      {para}
+                    </p>
+                  ))}
+                </div>
+              </article>
+            ))}
+
+            {/* CTA — shared website button for consistent styling */}
+            {family.ctaLabel && (
+              <div className={styles.ctaWrap}>
+                <ShopAllButton
+                  label={family.ctaLabel}
+                  href={family.ctaHref || "/contact"}
+                  colorScheme="dark-red"
+                  radius="sm"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Curated For You · You May Also Like (centered) ───────────── */}
-      {products.length > 0 && (
+      {related.enabled && products.length > 0 && (
         <div className={styles.inner}>
           <section className={styles.related}>
             <div className="mb-8 text-center lg:mb-10">
-              <p className="text-[1rem] font-semibold uppercase text-[var(--dark-red)]/60">
-                Curated For You
-              </p>
+              {related.eyebrow && (
+                <p className="text-[1rem] font-semibold uppercase text-[var(--dark-red)]/60">
+                  {related.eyebrow}
+                </p>
+              )}
               <h2 className="mt-1.5 font-neue text-[clamp(1.6rem,3.4vw,2.6rem)] font-medium uppercase leading-[1.1] text-[var(--dark-red-2)]">
-                You May Also Like
+                {related.title}
               </h2>
             </div>
 

@@ -16,7 +16,8 @@ gsap.registerPlugin(ScrollTrigger)
 //   title     — section heading
 //   writeup   — intro paragraph
 //   columns   — { name, meta, secondary } header labels
-//   items     — [{ id, href, name, metaLabel, secondaryLabel, previewImage }]
+//   items     — [{ id, href, name, metaLabel, secondaryLabel, previewImage, previewPosition? }]
+//               previewPosition: CSS object-position (a category cover's crop focus)
 const ArchiveSectionClient = ({ title, writeup, columns, items = [] }) => {
     const containerRef = useRef(null)
     const archiveItemsRef = useRef(null)
@@ -89,7 +90,7 @@ const ArchiveSectionClient = ({ title, writeup, columns, items = [] }) => {
         })
     }
 
-    const createPreviewImage = (previewImage) => {
+    const createPreviewImage = (previewImage, previewPosition) => {
         if (!previewRef.current || !previewImage) return
 
         const { x, y } = mousePosRef.current
@@ -100,6 +101,7 @@ const ArchiveSectionClient = ({ title, writeup, columns, items = [] }) => {
         img.alt = ''
         img.dataset.preview = 'true'
         img.className = styles.previewImage
+        if (previewPosition) img.style.objectPosition = previewPosition
         img.style.zIndex = String(Date.now())
 
         previewRef.current.appendChild(img)
@@ -191,6 +193,7 @@ const ArchiveSectionClient = ({ title, writeup, columns, items = [] }) => {
                     img.alt = ''
                     img.dataset.preview = 'true'
                     img.className = styles.previewImage
+                    if (item.previewPosition) img.style.objectPosition = item.previewPosition
                     img.style.zIndex = String(Date.now())
                     previewRef.current.appendChild(img)
                     gsap.to(img, { scale: 1, duration: 0.4, ease: 'power2.out' })
@@ -323,8 +326,8 @@ const ArchiveSectionClient = ({ title, writeup, columns, items = [] }) => {
                                 href={item.href}
                                 className={styles.item}
                                 key={item.id}
-                                onMouseEnter={() => createPreviewImage(item.previewImage)}
-                                onFocus={() => createPreviewImage(item.previewImage)}
+                                onMouseEnter={() => createPreviewImage(item.previewImage, item.previewPosition)}
+                                onFocus={() => createPreviewImage(item.previewImage, item.previewPosition)}
                             >
                                 <div className={styles.itemName}>
                                     <div className={styles.revealer}>

@@ -21,7 +21,8 @@ const mapCategory = (category) => ({
     name: category.name,
     metaLabel: category.collectionLabel,
     secondaryLabel: String(category.year),
-    previewImage: category.previewImage
+    previewImage: category.previewImage,
+    previewPosition: category.previewPosition
 })
 
 const mapColor = (color) => ({

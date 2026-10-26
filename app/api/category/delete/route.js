@@ -1,16 +1,13 @@
-import { revalidateTag } from "next/cache";
+import { revalidateCatalogue } from "@/lib/catalogueCache";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import mongoose from "mongoose";
 import CategoryModel from "@/models/Category.model";
 
-// Trashing/restoring/deleting a category changes the shop filter list and the
-// homepage "Categories" section, so both storefront caches must be dropped.
-const revalidateCategoryCaches = () => {
-    revalidateTag('storefront-shop-filters')
-    revalidateTag('storefront-home-categories')
-}
+// Trashing/restoring/deleting a category changes shop filters, homepage tiles,
+// landing pages, product canonical URLs and the sitemap.
+const revalidateCategoryCaches = () => revalidateCatalogue()
 
 export async function PUT(request) {
     try {
@@ -77,7 +74,7 @@ export async function DELETE(request) {
             return response(false, 404, 'Data not found.')
         }
 
-        if (!deleteType === 'PD') {
+        if (deleteType !== 'PD') {
             return response(false, 400, 'Invalid delet operation. Delete type should be PD for this route.')
         }
 

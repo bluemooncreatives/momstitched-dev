@@ -3,6 +3,7 @@ import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/authentication";
 import { isValidObjectId } from "mongoose";
 import CategoryModel from "@/models/Category.model";
+import "@/models/Media.model";
 
 export async function GET(request, { params }) {
     try {
@@ -26,12 +27,16 @@ export async function GET(request, { params }) {
 
         filter._id = id
 
-        const getCategory = await CategoryModel.findOne(filter).lean()
+        const getCategory = await CategoryModel.findOne(filter)
+            .populate('coverImage', '_id secure_url alt deletedAt deletingAt')
+            .lean()
 
         if (!getCategory) {
             return response(false, 404, 'Category not found.')
         }
 
+        // The populated cover is null if its media was permanently deleted;
+        // trashed covers come back with deletedAt so the form can flag them.
         return response(true, 200, 'Category found.', getCategory)
 
     } catch (error) {

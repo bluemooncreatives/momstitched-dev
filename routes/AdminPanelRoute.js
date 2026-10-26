@@ -55,6 +55,9 @@ export const ADMIN_REVIEW_SHOW = '/admin/review'
 // Testimonial route (homepage "Customer Reviews" / "What They Say" section)
 export const ADMIN_TESTIMONIAL_SHOW = '/admin/testimonial'
 
+// Page content (CMS)
+export const ADMIN_PAGES_ABOUT = '/admin/pages/about-us'
+
 // orders routes  
 
 export const ADMIN_ORDER_SHOW = '/admin/orders'
