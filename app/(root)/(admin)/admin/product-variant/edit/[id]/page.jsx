@@ -1,6 +1,7 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import PageHeader from '@/components/Application/Admin/PageHeader'
+import AdminRecordState from '@/components/Application/Admin/AdminRecordState'
 import { ADMIN_DASHBOARD, ADMIN_PRODUCT_VARIANT_SHOW } from '@/routes/AdminPanelRoute'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -31,7 +32,7 @@ const EditProductVariant = ({ params }) => {
   const [loading, setLoading] = useState(false)
   const [productOption, setProductOption] = useState([])
   const { data: getProduct } = useFetch('/api/product?deleteType=SD&&size=10000')
-  const { data: getVariant } = useFetch(`/api/product-variant/get/${id}`)
+  const { data: getVariant, error: recordError, errorStatus: recordErrorStatus, refetch: refetchRecord } = useFetch(`/api/product-variant/get/${id}`)
 
   const [open, setOpen] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState([])
@@ -126,6 +127,20 @@ const EditProductVariant = ({ params }) => {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (recordError) {
+    return (
+      <AdminRecordState
+        entity="Product variant"
+        error={recordError}
+        errorStatus={recordErrorStatus}
+        onRetry={refetchRecord}
+        backHref={ADMIN_PRODUCT_VARIANT_SHOW}
+        backLabel="Back to variants"
+        header={{ title: 'Edit Product Variant', description: 'Update variant details, pricing, and media.', breadcrumb: <BreadCrumb breadcrumbData={breadcrumbData} /> }}
+      />
+    )
   }
 
   return (

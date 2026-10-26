@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,11 +21,13 @@ import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import PageHeader from '@/components/Application/Admin/PageHeader'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { zSchema } from '@/lib/zodSchema'
 import { showToast } from '@/lib/showToast'
+import { cn } from '@/lib/utils'
 import { ADMIN_DASHBOARD, ADMIN_TESTIMONIAL_SHOW } from '@/routes/AdminPanelRoute'
 
 const breadcrumbData = [
@@ -34,6 +36,25 @@ const breadcrumbData = [
 ]
 
 const formSchema = zSchema.pick({ name: true, review: true, testimonialRating: true })
+
+const STATUS_FILTERS = [
+  { value: 'all', label: 'All' },
+  { value: 'live', label: 'Live' },
+  { value: 'draft', label: 'Draft' },
+]
+
+const StatusBadge = ({ live }) => (
+  <span
+    className={cn(
+      'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide',
+      live
+        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+        : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
+    )}
+  >
+    {live ? 'Live' : 'Draft'}
+  </span>
+)
 
 // Inline 1–5 star picker wired into react-hook-form.
 const StarPicker = ({ value, onChange }) => (
@@ -64,6 +85,24 @@ const ShowTestimonials = () => {
   const [orderDirty, setOrderDirty] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [busyId, setBusyId] = useState(null)
+  const [statusFilter, setStatusFilter] = useState('all')
+  // New testimonials only; existing ones are published/unpublished from the list.
+  const [publishNow, setPublishNow] = useState(true)
+
+  const counts = useMemo(() => {
+    const live = testimonials.filter((t) => t.isActive).length
+    return { all: testimonials.length, live, draft: testimonials.length - live }
+  }, [testimonials])
+
+  const visibleTestimonials = useMemo(() => {
+    if (statusFilter === 'live') return testimonials.filter((t) => t.isActive)
+    if (statusFilter === 'draft') return testimonials.filter((t) => !t.isActive)
+    return testimonials
+  }, [testimonials, statusFilter])
+
+  // Reordering a filtered subset would be ambiguous (where do the hidden rows
+  // go?), so the arrows only work on the full list.
+  const canReorder = statusFilter === 'all'
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -92,6 +131,7 @@ const ShowTestimonials = () => {
   const resetForm = () => {
     form.reset({ name: '', review: '', testimonialRating: 5 })
     setEditingId(null)
+    setPublishNow(true)
   }
 
   const startEdit = (testimonial) => {
@@ -110,7 +150,7 @@ const ShowTestimonials = () => {
       const isEdit = Boolean(editingId)
       const { data } = isEdit
         ? await axios.put('/api/testimonial/update', { _id: editingId, ...values })
-        : await axios.post('/api/testimonial', values)
+        : await axios.post('/api/testimonial', { ...values, isActive: publishNow })
       if (!data.success) throw new Error(data.message)
       showToast('success', data.message)
       resetForm()
@@ -133,6 +173,7 @@ const ShowTestimonials = () => {
       setTestimonials((prev) =>
         prev.map((t) => (t._id === testimonial._id ? { ...t, isActive: !t.isActive } : t))
       )
+      showToast('success', data.message)
     } catch (error) {
       showToast('error', error.message)
     } finally {
@@ -249,13 +290,21 @@ const ShowTestimonials = () => {
               )}
             />
 
+            {!editingId && (
+              <label className="flex w-fit cursor-pointer items-center gap-2 text-sm">
+                <Checkbox checked={publishNow} onCheckedChange={(value) => setPublishNow(value === true)} />
+                Publish immediately
+                <span className="text-muted-foreground">(untick to save as a draft)</span>
+              </label>
+            )}
+
             <div className="flex items-center gap-2">
               <ButtonLoading
                 loading={submitting}
                 type="submit"
                 text={
                   <span className="inline-flex items-center gap-2">
-                    <Plus className="size-4" /> {editingId ? 'Update Testimonial' : 'Add Testimonial'}
+                    <Plus className="size-4" /> {editingId ? 'Update Testimonial' : publishNow ? 'Publish Testimonial' : 'Save Draft'}
                   </span>
                 }
                 className="h-9"
@@ -272,12 +321,32 @@ const ShowTestimonials = () => {
 
       {/* Current testimonials */}
       <div className="rounded-md bg-card p-4 sm:p-6">
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold">Current testimonials</h3>
             <p className="text-sm text-muted-foreground">
-              Reorder with the arrows; hidden entries are not shown on the storefront.
+              Only live testimonials appear on the storefront. {canReorder ? 'Reorder with the arrows.' : 'Switch to "All" to reorder.'}
             </p>
+          </div>
+          <div role="tablist" aria-label="Filter by status" className="inline-flex h-9 items-center rounded-md border bg-background p-0.5">
+            {STATUS_FILTERS.map((filter) => (
+              <button
+                key={filter.value}
+                type="button"
+                role="tab"
+                aria-selected={statusFilter === filter.value}
+                onClick={() => setStatusFilter(filter.value)}
+                className={cn(
+                  'inline-flex h-full items-center gap-1.5 rounded-sm px-3 text-sm font-medium transition-colors',
+                  statusFilter === filter.value ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {filter.label}
+                <span className="rounded-full bg-background px-1.5 text-xs tabular-nums text-muted-foreground">
+                  {counts[filter.value]}
+                </span>
+              </button>
+            ))}
           </div>
           {orderDirty && (
             <ButtonLoading
@@ -300,9 +369,18 @@ const ShowTestimonials = () => {
               Until then the storefront shows a default set so the section never appears empty.
             </p>
           </div>
+        ) : visibleTestimonials.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            {statusFilter === 'draft'
+              ? 'No drafts. Every testimonial is live.'
+              : 'Nothing is live. The homepage section stays hidden until you publish one.'}
+          </p>
         ) : (
           <ul className="flex flex-col gap-2">
-            {testimonials.map((testimonial, index) => (
+            {visibleTestimonials.map((testimonial) => {
+              // Rank in the full list, so numbers don't shift when filtering.
+              const index = testimonials.indexOf(testimonial)
+              return (
               <li
                 key={testimonial._id}
                 className={`flex items-start gap-3 rounded-md border p-3 ${
@@ -329,11 +407,7 @@ const ShowTestimonials = () => {
                         />
                       ))}
                     </span>
-                    {!testimonial.isActive && (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                        Hidden
-                      </span>
-                    )}
+                    <StatusBadge live={testimonial.isActive} />
                   </div>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                     {testimonial.review}
@@ -346,7 +420,7 @@ const ShowTestimonials = () => {
                     variant="outline"
                     size="icon"
                     className="size-8"
-                    disabled={index === 0}
+                    disabled={!canReorder || index === 0}
                     onClick={() => move(index, -1)}
                     aria-label="Move up"
                   >
@@ -357,7 +431,7 @@ const ShowTestimonials = () => {
                     variant="outline"
                     size="icon"
                     className="size-8"
-                    disabled={index === testimonials.length - 1}
+                    disabled={!canReorder || index === testimonials.length - 1}
                     onClick={() => move(index, 1)}
                     aria-label="Move down"
                   >
@@ -366,14 +440,13 @@ const ShowTestimonials = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    size="icon"
-                    className="size-8"
+                    className="h-8 px-2.5 text-xs"
                     disabled={busyId === testimonial._id}
                     onClick={() => toggleActive(testimonial)}
-                    aria-label={testimonial.isActive ? 'Hide testimonial' : 'Show testimonial'}
-                    title={testimonial.isActive ? 'Hide from storefront' : 'Show on storefront'}
+                    title={testimonial.isActive ? 'Move to drafts (hide from storefront)' : 'Publish to the storefront'}
                   >
-                    {testimonial.isActive ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+                    {testimonial.isActive ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    {testimonial.isActive ? 'Unpublish' : 'Publish'}
                   </Button>
                   <Button
                     type="button"
@@ -398,7 +471,8 @@ const ShowTestimonials = () => {
                   </Button>
                 </div>
               </li>
-            ))}
+              )
+            })}
           </ul>
         )}
       </div>

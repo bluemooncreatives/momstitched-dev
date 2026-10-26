@@ -1,6 +1,7 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import PageHeader from '@/components/Application/Admin/PageHeader'
+import AdminRecordState from '@/components/Application/Admin/AdminRecordState'
 import ButtonLoading from '@/components/Application/ButtonLoading'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -32,7 +33,7 @@ const breadCrumbData = [
 
 const EditMedia = ({ params }) => {
     const { id } = use(params)
-    const { data: mediaData } = useFetch(`/api/media/get/${id}`)
+    const { data: mediaData, error: recordError, errorStatus: recordErrorStatus, refetch: refetchRecord } = useFetch(`/api/media/get/${id}`)
     const [loading, setLoading] = useState(false)
 
     const formSchema = zSchema.pick({
@@ -78,6 +79,20 @@ const EditMedia = ({ params }) => {
         }
     }
 
+
+    if (recordError) {
+      return (
+        <AdminRecordState
+          entity="Media"
+          error={recordError}
+          errorStatus={recordErrorStatus}
+          onRetry={refetchRecord}
+          backHref={ADMIN_MEDIA_SHOW}
+          backLabel="Back to media"
+          header={{ title: 'Edit Media', description: 'Update alt text and title metadata.', breadcrumb: <BreadCrumb breadcrumbData={breadCrumbData} /> }}
+        />
+      )
+    }
 
     return (
         <div className="flex flex-col gap-4 sm:gap-6">

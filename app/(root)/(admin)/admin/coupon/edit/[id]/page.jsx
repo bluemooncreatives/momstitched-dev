@@ -1,6 +1,7 @@
 'use client'
 import BreadCrumb from '@/components/Application/Admin/BreadCrumb'
 import PageHeader from '@/components/Application/Admin/PageHeader'
+import AdminRecordState from '@/components/Application/Admin/AdminRecordState'
 import { ADMIN_COUPON_SHOW, ADMIN_DASHBOARD, } from '@/routes/AdminPanelRoute'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -24,7 +25,7 @@ const breadcrumbData = [
 const EditCoupon = ({ params }) => {
   const { id } = use(params)
   const [loading, setLoading] = useState(false)
-  const { data: getCouponData } = useFetch(`/api/coupon/get/${id}`)
+  const { data: getCouponData, error: recordError, errorStatus: recordErrorStatus, refetch: refetchRecord } = useFetch(`/api/coupon/get/${id}`)
 
   const formSchema = zSchema.pick({
     _id: true,
@@ -74,6 +75,20 @@ const EditCoupon = ({ params }) => {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (recordError) {
+    return (
+      <AdminRecordState
+        entity="Coupon"
+        error={recordError}
+        errorStatus={recordErrorStatus}
+        onRetry={refetchRecord}
+        backHref={ADMIN_COUPON_SHOW}
+        backLabel="Back to coupons"
+        header={{ title: 'Edit Coupon', description: 'Update coupon rules and validity dates.', breadcrumb: <BreadCrumb breadcrumbData={breadcrumbData} /> }}
+      />
+    )
   }
 
   return (
