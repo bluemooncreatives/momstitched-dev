@@ -5,8 +5,8 @@ const TestimonialClient = dynamic(() => import('./TestimonialClient'))
 
 // Starter set shown only until the admin creates their first testimonial, so
 // a fresh store's homepage "What They Say" section isn't an empty gap. Once
-// any testimonial exists (live or draft) these are never shown again — if the
-// admin unpublishes everything, the section is hidden instead.
+// any testimonial has been created these are never shown again — if the admin
+// unpublishes or deletes everything, the section is hidden instead.
 const DEFAULT_TESTIMONIALS = [
     { name: 'Sophia Patel', review: "This product exceeded my expectations. The quality is top-notch and it arrived much faster than I anticipated. I will definitely be recommending it to my friends and family.", rating: 5 },
     { name: 'James Thompson', review: "Customer service was extremely helpful and responsive. They guided me through every step of the process. I'm very satisfied with the support I received.", rating: 4 },
