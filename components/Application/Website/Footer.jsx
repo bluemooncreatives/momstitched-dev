@@ -9,10 +9,9 @@ import { MapPin, Mail, Instagram, Facebook, Twitter, Globe, ArrowRight } from 'l
 
 import { USER_DASHBOARD, WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
 import FooterWordmark from '@/components/Application/Website/FooterWordmark'
+import { CONTACT_EMAIL, SOCIAL_PROFILES } from '@/lib/seo'
 
 gsap.registerPlugin(ScrollTrigger)
-
-const CONTACT_EMAIL = 'momstitched.official@gmail.com'
 
 // Shown when the catalogue has no categories yet, so the column is never empty.
 const fallbackCategoryLinks = [
@@ -36,9 +35,9 @@ const helpLinks = [
 ]
 
 const socialLinks = [
-    { label: 'Instagram', href: 'https://www.instagram.com/mom.stitched', Icon: Instagram },
-    { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=100087738263074', Icon: Facebook },
-    { label: 'X (Twitter)', href: 'https://twitter.com/momstitched', Icon: Twitter },
+    { label: 'Instagram', href: SOCIAL_PROFILES.instagram, Icon: Instagram },
+    { label: 'Facebook', href: SOCIAL_PROFILES.facebook, Icon: Facebook },
+    { label: 'X (Twitter)', href: SOCIAL_PROFILES.twitter, Icon: Twitter },
 ]
 
 const LinkColumn = ({ title, links }) => (

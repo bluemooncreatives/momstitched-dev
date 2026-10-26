@@ -79,10 +79,12 @@ export async function POST(request) {
             review,
             rating: testimonialRating,
             sortOrder: nextOrder,
+            // Optional "save as draft"; anything but an explicit false publishes.
+            isActive: payload?.isActive !== false,
         })
 
         revalidateTag(TESTIMONIALS_TAG)
-        return response(true, 200, 'Testimonial added.')
+        return response(true, 200, payload?.isActive === false ? 'Testimonial saved as draft.' : 'Testimonial published.')
     } catch (error) {
         return catchError(error)
     }

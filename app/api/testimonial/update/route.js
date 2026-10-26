@@ -9,7 +9,7 @@ import TestimonialModel from "@/models/Testimonial.model"
 
 // PUT — update a single testimonial. Supports two intents from one endpoint:
 //   • Full edit: { _id, name, review, testimonialRating }
-//   • Quick active toggle: { _id, isActive }
+//   • Publish / unpublish (Live ↔ Draft): { _id, isActive }
 // Only the fields present in the payload are applied, so the toggle never has
 // to resend (and re-validate) the whole record.
 export async function PUT(request) {
@@ -69,7 +69,10 @@ export async function PUT(request) {
         }
 
         revalidateTag(TESTIMONIALS_TAG)
-        return response(true, 200, 'Testimonial updated.')
+        const message = !hasContent && 'isActive' in update
+            ? (update.isActive ? 'Testimonial published.' : 'Testimonial moved to drafts.')
+            : 'Testimonial updated.'
+        return response(true, 200, message)
     } catch (error) {
         return catchError(error)
     }

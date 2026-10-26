@@ -3,10 +3,10 @@ import { getTestimonials } from '@/lib/services/testimonialService'
 
 const TestimonialClient = dynamic(() => import('./TestimonialClient'))
 
-// Fallback shown only when the admin has not added (or has hidden all)
-// testimonials. Keeping a default set means the homepage "What They Say"
-// section never collapses to an empty gap — the moment the admin adds real
-// testimonials in the panel, these are replaced automatically.
+// Starter set shown only until the admin creates their first testimonial, so
+// a fresh store's homepage "What They Say" section isn't an empty gap. Once
+// any testimonial exists (live or draft) these are never shown again — if the
+// admin unpublishes everything, the section is hidden instead.
 const DEFAULT_TESTIMONIALS = [
     { name: 'Sophia Patel', review: "This product exceeded my expectations. The quality is top-notch and it arrived much faster than I anticipated. I will definitely be recommending it to my friends and family.", rating: 5 },
     { name: 'James Thompson', review: "Customer service was extremely helpful and responsive. They guided me through every step of the process. I'm very satisfied with the support I received.", rating: 4 },
@@ -22,16 +22,22 @@ const DEFAULT_TESTIMONIALS = [
 
 const Testimonial = async () => {
     let testimonials = []
+    let hasAny = false
     try {
-        testimonials = await getTestimonials()
+        ({ testimonials, hasAny } = await getTestimonials())
     } catch {
-        // A transient DB error must not take down the homepage — fall back below.
-        testimonials = []
+        // A transient DB error must not take down the homepage — hide the section.
+        return null
     }
 
-    const items = testimonials && testimonials.length > 0 ? testimonials : DEFAULT_TESTIMONIALS
+    if (testimonials?.length > 0) {
+        return <TestimonialClient testimonials={testimonials} />
+    }
 
-    return <TestimonialClient testimonials={items} />
+    // Every testimonial is a draft: respect that rather than showing samples.
+    if (hasAny) return null
+
+    return <TestimonialClient testimonials={DEFAULT_TESTIMONIALS} />
 }
 
 export default Testimonial

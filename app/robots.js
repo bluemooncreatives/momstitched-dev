@@ -1,4 +1,4 @@
-const BASE_URL = 'https://www.momstitched.com'
+import { SITE_URL } from '@/lib/seo'
 
 export default function robots() {
     return {
@@ -22,6 +22,6 @@ export default function robots() {
                 ],
             },
         ],
-        sitemap: `${BASE_URL}/sitemap.xml`,
+        sitemap: `${SITE_URL}/sitemap.xml`,
     }
 }

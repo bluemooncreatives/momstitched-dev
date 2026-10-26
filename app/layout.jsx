@@ -2,9 +2,10 @@ import GlobalProvider from "@/components/Application/GlobalProvider";
 import LenisProvider from '@/components/Application/LenisProvider'
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import { SITE_URL } from "@/lib/seo";
 
 export const metadata = {
-  metadataBase: new URL('https://www.momstitched.com'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'MomStitched - Handcrafted Women\'s Ethnic Wear',
     template: '%s | MomStitched',
@@ -29,7 +30,7 @@ export const metadata = {
     title: 'MomStitched - Handcrafted Women\'s Ethnic Wear',
     description:
       "From everyday comfort to festive charm, MomStitched brings you handcrafted women's ethnic wear — designs that make you shine effortlessly.",
-    url: 'https://www.momstitched.com',
+    url: SITE_URL,
     images: [
       {
         url: '/assets/images/hero/01.webp',
