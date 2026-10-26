@@ -1,4 +1,6 @@
+import { Suspense } from 'react'
 import ProductDetails from './ProductDetails'
+import ProductLoading from './ProductLoading'
 import { getRelatedProducts } from '@/lib/services/productService'
 import { htmlToText, pickRandom } from '@/lib/utils'
 import JsonLd from '@/components/Application/JsonLd'
@@ -51,7 +53,15 @@ export const productMetadata = (productData) => {
     }
 }
 
-export const ProductPageView = async ({ productData }) => {
+// Rendered by the route only after its redirect / not-found checks, so those
+// still produce real 308 / 404 responses; the skeleton covers the rest.
+export const ProductPageView = ({ productData }) => (
+    <Suspense fallback={<ProductLoading />}>
+        <ProductPageContent productData={productData} />
+    </Suspense>
+)
+
+const ProductPageContent = async ({ productData }) => {
     // Fetch the cached pool, then randomly pick 4 so the rail varies each visit.
     const relatedPool = await getRelatedProducts(
         productData.product._id,

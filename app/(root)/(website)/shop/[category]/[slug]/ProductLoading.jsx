@@ -3,6 +3,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 // Mirrors ProductDetails' gallery + buy box. Shown when opening a product;
 // switching color/size on the same product keeps the page mounted and uses
 // the inline swatch spinner instead.
+//
+// Used as a <Suspense> fallback inside the product pages, NOT as loading.jsx:
+// a route-level loading boundary starts streaming a 200 before the page can
+// 308 an old slug or 404 a missing product.
 const ProductLoading = () => {
     return (
         <section
