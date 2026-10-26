@@ -1,9 +1,10 @@
-import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
 import { zSchema } from "@/lib/zodSchema"
 import { validatePricing } from "@/lib/pricing"
+import { revalidateCatalogue } from "@/lib/catalogueCache"
+import { productSaveProblem } from "@/lib/productSave"
 import ProductModel from "@/models/Product.model"
 import { encode } from "entities"
 
@@ -48,6 +49,9 @@ export async function POST(request) {
             return response(false, 400, pricing.message)
         }
 
+        const problem = await productSaveProblem(productData)
+        if (problem) return response(false, problem.status, problem.message)
+
         const newProduct = new ProductModel({
             name: productData.name,
             parentSku: productData.parentSku,
@@ -63,12 +67,7 @@ export async function POST(request) {
 
         await newProduct.save()
 
-        // The Freshly Arrived section tops up with the newest products, so a new
-        // product can change what it shows — refresh that cache.
-        revalidateTag('storefront-freshly-arrived-products')
-        // A new product changes its category's product count and may become the
-        // representative image for the homepage "Categories" section.
-        revalidateTag('storefront-home-categories')
+        revalidateCatalogue()
 
         return response(true, 200, 'Product added successfully.', { _id: newProduct._id })
 

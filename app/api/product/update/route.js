@@ -1,10 +1,11 @@
-import { revalidateTag } from "next/cache"
 import { isAuthenticated } from "@/lib/authentication"
 import { connectDB } from "@/lib/databaseConnection"
 import { catchError, response } from "@/lib/helperFunction"
 import { zSchema } from "@/lib/zodSchema"
 import { validatePricing } from "@/lib/pricing"
+import { revalidateCatalogue } from "@/lib/catalogueCache"
 import ProductModel from "@/models/Product.model"
+import { productSaveProblem } from "@/lib/productSave"
 import { encode } from "entities"
 
 export async function PUT(request) {
@@ -52,8 +53,12 @@ export async function PUT(request) {
             return response(false, 404, 'Data not found.')
         }
 
+        const problem = await productSaveProblem(validatedData)
+        if (problem) return response(false, problem.status, problem.message)
+
         getProduct.name = validatedData.name
-        getProduct.slug = validatedData.slug
+        // Keeps the outgoing slug in routeSlugs so its URL redirects here.
+        getProduct.changeSlug(validatedData.slug)
         getProduct.category = validatedData.category
         if (hasSizeGuide) {
             getProduct.sizeGuide = validatedData.sizeGuide ?? null
@@ -65,9 +70,7 @@ export async function PUT(request) {
         getProduct.media = validatedData.media
         await getProduct.save()
 
-        // Re-categorising a product or changing its media can change category
-        // counts and the homepage "Categories" representative image.
-        revalidateTag('storefront-home-categories')
+        revalidateCatalogue()
 
         return response(true, 200, 'Product updated successfully.')
 

@@ -19,6 +19,13 @@ const productSchema = new mongoose.Schema({
         lowercase: true,
         trim: true
     },
+    // Every slug this product used before. Old URLs resolve through these and
+    // 308 to the current one, so renaming a product never breaks a shared or
+    // indexed link. Managed by changeSlug() — don't edit directly.
+    routeSlugs: {
+        type: [{ type: String, lowercase: true, trim: true }],
+        default: [],
+    },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
@@ -84,6 +91,15 @@ const productSchema = new mongoose.Schema({
 
 
 productSchema.index({ category: 1 })
+productSchema.index({ routeSlugs: 1 })
+
+productSchema.methods.changeSlug = function (nextSlug) {
+    const next = String(nextSlug).trim().toLowerCase()
+    if (next === this.slug) return
+    // Remember the outgoing slug; renaming back to an old slug reclaims it.
+    this.routeSlugs = [...new Set([...(this.routeSlugs || []), this.slug])].filter((slug) => slug && slug !== next)
+    this.slug = next
+}
 // Drives the storefront Bestsellers query: active bestsellers, ordered by rank.
 productSchema.index({ isBestseller: 1, deletedAt: 1, bestsellerSortOrder: 1 })
 // Drives the storefront Freshly Arrived query: active picks, ordered by rank.
